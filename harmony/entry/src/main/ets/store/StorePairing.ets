@@ -1,4 +1,4 @@
-export const STORE_DOWNLOAD_URL: string = 'https://github.com/He-He-He-He-He-He/yingqiao-store';
+export const STORE_DOWNLOAD_URL: string = 'https://github.com/5zhangxuanhao5/yingqiao-store';
 export interface StorePairing { schema: string; token: string; cert: string; host: string; port: number; udpPort: number; codecs: string[]; }
 export function localIPv4(host: string): boolean {
  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) { return false; }

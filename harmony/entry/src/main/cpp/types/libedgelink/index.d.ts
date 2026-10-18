@@ -65,3 +65,7 @@ export const rtcPush: (session: string, record: ArrayBuffer) => boolean;
 export const rtcSignal: (session: string, json: string) => boolean;
 
 export const storeProfile: (width:number,height:number,codec:string,refresh?:number)=>string;
+
+export const storeLinkStart: (host:string,certificate:string)=>boolean;
+export const storeLinkStatus: ()=>string;
+export const storeLinkCancel: ()=>void;

@@ -13,7 +13,7 @@ inline StartResult Start(ControlPipe&pipe,bool consent,const std::string&session
  if(!consent)return StartResult::permissionRequired;
  if(sessionSerial.empty()||sessionSerial.size()>64||sessionSerial.find('\0')!=std::string::npos)return StartResult::transferFailed;
  const auto version=ProtocolVersion(pipe);if(version<1||version>2)return StartResult::unsupported;
- const std::array<std::string,6>identity={"Yingqiao","Yingqiao Display Link","Paired display transport","1","https://github.com/He-He-He-He-He-He/yingqiao-store",sessionSerial};
+ const std::array<std::string,6>identity={"Yingqiao","Yingqiao Display Link","Paired display transport","1","https://github.com/5zhangxuanhao5/yingqiao-store",sessionSerial};
  for(size_t i=0;i<identity.size();++i){std::vector<uint8_t>data(identity[i].begin(),identity[i].end());data.push_back(0);if(data.size()>256||!pipe.transfer(0x40,52,uint16_t(i),data))return StartResult::transferFailed;}
  std::vector<uint8_t>none;if(!pipe.transfer(0x40,53,0,none))return StartResult::transferFailed;return StartResult::waitingForReenumeration;
 }

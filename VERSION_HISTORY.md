@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.3-test.1
+
+Move the public project to 5zhangxuanhao5/yingqiao-store, preserve all history and tags, restore the accepted personal-edition dashboard theme and tablet card layout. Replace QR/manual configuration with mDNS/Bonjour discovery, strict pinned TLS bootstrap and one-time Mac approval after comparing a TLS-exporter-derived code. Remember approved credentials locally. Consumer USB remains incomplete and AppGallery submission is paused. Device deployment evidence is recorded separately; private profiles stay outside public archives.
+
 ## store-v0.1.2-test.1
 
 Owner requested a pause in AppGallery publication and named test installation on current Mac and MatePad. Rename both launchers to 映桥测试版, bump independent packages to 0.1.2 (3), preserve personal identities/configuration, and document local-only test scope. Consumer USB remains unfinished. Device-bound signing profiles stay outside public source and releases.
