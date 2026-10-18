@@ -4,3 +4,6 @@
 
 实测：mDNS启动返回0，但未收到serviceFound；0.1.5增加独立局域网UDP探测并保留mDNS。探测窗口15秒后关闭，不持续轮询。
 USB只读探测：旧IOKit适配器无法打开设备，未发模式切换或重枚举指令；不能据此宣称设备不支持配件模式。
+
+## store-v0.1.5-diagnostic.1
+Mac的UDP发现增加仅阶段/时间的本机诊断文件，不记录IP、名称或凭据。候选未验收。释放HDC宿主占用后，现代IOUSBHost可打开设备；只读AOA GetProtocol请求失败，零字节、IOReturn=-536850432。没有发送AOA启动、重置、抢占或配置指令，已恢复HDC服务。

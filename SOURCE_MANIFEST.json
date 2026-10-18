@@ -96,8 +96,8 @@
   },
   {
     "path": "docs/DISCOVERY_DIAGNOSTIC.md",
-    "bytes": 607,
-    "sha256": "b69de8c5a64d6268cfa31ebab2cc31d9c23af6db5a3ae5321093769d18145b5b"
+    "bytes": 957,
+    "sha256": "57f9e0373dda58c5b342e10e516f638c0dabfddac2066dbb0f223c674dc687e2"
   },
   {
     "path": "docs/MAC_INSTALL.md",
@@ -556,8 +556,8 @@
   },
   {
     "path": "mac/Sources/StoreDiscovery.swift",
-    "bytes": 5581,
-    "sha256": "0ff19e4b57518feac9a0234efc82784b4cebe62f8e9a3e41d214345e27582ca8"
+    "bytes": 6287,
+    "sha256": "d9ccbae69dc672b3378ef1e46b206f1968db08c5a0c573f8ac34928a5b1d5d24"
   },
   {
     "path": "mac/Sources/StoreIdentity.swift",

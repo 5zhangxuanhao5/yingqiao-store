@@ -36,6 +36,9 @@ extension StoreHost:NetServiceDelegate {
 }
 
 extension StoreHost {
+ func discoveryHealth(_ stage:String){
+  if let data=try? JSONSerialization.data(withJSONObject:["stage":stage,"time":Date().timeIntervalSince1970]){try? data.write(to:StoreIdentity.directory.appendingPathComponent("discovery-health.json"),options:.atomic)}
+ }
  // Independent, bounded LAN probe for Wi-Fi networks that suppress mDNS.
  // This reply is public identity only; LINK approval still authenticates TLS.
  func startDatagramDiscovery(_ identity:StoreIdentity){
@@ -43,21 +46,21 @@ extension StoreHost {
   do{
    let listener=try NWListener(using:.udp,on:49565);discoveryListener=listener
    listener.newConnectionHandler={[weak self] connection in
-    guard let self,case let .hostPort(host,_)=connection.endpoint,privateLANAddress(host.debugDescription),self.discoveryPeers.count<16 else{connection.cancel();return}
+    self?.discoveryHealth("packet_arrived");guard let self,case let .hostPort(host,_)=connection.endpoint,privateLANAddress(host.debugDescription),self.discoveryPeers.count<16 else{self?.discoveryHealth("endpoint_rejected");connection.cancel();return};self.discoveryHealth("endpoint_accepted")
     let key=ObjectIdentifier(connection);self.discoveryPeers[key]=connection;connection.start(queue:.main)
     connection.receiveMessage{[weak self] data,_,_,_ in
      
-     guard let self,let data,data.count<80,let query=String(data:data,encoding:.utf8),query.hasPrefix("YQDISC1 ") else{return}
-     let nonce=String(query.dropFirst(8));guard nonce.count==32,nonce.allSatisfy({$0.isHexDigit && !$0.isUppercase}) else{return}
-     let now=Date();self.discoveryRates=self.discoveryRates.filter{now.timeIntervalSince($0.value)<10}
+     self?.discoveryHealth("message_received");guard let self,let data,data.count<80,let query=String(data:data,encoding:.utf8),query.hasPrefix("YQDISC1 ") else{return}
+     self.discoveryHealth("query_prefix_valid");let nonce=String(query.dropFirst(8));guard nonce.count==32,nonce.allSatisfy({$0.isHexDigit && !$0.isUppercase}) else{return}
+     self.discoveryHealth("nonce_valid");let now=Date();self.discoveryRates=self.discoveryRates.filter{now.timeIntervalSince($0.value)<10}
      let address=host.debugDescription;guard self.discoveryRates.count<64,self.discoveryRates[address].map({now.timeIntervalSince($0)>=0.5}) ?? true else{return};self.discoveryRates[address]=now
      let id=String(hex(Data(SHA256.hash(data:Data(identity.certificate.utf8)))).prefix(24))
      let reply:[String:Any]=["schema":"store-discovery-v1","nonce":nonce,"id":id,"name":Host.current().localizedName ?? "Mac","certificate":identity.certificate,"port":49563]
-     if let bytes=try? JSONSerialization.data(withJSONObject:reply),bytes.count<=8192{connection.send(content:bytes,completion:.contentProcessed{[weak self] _ in connection.cancel();self?.discoveryPeers.removeValue(forKey:key)})}
+     if let bytes=try? JSONSerialization.data(withJSONObject:reply),bytes.count<=8192{self.discoveryHealth("reply_queued");connection.send(content:bytes,completion:.contentProcessed{[weak self] error in self?.discoveryHealth(error==nil ? "reply_sent":"reply_failed");connection.cancel();self?.discoveryPeers.removeValue(forKey:key)})}
     }
     DispatchQueue.main.asyncAfter(deadline:.now()+2){[weak self] in connection.cancel();self?.discoveryPeers.removeValue(forKey:key)}
    }
-   listener.stateUpdateHandler={[weak self] state in if case .failed=state{self?.discoveryListener=nil}}
+   listener.stateUpdateHandler={[weak self] state in if case .ready=state{self?.discoveryHealth("ready")};if case .failed=state{self?.discoveryHealth("listener_failed");self?.discoveryListener=nil}}
    listener.start(queue:.main)
   }catch{discoveryListener=nil}
  }
