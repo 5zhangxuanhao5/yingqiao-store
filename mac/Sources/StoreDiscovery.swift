@@ -28,7 +28,7 @@ extension StoreHost:NetServiceDelegate {
   statusMessage="平板正在请求连接，确认后自动保存此设备。"
   alert.beginSheetModal(for:window){[weak self,weak peer] response in
    guard let self,let peer,self.linkPeer===peer else{return};self.linkAlert=nil;self.linkPeer=nil
-   guard response == .alertFirstButtonReturn,!peer.closed,let host=StoreIdentity.addresses().first,let json=try? identity.pairingJSON(host:host) else{peer.send("ERR denied");self.statusMessage="未允许此次连接。";return}
+   guard response == .alertFirstButtonReturn,!peer.closed,let host=(peer.usb ? StoreUSB.address():StoreIdentity.addresses().first),let json=try? identity.pairingJSON(host:host) else{peer.send("ERR denied");self.statusMessage="未允许此次连接。";return}
    peer.send("LINKED "+json);self.statusMessage="已允许平板，正在建立扩展桌面。"
   }
   DispatchQueue.main.asyncAfter(deadline:.now()+45){[weak self,weak peer] in guard let self,let peer,self.linkPeer===peer else{return};self.clearLinkPrompt();peer.send("ERR timeout");peer.close();self.statusMessage="连接请求已到期，可在平板重新连接。"}
@@ -55,7 +55,7 @@ extension StoreHost {
      self.discoveryHealth("nonce_valid");let now=Date();self.discoveryRates=self.discoveryRates.filter{now.timeIntervalSince($0.value)<10}
      let address=host.debugDescription;guard self.discoveryRates.count<64,self.discoveryRates[address].map({now.timeIntervalSince($0)>=0.5}) ?? true else{return};self.discoveryRates[address]=now
      let id=String(hex(Data(SHA256.hash(data:Data(identity.certificate.utf8)))).prefix(24))
-     let reply:[String:Any]=["schema":"store-discovery-v1","nonce":nonce,"id":id,"name":Host.current().localizedName ?? "Mac","certificate":identity.certificate,"port":49563]
+     let reply:[String:Any]=["schema":"store-discovery-v1","nonce":nonce,"id":id,"name":Host.current().localizedName ?? "Mac","certificate":identity.certificate,"port":49563,"paths":StoreNetworkPath.publicRecords()]
      if let bytes=try? JSONSerialization.data(withJSONObject:reply),bytes.count<=8192{self.discoveryHealth("reply_queued");connection.send(content:bytes,completion:.contentProcessed{[weak self] error in self?.discoveryHealth(error==nil ? "reply_sent":"reply_failed");connection.cancel();self?.discoveryPeers.removeValue(forKey:key)})}
     }
     DispatchQueue.main.asyncAfter(deadline:.now()+2){[weak self] in connection.cancel();self?.discoveryPeers.removeValue(forKey:key)}

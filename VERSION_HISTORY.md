@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.12-test.1
+
+Candidate: retain the user-improved 0.1.11 media core, add a consumer-mode USB RNDIS adapter using IOUSBHost and BSD-licensed lwIP, a local-source-port-gated TLS bridge, USB public-identity discovery, and authenticated measured-path selection. Hardware verified RNDIS initialization and device receive counter, but no DHCP/ARP response yet; USB streaming and real handover are not accepted. No HDC provider, private WAN runtime, system driver, microphone permission or privileged helper is added. Original personal applications remain outside the build/install scope.
+
 ## store-v0.1.11-test.1
 
 User rejected 0.1.10 clarity and asked why the proven personal version was better. Retire the simplified capture/video sender. Port the accepted NativeCapture, bounded lifecycle, timing, cursor monitor, initial layout, and VideoSender LAN implementation, retaining raw-frame permits, two in-flight hardware encodes, measured window, timed encrypted framing and independent cursor records. Remove RTC provider branches and unsupported advertised capabilities; retain isolated TLS identity and one-click approval. Restore HiDPI=1 at half-size logical display mode and full panel pixel output. Add H.264 codec selection around the original HEVC path for capability fallback. Real M4 encoder setup passed at 3120x2080 for HEVC and AVC; this is not display/performance acceptance. Consumer USB, first discovery on multicast-suppressed campus networks and full hot-plug Sidecar recovery remain open.

@@ -1,0 +1,8 @@
+{
+  "project": "lwIP",
+  "version": "2.2.1",
+  "source": "https://download.savannah.nongnu.org/releases/lwip/lwip-2.2.1.zip",
+  "archiveSHA256": "7b622662dba2383d71f874f2e494b54ae948531559c17acbe75797966d646878",
+  "license": "BSD-3-Clause",
+  "selectedSource": "src/core, src/include, src/netif/ethernet.c; no upstream tests/apps"
+}

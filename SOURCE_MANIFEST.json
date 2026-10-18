@@ -6,8 +6,8 @@
   },
   {
     "path": ".github/workflows/compatibility.yml",
-    "bytes": 3773,
-    "sha256": "d0660a6faf67f9530e282512f17d94e3a57e3277649bc1fe1c0f4f13e6a3c863"
+    "bytes": 4015,
+    "sha256": "345765c94560885c1442697948eb86499bf10e41a3bde8c01332be87bb931b86"
   },
   {
     "path": ".gitignore",
@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 2247,
-    "sha256": "859061b0596eb854d6da183f883de52c95f463ce1c5a07f59711ea9c92e7c602"
+    "bytes": 2312,
+    "sha256": "2f78a52ef1198b3d5e35001d82aa7a19eec66ad080a0ea80121d9007dfca4f42"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -71,13 +71,13 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 1602,
-    "sha256": "b1fda59403fe6fd0a8840bf01bd8532c3a3e466808c0af102ab2bedd75daa568"
+    "bytes": 1903,
+    "sha256": "0709883071e27cdb284f88e18dfdb71e955f1c40370efc72b17df05cb159665e"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 6108,
-    "sha256": "30d7f4a1ceffe6f579663fe9dd09a64038be639b348b7333b063bcafb74006c1"
+    "bytes": 6702,
+    "sha256": "797c87b80bbd7d9d55a4aeabd8ebe03840420db03fcc1324d6c8f654749ff642"
   },
   {
     "path": "docs/ACCEPTED_CORE_PROVENANCE.json",
@@ -101,8 +101,8 @@
   },
   {
     "path": "docs/DISCOVERY_DIAGNOSTIC.md",
-    "bytes": 2115,
-    "sha256": "10dbd56fbb8f17b0f10196eecdde87efb0aa5dcc468a85f3e4ba1d0d6f3f913f"
+    "bytes": 2652,
+    "sha256": "c90ac15a3c4906f3985d4e36516c2e1d5c8e3e2df4970eac7e0c80025f339ec0"
   },
   {
     "path": "docs/MAC_INSTALL.md",
@@ -121,8 +121,8 @@
   },
   {
     "path": "docs/USB_AND_HANDOVER.md",
-    "bytes": 3943,
-    "sha256": "b445107d14b59c4132c40316be15fd60fdb9e7087b05d73d50a11471275dcf16"
+    "bytes": 5457,
+    "sha256": "1d694cecc8e1fee4185585119b5e26e96b392e0f6222c0b02dade3231499fafd"
   },
   {
     "path": "docs/compatibility-catalog.json",
@@ -137,7 +137,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 199,
-    "sha256": "6d77db3ef59ec5138f67376637e50cc94c8638a456db5e53b40fcf9654c995df"
+    "sha256": "ac256fb70e5317fd10567f24225a466596c1c3ec355ff696f7a947d605db9a13"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -181,8 +181,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/CMakeLists.txt",
-    "bytes": 1115,
-    "sha256": "47a38845068a4f78794f3e5de8f45044ddc1c6588359fe727e7a83d1924c5c72"
+    "bytes": 1131,
+    "sha256": "13a9e26d780b59c90cbb7fc76730ef15d8d47692fb2f98afe9ba02a3faba7dd3"
   },
   {
     "path": "harmony/entry/src/main/cpp/audio_crypto.cpp",
@@ -216,8 +216,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/client.cpp",
-    "bytes": 107062,
-    "sha256": "2f9f5841a6ab1d1d9064baa4f6d83ea25fafe0104cf0a5a4cd8cee71edc5aa34"
+    "bytes": 107146,
+    "sha256": "b2d59b8774703560434b9c386441445c7cdf9e36da064b040c79d3afa8995fb6"
   },
   {
     "path": "harmony/entry/src/main/cpp/clock_refresh.h",
@@ -380,6 +380,11 @@
     "sha256": "a98397e0dcefe9d09c223b71291c44f250ea91c9ed72c67ec508ad5d7fc96dc4"
   },
   {
+    "path": "harmony/entry/src/main/cpp/store_paths.cpp",
+    "bytes": 10114,
+    "sha256": "26d3ab5eae64beda2f8a657a4b2f61396e448169a83c3eb23e44f9fa81b139a5"
+  },
+  {
     "path": "harmony/entry/src/main/cpp/store_policy.h",
     "bytes": 780,
     "sha256": "13d3b9d6c46255821a2097b4cf474615149a48a7aef325c945a12af33bdf02ea"
@@ -391,8 +396,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/index.d.ts",
-    "bytes": 2883,
-    "sha256": "e0932bff920826b646f817e5e67a2f8f8eef8e36d58b98b91c1edc20274eda8e"
+    "bytes": 3186,
+    "sha256": "a4160a6f1faae7d8625230c3e06bc55ad9939335f59fd57abc80b97be6bf501b"
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/oh-package.json5",
@@ -411,8 +416,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 144419,
-    "sha256": "2454209fd7618af9089c6a43e9a1faddd1b9db58e6ecf1be2a850804ddfec26c"
+    "bytes": 147927,
+    "sha256": "3fc6c2fc2913469021230082c0f08339a8414da5b5bd5f6c1983f2fe118da10f"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -446,8 +451,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/store/StoreDiscovery.ets",
-    "bytes": 7539,
-    "sha256": "c611c69c28ca4db01f3b5da142de53aee5309eb0a6b1e59f487121c8b45c50e2"
+    "bytes": 8615,
+    "sha256": "6e50e05d63022b590cde082cf3643994330a6aff28570a16a618315edc4ee40e"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
@@ -527,7 +532,7 @@
   {
     "path": "mac/Info.plist",
     "bytes": 1019,
-    "sha256": "2a7632c36db3f93f537fe4213ff0f6cb4f2c2a8704a9128bb1bd75317bcefe34"
+    "sha256": "dbd7312c0729b8cb1dc022f8922655fab39b2f75f305d2c5613a5c86370285fd"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -581,8 +586,8 @@
   },
   {
     "path": "mac/Sources/CGVirtualDisplayPrivate.h",
-    "bytes": 3169,
-    "sha256": "d970f9ac54833030fe48f0e2deb2345797229e2ad89711af62d4072a6786afbf"
+    "bytes": 3199,
+    "sha256": "605b21d12dbb830d15fc38e13e5b1cf15de180e65bb957821e3cda0357e2348a"
   },
   {
     "path": "mac/Sources/Gesture.swift",
@@ -606,8 +611,8 @@
   },
   {
     "path": "mac/Sources/StoreDiscovery.swift",
-    "bytes": 6283,
-    "sha256": "ca4bb631974121b22eacd814882bfb3b6ceff189450706ac11e40d5b08b0b510"
+    "bytes": 6356,
+    "sha256": "4648461c4e5feebdf71ce2f7a28c7e4f8785993bd86c81e886ab0d6f8f91eac5"
   },
   {
     "path": "mac/Sources/StoreEncoderSettings.swift",
@@ -625,9 +630,19 @@
     "sha256": "0dd52af6eefd4f84a22581bf36e3c15f510b1aad59405f4b957730b62d04205a"
   },
   {
+    "path": "mac/Sources/StoreNetworkPaths.swift",
+    "bytes": 2680,
+    "sha256": "c22883f5541cbd8c2b21089495971082e5981f340cb4d0825a6793486362193b"
+  },
+  {
+    "path": "mac/Sources/StoreUSB.swift",
+    "bytes": 1390,
+    "sha256": "cd46cad93e7c9f95522d9762f971f54f90a393350f91d396bf9bb7a30345b8f3"
+  },
+  {
     "path": "mac/Sources/StoreWire.swift",
-    "bytes": 2596,
-    "sha256": "9157088fd45b7603ce9e1f60c1cfb1db570bc2426e9ef51fcb971abfadac713f"
+    "bytes": 2660,
+    "sha256": "5ad3db2b8571a760d68a8c09b5fc9f178b27a0b6028698697891be5b2caae7b8"
   },
   {
     "path": "mac/Sources/VisualTheme.swift",
@@ -636,8 +651,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 13438,
-    "sha256": "a61e1ffe49750745fd5a390db4a6dfa467dd5837d9e23628acfda70355b28f4e"
+    "bytes": 15132,
+    "sha256": "a9cef1d5a8947e35420cfc003f3f86525602ed15484a38635e0e543eaf7e3d0c"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
@@ -645,9 +660,29 @@
     "sha256": "a31134008491541112536631453d12618368a8e8aff30ef823bcebe7d149047d"
   },
   {
+    "path": "mac/USB/StoreUSB.h",
+    "bytes": 388,
+    "sha256": "bd860378a97a33bff0c627a0d5613b91ac279e270111e5200098f1092689da90"
+  },
+  {
+    "path": "mac/USB/StoreUSB.mm",
+    "bytes": 16637,
+    "sha256": "e9a37790271fa1275a663cfdbf75769226fc0c12cd7b78200907abd2eeaec5ac"
+  },
+  {
+    "path": "mac/USB/port/arch/cc.h",
+    "bytes": 304,
+    "sha256": "556e27174561a0df52abe641e8f2903372ff9f6102f27a30b4a439a7667766a4"
+  },
+  {
+    "path": "mac/USB/port/lwipopts.h",
+    "bytes": 1010,
+    "sha256": "23a0c7e23f82a37872b867b5369f4aff34392bb283b91b9333c9fbf226298e48"
+  },
+  {
     "path": "mac/build.sh",
-    "bytes": 1057,
-    "sha256": "77f8695bbedb1e7ca79ac80d4c3a4d6c2aef5de78353aeca9595ae85cddec410"
+    "bytes": 1829,
+    "sha256": "8719d08d4a76feee945c3ae3b44de67dc10dab6251205a7cfba2951e394380de"
   },
   {
     "path": "shared/DisplayProfile.hpp",
@@ -690,9 +725,1039 @@
     "sha256": "90672a4edc61b9b455bea41bd506c71c9b247d401ec9b867f12418f687d65e31"
   },
   {
+    "path": "tests/rndis_test.cpp",
+    "bytes": 1545,
+    "sha256": "c347055ded720dfcf9b788e3aa3adf5a135c749233389ebce4e1d5121c1d4176"
+  },
+  {
     "path": "tests/usb_test.cpp",
     "bytes": 1997,
     "sha256": "888108c766e3ac51612d33727aaa0b90a29d0120ed36693fde1e0345d1cdea66"
+  },
+  {
+    "path": "third_party/lwip/COPYING",
+    "bytes": 1450,
+    "sha256": "d51980b934e4411a8e0d80ce61afa28978bf0d49c50d0ee93f705679cb8a6042"
+  },
+  {
+    "path": "third_party/lwip/UPSTREAM.json",
+    "bytes": 334,
+    "sha256": "aa9dc0f0ee9c636d7a680117f2a30b1106ee7fd1a3416d878ec81658f6a5deae"
+  },
+  {
+    "path": "third_party/lwip/src/core/altcp.c",
+    "bytes": 17578,
+    "sha256": "8ec8e486d3d63af44da2a23c2f6ca402bd12dff20ac663ed5d76047fe048fd0b"
+  },
+  {
+    "path": "third_party/lwip/src/core/altcp_alloc.c",
+    "bytes": 3104,
+    "sha256": "40883643d0a06dab4bb1c9f959f8193152d1f741089db48491646cf69d3877f9"
+  },
+  {
+    "path": "third_party/lwip/src/core/altcp_tcp.c",
+    "bytes": 14862,
+    "sha256": "564946787e394d70cf6e3b7d955c786cd9596e67d1d63ada3e56a21441405e9d"
+  },
+  {
+    "path": "third_party/lwip/src/core/def.c",
+    "bytes": 8284,
+    "sha256": "3abf710515bc3e16b8844141d3361b79f01912d4537dbce6d20c8594f605338f"
+  },
+  {
+    "path": "third_party/lwip/src/core/dns.c",
+    "bytes": 55730,
+    "sha256": "c7d6b3f0e0348acc4312eeebcfcbd8b2673893f55bb380570c7ca047d61b043e"
+  },
+  {
+    "path": "third_party/lwip/src/core/inet_chksum.c",
+    "bytes": 20007,
+    "sha256": "46c0a094463ae27b6a0daedcb4c07e14ee62cbf365cd58dd36470539e2bc0ef9"
+  },
+  {
+    "path": "third_party/lwip/src/core/init.c",
+    "bytes": 17171,
+    "sha256": "e461ca0fcb506eb3cc668dfdf7adbdbb0a3b76368883748553ec85445196cd44"
+  },
+  {
+    "path": "third_party/lwip/src/core/ip.c",
+    "bytes": 4876,
+    "sha256": "aadd79d9ba3b13decdac92d43e7fdfe17415e5527f09a8276114b77eb037ce48"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/acd.c",
+    "bytes": 19309,
+    "sha256": "1c4a6224020797aea3638d2088908fabffb7ca2fcc6ebd84ec8c2d615973f94f"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/autoip.c",
+    "bytes": 12802,
+    "sha256": "32c0051c7ef0035f749999b73c3a10cd831cc45fc7e122e773e97036888ea38d"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/dhcp.c",
+    "bytes": 78623,
+    "sha256": "8638409156843a4741eb3a9aac47e874506399b251d5fe0b17cbb5b7993843bb"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/etharp.c",
+    "bytes": 48793,
+    "sha256": "cbd8b5e6e859fc267678b029a8371466317d590a8013893ade1fec78dd9f4b4a"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/icmp.c",
+    "bytes": 15012,
+    "sha256": "2489779474ae6ec157c6634275b3f570fc12bcbb18b33b9ed457b83593df9bb5"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/igmp.c",
+    "bytes": 28536,
+    "sha256": "cee7af2217787b9d1e2de691e0809d88bd02f8942f706937b3ddf1c8a9211a81"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/ip4.c",
+    "bytes": 43197,
+    "sha256": "8ceed579626e49883afd37fbff81d47a5ad9023fa51458eeaa2e0de5097c90d1"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/ip4_addr.c",
+    "bytes": 9012,
+    "sha256": "ce153b850d018c9bd8ecb66da7afa124734a52485c32926ce15dc54950690ab6"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv4/ip4_frag.c",
+    "bytes": 31196,
+    "sha256": "b1b76e03aae7c4003b090ec3b91a48f9f1ed3d70053a032c8b564c83a7a66ba2"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/dhcp6.c",
+    "bytes": 28927,
+    "sha256": "bb5b86865281e7e9fd9eb8ed3defceaffd5b2edae43ab987976ace54bc538fe8"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/ethip6.c",
+    "bytes": 4383,
+    "sha256": "ea73b39759b87ab77e4cfc523129eca172c78f6e59bfe0eb5767a9a911fbbe05"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/icmp6.c",
+    "bytes": 14766,
+    "sha256": "4e89bcda0f77eaebe7c8b033f5d62954ce860ffe653348666bebb04de428b0bd"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/inet6.c",
+    "bytes": 2094,
+    "sha256": "3e16b2cdc011389e661f704a00e66da94580ecebe7fb63294e2853149c7708e1"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/ip6.c",
+    "bytes": 56104,
+    "sha256": "b46f5bcc0d086552502bd0db36198a9a804f22efcb97683bc968e20099025dec"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/ip6_addr.c",
+    "bytes": 10605,
+    "sha256": "8ace022aadcc391223bd3652689f9e9ab5f0a3c15960654bb8f9022963b0a845"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/ip6_frag.c",
+    "bytes": 31907,
+    "sha256": "c770139ab8d31da076fbf9b74a260511b647c377241bf1344547d02f6e0cc99d"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/mld6.c",
+    "bytes": 19264,
+    "sha256": "18b5a4621c4b87a4d968369b147685f168050586c2fbdeb2d9ef98d4180f5cc3"
+  },
+  {
+    "path": "third_party/lwip/src/core/ipv6/nd6.c",
+    "bytes": 87969,
+    "sha256": "c415888732a6b68e9276a6f50276bf1de524b0aa2403121b18c15b1bec3fe0b4"
+  },
+  {
+    "path": "third_party/lwip/src/core/mem.c",
+    "bytes": 35756,
+    "sha256": "5dca0b77132ab681b4761f5a838dc83b522f434ed3c69dd3aa6763df85fd592c"
+  },
+  {
+    "path": "third_party/lwip/src/core/memp.c",
+    "bytes": 12191,
+    "sha256": "9c21b3273224919e65a98eacdc7b74ca88c69d5e7b3d54717655bde824ee2dc6"
+  },
+  {
+    "path": "third_party/lwip/src/core/netif.c",
+    "bytes": 55517,
+    "sha256": "a24f628d9ffe1aad43d66a2e3a58ef1092ce998fb3910a79f7f9b60dd55ce3d0"
+  },
+  {
+    "path": "third_party/lwip/src/core/pbuf.c",
+    "bytes": 53274,
+    "sha256": "e6bd58c3f5efbabad79d3abf0daae5c91f44a63a6ac6bddaf720305cb4c3af6d"
+  },
+  {
+    "path": "third_party/lwip/src/core/raw.c",
+    "bytes": 21570,
+    "sha256": "6ad002c136ec65b5efcdec896cb3980de9410e16576829510970c266f1af0d87"
+  },
+  {
+    "path": "third_party/lwip/src/core/stats.c",
+    "bytes": 6278,
+    "sha256": "ad9b8aede3f38f2fffad212881f1ca90135dc5e8ee3f929b538ef17443d6e657"
+  },
+  {
+    "path": "third_party/lwip/src/core/sys.c",
+    "bytes": 5949,
+    "sha256": "a3a60f22adac27bd7a1595836906a8e5d910986275414dd709cbb70fe3522976"
+  },
+  {
+    "path": "third_party/lwip/src/core/tcp.c",
+    "bytes": 89454,
+    "sha256": "5a94c5cd4f5edd8d83cc522effd9af581634f95e11cd393c55d12cf48718e41a"
+  },
+  {
+    "path": "third_party/lwip/src/core/tcp_in.c",
+    "bytes": 86062,
+    "sha256": "b4d1f0bf55dd782aa75f94069284bf99019aa8c42ee040c4e9e966ae8172b443"
+  },
+  {
+    "path": "third_party/lwip/src/core/tcp_out.c",
+    "bytes": 81578,
+    "sha256": "690d0b9e75e3aa5e5588e2990a1ce10cc2cbfd94a72951891f32d6588b03d1a7"
+  },
+  {
+    "path": "third_party/lwip/src/core/timeouts.c",
+    "bytes": 13304,
+    "sha256": "a5e36f81cab4fcd17d870d286643bfa0787e40cf6a714e79c9a6b97f519a597b"
+  },
+  {
+    "path": "third_party/lwip/src/core/udp.c",
+    "bytes": 45605,
+    "sha256": "dd715899d10cb0e1568b4b2ca034b39f15bff6de209cb3f2b10d0f86bd45646c"
+  },
+  {
+    "path": "third_party/lwip/src/include/compat/posix/arpa/inet.h",
+    "bytes": 1589,
+    "sha256": "e92abfec8db381dc33039725a4af8e4525788d85e7db01b8a4b320ecb447c288"
+  },
+  {
+    "path": "third_party/lwip/src/include/compat/posix/net/if.h",
+    "bytes": 1712,
+    "sha256": "6cd39d76c4ec6c23a4cd01ae1b3385731e74dbbc5e15e07e3d3df846e49f53d8"
+  },
+  {
+    "path": "third_party/lwip/src/include/compat/posix/netdb.h",
+    "bytes": 1585,
+    "sha256": "b37dde949b00fd552be550760b62c577c1ba929e349385fdbd4ba010d60d20eb"
+  },
+  {
+    "path": "third_party/lwip/src/include/compat/posix/sys/socket.h",
+    "bytes": 1589,
+    "sha256": "e92abfec8db381dc33039725a4af8e4525788d85e7db01b8a4b320ecb447c288"
+  },
+  {
+    "path": "third_party/lwip/src/include/compat/stdc/errno.h",
+    "bytes": 1590,
+    "sha256": "28b90f3f1e14bde8217090f448724b104deea29fc40ab4ed381c677502b36cca"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/acd.h",
+    "bytes": 4053,
+    "sha256": "a55b912462acded2d9b0b5fda0b4db17123ca4dc05b770255c79559d619cad49"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/altcp.h",
+    "bytes": 7588,
+    "sha256": "0887f8bb0c15ee2fd8eafb9de321dc37c972744dfec36204d62302bd313cf8e6"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/altcp_tcp.h",
+    "bytes": 2723,
+    "sha256": "ef238110f879ea8218aca79d595ffa72fedbf4ba314f586d523d3bd96165ad3d"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/altcp_tls.h",
+    "bytes": 7403,
+    "sha256": "5d2d8aebdb3d0b8002bc05bad47ea59fc6572fc378d84247cbebb2143456ac62"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/api.h",
+    "bytes": 18641,
+    "sha256": "444d1d14de8b0fc037fe79e3babbc08473b68f560093884549ab22b4e0155044"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/FILES",
+    "bytes": 141,
+    "sha256": "44f2aae35c494db094654524395cdda5131fea3eb746ca1f0543b73f16c5b59e"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/altcp_proxyconnect.h",
+    "bytes": 2843,
+    "sha256": "952a0862cdb42b559708de54020fbaeead92c1223a4fa40c525132a1b8b67447"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/altcp_tls_mbedtls_opts.h",
+    "bytes": 4281,
+    "sha256": "91037dd0b14bc901726d88c6610747cbe69e5b28625b352ba758ec11babbe43b"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/fs.h",
+    "bytes": 5140,
+    "sha256": "edc06b66d4f08561ca786091275445669e3464f924563d36e87f81ed2fc605fe"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/http_client.h",
+    "bytes": 6102,
+    "sha256": "e407f07ef8bbaf895fe2a398abba62279a6519bed7dd85a43ebe97a058935fc3"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/httpd.h",
+    "bytes": 10925,
+    "sha256": "8ce6a0ff54dcefab304851a482518966c9f450df3fc55c3527d5eced0bffb012"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/httpd_opts.h",
+    "bytes": 16972,
+    "sha256": "4af4f25757002c8ee1cd14f4a8d97ad8a00feef3ead3e86a0c5b709b6da40c84"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/lwiperf.h",
+    "bytes": 4238,
+    "sha256": "7a1665245094dfea157479c40b5a216875fcf68459077c12426cb3b5b164f81b"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/mdns.h",
+    "bytes": 5631,
+    "sha256": "ac1f23f7211c807d85403e06ae550337bd3c0cd47fcaddac4761c08522ad8a42"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/mdns_domain.h",
+    "bytes": 3384,
+    "sha256": "1fe8e3e9707fc0ffb4a19703475593379f67a93971b654c625ab343cb80b1e30"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/mdns_opts.h",
+    "bytes": 4102,
+    "sha256": "93936f5878294e0fc4212065a4aa31219fa8f6f26e05c25241dd69270de7d305"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/mdns_out.h",
+    "bytes": 5650,
+    "sha256": "8f8d21978d4b0f203b5db0e0347b525249b772288a310166fd9aa44db54cfe10"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/mdns_priv.h",
+    "bytes": 7696,
+    "sha256": "a84564bb6004713bc3e25fd0bfc4e2ddf10df34b48bae2dfd61a4a9e131675c4"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/mqtt.h",
+    "bytes": 7617,
+    "sha256": "6d562b39d3fa21af5104c9851a9dc80a15c7d459f6032cf3a31ea8229afd92f8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/mqtt_opts.h",
+    "bytes": 3045,
+    "sha256": "0edca5faad96ad17ea6eb4fd54f8c1afd996b006dbc0b80aee92cbe0e8829db5"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/mqtt_priv.h",
+    "bytes": 3337,
+    "sha256": "1fa194809a5d265012f9763f1677330e883b16650b0a07837c4d39e88291717d"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/netbiosns.h",
+    "bytes": 1907,
+    "sha256": "31977f1265e4711f6e47769e0ae124be2b53aabfb83322186e16e9b3a53070f0"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/netbiosns_opts.h",
+    "bytes": 2512,
+    "sha256": "462523a8ae8e5b7416d28d12868c4f479206d72453e3a6dd359b65bcfb129dec"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/smtp.h",
+    "bytes": 4665,
+    "sha256": "5e5c3d5819b0b7ec7532a137d9d382ab97ffa3225542c4780cf7769cc49e42b6"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/smtp_opts.h",
+    "bytes": 1866,
+    "sha256": "1cfe42968b28cd026aad693cde3390bbd8e36a07d6d8a32b7ea61b838e8eda94"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp.h",
+    "bytes": 5413,
+    "sha256": "53f03de1f8152e78e94b9e156888c45c1144f32313ebd845d7bdb0aef17effd8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp_core.h",
+    "bytes": 15182,
+    "sha256": "e6caf7a9c3200e2280de061e21ef46144430302f51465ee87a4562d9e4e771e6"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp_mib2.h",
+    "bytes": 3009,
+    "sha256": "fdb6a91ec6b210bbd6f4dcc6e23e1c641ca5dd866e626ce51a3ccc3ff451349f"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp_opts.h",
+    "bytes": 9910,
+    "sha256": "d251e809614acabf45753a249748a6c2ec489c06047ad9d288da985bad1a6fdd"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp_scalar.h",
+    "bytes": 4629,
+    "sha256": "ad2ed188f5f8c051ddc8de7fbc83ba07f0de270657034c689935ab39f1ba135f"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp_snmpv2_framework.h",
+    "bytes": 781,
+    "sha256": "a2bdb4c6f9b9149feca2f8db58969c4749db559e46c80b355c0d7a9194f86b22"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp_snmpv2_usm.h",
+    "bytes": 459,
+    "sha256": "928d28d87406894693a5ef48ead632a5c173d1914c3b681706079326044f9bd2"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp_table.h",
+    "bytes": 5644,
+    "sha256": "cf1d6d7e260d966910c021b6ce627056c4db971459c463c9ace5d9f2792282bf"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmp_threadsync.h",
+    "bytes": 3913,
+    "sha256": "2ffec17f30ca770bf422b3ae1458a7b837c50145173e5138b06a9a39129119fc"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/snmpv3.h",
+    "bytes": 4016,
+    "sha256": "401436fce49633574fc4f0eb6a497ee61ada25d5737fe2bc6e45a8250c33cc19"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/sntp.h",
+    "bytes": 2982,
+    "sha256": "c568abe5af32f6d91d5ea7f5fe50973f922eb826223550ea71a94cfce6c3db7d"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/sntp_opts.h",
+    "bytes": 8558,
+    "sha256": "1f427c509c97c8c7e7fb01b0665898e9388844348bf0692c3050aedc0b801433"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/tftp_client.h",
+    "bytes": 2126,
+    "sha256": "a183972c5a07d93c07f6ec2ed4e01dfa523739a6c9890c98b459667b6b04d504"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/tftp_common.h",
+    "bytes": 3947,
+    "sha256": "f57761b501118d6823e61f33c2203106b0fb6ddfe4259d5971c1da02b74dc799"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/tftp_opts.h",
+    "bytes": 3025,
+    "sha256": "fbba24d4337e141d0ec9637cc4cc350219c952376aba3b19ff9e6a037da370a9"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/apps/tftp_server.h",
+    "bytes": 1768,
+    "sha256": "e63220c1a687609b95dd03ba09145c8584d8588c0bf954579ff642ba4b313898"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/arch.h",
+    "bytes": 14685,
+    "sha256": "b86e1fc2b83b0f11742ad31cd4567643ba6af0fc6a0c90b98c54ec2d1c9c1d98"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/autoip.h",
+    "bytes": 3141,
+    "sha256": "0eb054f0fc94340a4868763220f33d3972ec0fc1115347a287cf9eea5ab7b151"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/debug.h",
+    "bytes": 5309,
+    "sha256": "0e556dcfd69849a5e3d1e7de93829545b28d3e4367fdb6bf919cd0e1a10eb938"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/def.h",
+    "bytes": 6069,
+    "sha256": "07cd432de806a1f8a50c1d6b1a4d7a46bfa3381d6660e084f60c7a262dbdafd4"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/dhcp.h",
+    "bytes": 6198,
+    "sha256": "76b9b6d4bc7e2cc15ff059a13a7021e95e0e3f2ab6f2ae12f97347794c9901f3"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/dhcp6.h",
+    "bytes": 3857,
+    "sha256": "c167f1a899e0e5b02d34620683bac8dce62801afcc7466a72ec954fa3808753c"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/dns.h",
+    "bytes": 5004,
+    "sha256": "573977308b19b9f47690e7f5c3e1e879eb14b7e2e79093bb556409a078932083"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/err.h",
+    "bytes": 3454,
+    "sha256": "c35e7cfe52ecc4e84a423c78f6cbf930e94713abcc5d03ad89bfce429472ff16"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/errno.h",
+    "bytes": 9713,
+    "sha256": "da2cbcf57126b44a2fff00eb5c80f0d12ea4e4ecedb5bb2ed26931bf5cbcebd0"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/etharp.h",
+    "bytes": 4325,
+    "sha256": "75f78a87bfbc99fa7958bd8cb50fad5c19d3b0d0d4290cd039f4994ca93b1212"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ethip6.h",
+    "bytes": 2326,
+    "sha256": "ea2e21da73252211440b23108b4a6657d4c897fee244a504527c2836b81fa8e3"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/icmp.h",
+    "bytes": 3903,
+    "sha256": "ce0f09739d7e82f7701366da29a3a2936744627898ab70193acc1df2cfe6feca"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/icmp6.h",
+    "bytes": 2668,
+    "sha256": "585e8dfc16a5add1bcad6eae60dd13d60a09dfc26d40b3e7ceb32190b0970716"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/if_api.h",
+    "bytes": 2564,
+    "sha256": "78aaa6edb9204e495f5feb2406d055429b3f893b6c863c5b222e9d6841011717"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/igmp.h",
+    "bytes": 4469,
+    "sha256": "b3e975c941a75f9bbbd4fbf7248c409069e5b09bbed5ae8e2931d51418ea23f8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/inet.h",
+    "bytes": 7944,
+    "sha256": "25999a511395659a2a7a4fe02c39ff233fd391d67ff74b60b52a791d8340e626"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/inet_chksum.h",
+    "bytes": 4022,
+    "sha256": "568d5b97ff38cef32852a3edd4f4ad28fbe50592d92e72e40b5fd5e7f7c60930"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/init.h",
+    "bytes": 3742,
+    "sha256": "eec744e0df5477991a54c60808ffc72a1ac26e345b26f460f53ea472c71ef805"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/init.h.cmake.in",
+    "bytes": 3808,
+    "sha256": "054a4865ed9d7773e1255b4239fb05f76fbf35db109a092c80cc02aebd8df7f4"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip.h",
+    "bytes": 14951,
+    "sha256": "2bd77f9ea857637b2943eeaac468f4d0451129d416e8d2c4cf964f7c6e1ca6d6"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip4.h",
+    "bytes": 4107,
+    "sha256": "2eabd8f98f24d29eac54f4f8b46ba3199e8d78947adba8614914506f4d2df418"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip4_addr.h",
+    "bytes": 9938,
+    "sha256": "be2f4cac00567de19dc7688edd5cf5ac971e31648613e0f030542aaffbfa78ef"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip4_frag.h",
+    "bytes": 3190,
+    "sha256": "9abd0c56d1e5d1a076458d10ec1455670a2f9f5ef0f4b25516ef3225536644a2"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip6.h",
+    "bytes": 3526,
+    "sha256": "fca378457957de286555704405cab9eabca3d74f85e863717dbd0ab6ca3f807d"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip6_addr.h",
+    "bytes": 20146,
+    "sha256": "6da2c3efe21a33d95f20a7fed8a5b59a7870de996a1aa5ec7dfdb75daba1927a"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip6_frag.h",
+    "bytes": 5781,
+    "sha256": "0dcea4a7600b856877e7fb4943b20690aa9e2b69414b4b2273c7e9e0a25f74a3"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip6_zone.h",
+    "bytes": 14235,
+    "sha256": "6c10757286ace70898ffaf5957d0e9b96e9b20eb621dc5267b2fb3f2d3739582"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/ip_addr.h",
+    "bytes": 21863,
+    "sha256": "6ea66fae68e5972e6e292a791719f2e2226f25b3dac1e8a86d13d132082e426c"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/mem.h",
+    "bytes": 2523,
+    "sha256": "832bcbe6480947265500a298bb6b27ec5cb4308ac70b9fa5ac3dbac3612ff424"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/memp.h",
+    "bytes": 5321,
+    "sha256": "b38e28c11735115189a7939a3d2f4544cb78df5787b19609cee5daa4e4c3e044"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/mld6.h",
+    "bytes": 3645,
+    "sha256": "c7037171e0a565cd19f038a1cc583bdbc2d1209ec9cb07bbaee87e8058328e1c"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/nd6.h",
+    "bytes": 3260,
+    "sha256": "a861eb61999a3ddfb1004dc80f99b3bbe623e3e5791a68e2bee238cbe122fe7a"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/netbuf.h",
+    "bytes": 4662,
+    "sha256": "aea791762b4a1031f62789bbd05115198424088c20cabcffb001fae76c027ffa"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/netdb.h",
+    "bytes": 5464,
+    "sha256": "1df1d70b2a7dd1b340da3b261586eefcfcccecb459a853285fa11dab1dfd2a9d"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/netif.h",
+    "bytes": 27645,
+    "sha256": "fe36067c5adeeccae5c5408c98ae2080bdd296517fdafd0529c0699772bcad23"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/netifapi.h",
+    "bytes": 5763,
+    "sha256": "8a1480df68a69277e1700acd5ab0f01f34698e70dd303cee79c4e708ad335109"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/opt.h",
+    "bytes": 118613,
+    "sha256": "3c18bc6b788bd6c5bdd6b2813f7fdddfac8884d3b9ace9af206b84c5cfc304b8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/pbuf.h",
+    "bytes": 14819,
+    "sha256": "1f3112b8e76ad1bbd32f7727eb735e71a57e67d72b56e8252574e2b8df05ced8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/altcp_priv.h",
+    "bytes": 6955,
+    "sha256": "6a4c147efebbb6aa358861e00e240b07e098714b91b486f8b326f3e003197aa7"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/api_msg.h",
+    "bytes": 9222,
+    "sha256": "9fadb1f2ace864f21042b12cdc2fa92b34800ab35c51e34b0ad9b313d43d5b93"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/mem_priv.h",
+    "bytes": 3363,
+    "sha256": "3a519997f84a67f35d901dd8f46cb5697cc185d648cc96372e8818878ffd1899"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/memp_priv.h",
+    "bytes": 5500,
+    "sha256": "7487d08cc95fd221901c1d9f0b0a8b4d1e5936c0e07c00dd29e51de34464dcb8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/memp_std.h",
+    "bytes": 6925,
+    "sha256": "c8aff2d2323c228353b654d925228bb4a165f4f644c4edea571e5b09a13fa94e"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/nd6_priv.h",
+    "bytes": 4409,
+    "sha256": "5c5755310ecaca7cccf9cbf614d9643e8015ae54c89ce6232d263b3876645d9d"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/raw_priv.h",
+    "bytes": 2564,
+    "sha256": "6708f3a65434fda97df55285200200e663e738c5e6d8801e7c3d2c7176234825"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/sockets_priv.h",
+    "bytes": 5914,
+    "sha256": "67f8d8fbbad756440e99205198bec1b2cdb9bc4e8cd583898db1e47681ecede8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/tcp_priv.h",
+    "bytes": 23029,
+    "sha256": "dfa76f4a861e2fec96dc7310603232a992c03ed830823f07d614ca6a854de418"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/priv/tcpip_priv.h",
+    "bytes": 6138,
+    "sha256": "fe897f524d614dacf8d3cd52d4156bb99951e5dc361e562225cb4e21ec6893f2"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/acd.h",
+    "bytes": 4082,
+    "sha256": "163823214d14c0f8bc745fbd7859dfa2a98b6e289b8df57da0c102108c1333b8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/autoip.h",
+    "bytes": 2270,
+    "sha256": "d9c8f7c983f587b0f2220f26ed62d077031898c4c3c81c607a009127716cbaf6"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/dhcp.h",
+    "bytes": 6561,
+    "sha256": "4601e60d159d4b53a7a41114ce850ca1c2552d5cc4561cdfa2c92049c453e087"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/dhcp6.h",
+    "bytes": 5499,
+    "sha256": "9e73a416f803125fa3849b0b5c2767a66c4fc7df39abd3ac36df401f673a21f8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/dns.h",
+    "bytes": 5507,
+    "sha256": "d599862e07d662ffe55d75360afad80043376c35f10dd570060f18d37b095be4"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/etharp.h",
+    "bytes": 3992,
+    "sha256": "40b5b4d8c632d89a29e441dbb4798587c7d29b0f129d140738f457a091ea66c7"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/ethernet.h",
+    "bytes": 4077,
+    "sha256": "f7738af54d5dbf600aab02a9809b83572edffcfac687a01d04f0a1ce9ee636b8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/iana.h",
+    "bytes": 2991,
+    "sha256": "32a63eda2e1a9bc5bde36be2fbf26c27bae9541aa86f9da272f9e41badde2194"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/icmp.h",
+    "bytes": 3670,
+    "sha256": "02e193d6e5b1d77f16ba64b901ad63cf00357fce905f6a5eb972730d91446164"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/icmp6.h",
+    "bytes": 5154,
+    "sha256": "115b21b102c426107dc4561f013db2d2540c93c68aad135ca191f91b367c3b78"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/ieee.h",
+    "bytes": 3097,
+    "sha256": "0f9c74a2e4822af5a10a06538d7a0adb3a3d2912858985173b328d6a25f76e5c"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/igmp.h",
+    "bytes": 3093,
+    "sha256": "122e5759d7129c79a718188e2730e97926fa3207f1e39f0db7c971fb192464d5"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/ip.h",
+    "bytes": 2133,
+    "sha256": "b610c5bb14ec82c6506616a68650d8433d4656c46d87b21b692c704f218852b6"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/ip4.h",
+    "bytes": 4601,
+    "sha256": "cc06f3758b0a62b4081234b78e2d56374b7fe630c56357cee3004582aee1e8c7"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/ip6.h",
+    "bytes": 7395,
+    "sha256": "74f7de2571eae0669935929ab922466c6634ccbc7c48874e3618f6ea71a19d1f"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/mld6.h",
+    "bytes": 2478,
+    "sha256": "adf2f34759e238cc8965235c274d9281c9b082258ef90c4be0b5a0249fc92970"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/nd6.h",
+    "bytes": 8350,
+    "sha256": "185bf89b22dbec7b6184fb8f00be8b8a3b6feadd0455a08c3602c59e0bb6cf1a"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/tcp.h",
+    "bytes": 3739,
+    "sha256": "7d143dd53c5f5f2138f0d5f5464651b2e2b02aa46411757a1825f862be1677c8"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/prot/udp.h",
+    "bytes": 2331,
+    "sha256": "edeae0cbac3a2f0d0c54b4abaa9d31876ea135b0d7689edb2ef9df58be0bce46"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/raw.h",
+    "bytes": 5526,
+    "sha256": "bc954056ba01001801d48cf244721091a5d2e6e563e5d96a92696a59029a6c7e"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/sio.h",
+    "bytes": 4366,
+    "sha256": "5ec9f8d63040826ffddbe177ecdaedf77131085264e53588387689c2d9c36d44"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/snmp.h",
+    "bytes": 7793,
+    "sha256": "5374b02ccab56ebd711ec7242dc029b974ce2b4f805850705b9efef07304b993"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/sockets.h",
+    "bytes": 26593,
+    "sha256": "e18b00eb7a17df40ce840abba8b4d22bc1275bd0528f487e96625426902e1a7e"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/stats.h",
+    "bytes": 15424,
+    "sha256": "68ebe2e52eb105d42e21c0da66c583db79b0e875e097ef0897c09eac4ed6257a"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/sys.h",
+    "bytes": 21349,
+    "sha256": "28e659eaeb9f3f96273cbe3e5595ce6168c7fbb0d252a55e397080abb45cfff4"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/tcp.h",
+    "bytes": 19488,
+    "sha256": "192117d1da4f796470049978e037d42048d99b78c08564197e2dbd89637dc69b"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/tcpbase.h",
+    "bytes": 2744,
+    "sha256": "d2be437bf439a11e109a0af34fd5c9885311831b051c82da153f1ae7257cd554"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/tcpip.h",
+    "bytes": 4369,
+    "sha256": "ee4f36b68e1a34c4f16dd75e10b02271d0cca5924002156e68e4b5badca930c2"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/timeouts.h",
+    "bytes": 4242,
+    "sha256": "7bcd208f7250e10539cdb62c599d48444bc6787b5f4bea46bf571a3483aab0eb"
+  },
+  {
+    "path": "third_party/lwip/src/include/lwip/udp.h",
+    "bytes": 8056,
+    "sha256": "e506bed37fc7e8e0ed0ea6cd5e951e754d9a6323cc2324b27085e7113a09877a"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/bridgeif.h",
+    "bytes": 5286,
+    "sha256": "117fd9fc361fffb0a9eb35b2f4114c90039e09c90366fa2399428184e7211ea1"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/bridgeif_opts.h",
+    "bytes": 3546,
+    "sha256": "ed95dc1ff51c74b57267ac619351df8bebf534f4cbb24bc5c416ccd924523491"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/etharp.h",
+    "bytes": 140,
+    "sha256": "598f51cc6d1009880bd27d80d5c41ac0a64685b60bd5faff4677515317a8b015"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ethernet.h",
+    "bytes": 2966,
+    "sha256": "6c45b4855110f01cfb8a449ce195caaffa58652db918689d914e79246cbcae69"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ieee802154.h",
+    "bytes": 5450,
+    "sha256": "e90c1cc2b269a265c2f2320d8e1f062cb2fd1a0da072fb915b52e960e2056b5d"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/lowpan6.h",
+    "bytes": 3010,
+    "sha256": "ed5b3401c22e18fd6e23e246b949568c62d8c28d00464e7a4e1f97ff97147f62"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/lowpan6_ble.h",
+    "bytes": 3177,
+    "sha256": "7bf47b2ce1c11482545f4c363797538d9e85f652ee9fa2a4ca977ee6d9f8d706"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/lowpan6_common.h",
+    "bytes": 3194,
+    "sha256": "e3d550248cbbc87e330f59c41ec6b612320242e6a4329820caf931accca6f80d"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/lowpan6_opts.h",
+    "bytes": 4388,
+    "sha256": "a73baf54d7262fd310c434b8a83086de39fe37a1df5793db40aeb2785177217d"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/ccp.h",
+    "bytes": 5126,
+    "sha256": "9629b99d93e3c7260c88675cc7351441178d5f336e5ba5b971d9d10243a20372"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/chap-md5.h",
+    "bytes": 1508,
+    "sha256": "8bdeecfa0224223dabab2b8e6a5c04651eed5e6c80b979cc7b47f0e44ec2f99f"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/chap-new.h",
+    "bytes": 6386,
+    "sha256": "f40a75b954e8479fd2696d187107b3a71ee9e6d2756fc73e979049da7b28d200"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/chap_ms.h",
+    "bytes": 1782,
+    "sha256": "cb2eb95fe76e739049b3a2f3dcd041f1e9f348477d2388724959cf2885de728a"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/eap.h",
+    "bytes": 5741,
+    "sha256": "1f705db654149fa5b2ed84153c028f47828604e7014d34b0e23d810a3e87d7e4"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/ecp.h",
+    "bytes": 2060,
+    "sha256": "64f48a5301b09437df9d9270d59c1140cf32166b274e582f510aeff405d2222b"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/eui64.h",
+    "bytes": 3154,
+    "sha256": "a7715aa16680379dfc62703112da1ca345e3bd219c1079ed2c0956f570c92070"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/fsm.h",
+    "bytes": 6567,
+    "sha256": "3ee20821e270bee0ec4c807a03dc7fc0c395110122142310426d229a6735277a"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/ipcp.h",
+    "bytes": 5216,
+    "sha256": "9100fe618f34fc2b9c31f462a36bdab00bdee3ab9bc0b1caba0a6f544b7eaa0e"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/ipv6cp.h",
+    "bytes": 7840,
+    "sha256": "90a2b6e529467b24fb8b5c41cea5d20af5568ff535a6d40e6febd0a0918fee3d"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/lcp.h",
+    "bytes": 6989,
+    "sha256": "bea16cac731fb7f0199269e30bbce0c896b2b680c966cef77b0ef6a27112d14f"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/magic.h",
+    "bytes": 4988,
+    "sha256": "15eb12fbbbf842e01a7960d721a4bd846604b230fec6d09c06655c4ae2ace688"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/mppe.h",
+    "bytes": 6439,
+    "sha256": "0dec116fbded31193275e5abc99d767278fe4dab35a25e2d77d71c9d9d035a0b"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/polarssl/arc4.h",
+    "bytes": 2857,
+    "sha256": "0404bdb5bfa7b1ec28ccd1d62f2bce38b980c49659abca75f10779cbdd6ebd9a"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/polarssl/des.h",
+    "bytes": 3126,
+    "sha256": "deb872305c3e0e097ac508706b6d158d8409c5075f0520620577e442b1f9db56"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/polarssl/md4.h",
+    "bytes": 3229,
+    "sha256": "5c1fc263e83327de7bcc897287efde528f0f4bb786dafe31ae2ec5b454d0aac4"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/polarssl/md5.h",
+    "bytes": 3227,
+    "sha256": "c8eca46bcdcb4745d5dcfdb6d73bf4efe9f74bd567abee46bf0217297133995b"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/polarssl/sha1.h",
+    "bytes": 3259,
+    "sha256": "2800e8b2bdb15cfaaf3c2afeef947cec10b2ba78b7fced3fc5371b7b8c2311a8"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/ppp.h",
+    "bytes": 25648,
+    "sha256": "cbc828e5c742e0d40918e9dcb04a4a81afe23b42ac5629c32791a0e3a7a39d10"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/ppp_impl.h",
+    "bytes": 26717,
+    "sha256": "d3dc3d94fe5f2e0963dca561fa1e43f06758b21f014e81cea6df948562e5f332"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/ppp_opts.h",
+    "bytes": 16103,
+    "sha256": "6b7faa99686360bf96e5bc223ccd14a81c2b14d30e5fc07ced9744d59d49c0ee"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/pppapi.h",
+    "bytes": 4584,
+    "sha256": "63e8e37916f98c91fc8dd20460728fb571525e2310410c323810929f408746c8"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/pppcrypt.h",
+    "bytes": 4781,
+    "sha256": "30b8d0e40bd366992a27800cb5139f5e116d7f346ae003cf945aac842d0a19db"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/pppdebug.h",
+    "bytes": 3317,
+    "sha256": "8e1a9f01928b9c44ae283a2ae673fb80274c87edd471f8ec250bab8143722764"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/pppoe.h",
+    "bytes": 7611,
+    "sha256": "1490d5367ef31488ca963dfbd99a6154f9a9f07aa5a96f0c7a16b6f69f2a33ce"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/pppol2tp.h",
+    "bytes": 9073,
+    "sha256": "e589e31b31bb3c8948e52f3a271ea72db8f56e5c24fb1a6ea1ca7e1c98c7c885"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/pppos.h",
+    "bytes": 4671,
+    "sha256": "181e3af7c0e58a1f3b35b9efc525e1bb45ee193b28d31140e5dc8d48330bc4ef"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/upap.h",
+    "bytes": 4270,
+    "sha256": "52957fc1be26b98088b0cab3435772af73de1277b3b94f5099cbd529ae4a151b"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/ppp/vj.h",
+    "bytes": 6528,
+    "sha256": "078dfc63d5551b74274f5f6efb12149c99d69134db1d901573e0348eea5a6bd7"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/slipif.h",
+    "bytes": 3178,
+    "sha256": "0cb2dcb6ac3798599c776a48abc60dcbcc89de9b01ddec6d517bd694f6bc559d"
+  },
+  {
+    "path": "third_party/lwip/src/include/netif/zepif.h",
+    "bytes": 2940,
+    "sha256": "2f77f06432565dc13598c3717936d54dd7ebfd8cf66f52920d351dbe7544f4a7"
+  },
+  {
+    "path": "third_party/lwip/src/netif/ethernet.c",
+    "bytes": 12259,
+    "sha256": "3cecace1ce4b8d9dfe348de7de9ce118cb8ffd4592707f9324eb0efe749ca636"
   },
   {
     "path": "tools/build-harmony.sh",
@@ -713,6 +1778,11 @@
     "path": "usb/AccessoryProtocol.hpp",
     "bytes": 1688,
     "sha256": "55f51795a8e107328843a74207d22433b848fe51b853d0af4fa9e0ba3c26eef0"
+  },
+  {
+    "path": "usb/RNDIS.hpp",
+    "bytes": 2785,
+    "sha256": "4a947d32bc2772ec0385dc10cd7e20067b857174bc4c3f24e4ee20082796c86d"
   },
   {
     "path": "usb/StreamMux.hpp",

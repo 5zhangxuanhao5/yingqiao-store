@@ -30,6 +30,8 @@ jobs:
           ./portable-test
           g++ -std=c++17 -Wall -Wextra -Werror tests/usb_test.cpp -o usb-test
           ./usb-test
+          g++ -std=c++17 -Wall -Wextra -Werror tests/rndis_test.cpp -o rndis-test
+          ./rndis-test
           g++ -std=c++17 -Wall -Wextra -Werror tests/policy_test.cpp -o policy-test
           ./policy-test
           g++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -I tests/host_stubs tests/native_exports_test.cpp -o exports-test
@@ -72,6 +74,8 @@ jobs:
           "$RUNNER_TEMP/portable-test"
           clang++ -std=c++17 -Wall -Wextra -Werror tests/usb_test.cpp -o "$RUNNER_TEMP/usb-test"
           "$RUNNER_TEMP/usb-test"
+          clang++ -std=c++17 -Wall -Wextra -Werror tests/rndis_test.cpp -o "$RUNNER_TEMP/rndis-test"
+          "$RUNNER_TEMP/rndis-test"
           clang++ -std=c++17 -Wall -Wextra -Werror tests/policy_test.cpp -o "$RUNNER_TEMP/policy-test"
           "$RUNNER_TEMP/policy-test"
           clang++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -I tests/host_stubs tests/native_exports_test.cpp -o "$RUNNER_TEMP/exports-test"

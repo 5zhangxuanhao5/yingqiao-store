@@ -69,3 +69,9 @@ export const storeProfile: (width:number,height:number,codec:string,refresh?:num
 export const storeLinkStart: (host:string,certificate:string)=>boolean;
 export const storeLinkStatus: ()=>string;
 export const storeLinkCancel: ()=>void;
+
+export const storePathsConfigure: (hosts:string,token:string,certificate:string)=>boolean;
+export const storePathsStatus: (activeHost:string,elapsedSinceSwitchMs:number,inputHeld:boolean,activeAlive:boolean)=>string;
+export const storePathsStop: ()=>void;
+
+export const storeUSBInterfaces: ()=>string;

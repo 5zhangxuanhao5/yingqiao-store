@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5.0)
 project(edgelink)
 set(CMAKE_CXX_STANDARD 17)
 add_compile_options(-Wno-unused-command-line-argument)
-add_library(edgelink SHARED probe.cpp client.cpp store_link.cpp network.cpp axis_observer.cpp cursor_lock.cpp mouse_node.cpp cursor_channel.cpp local/availability.cpp remote_audio_stub.cpp audio_crypto.cpp opus_audio_codec.c rtc_event_channel.cpp)
+add_library(edgelink SHARED probe.cpp client.cpp store_link.cpp store_paths.cpp network.cpp axis_observer.cpp cursor_lock.cpp mouse_node.cpp cursor_channel.cpp local/availability.cpp remote_audio_stub.cpp audio_crypto.cpp opus_audio_codec.c rtc_event_channel.cpp)
 target_include_directories(edgelink PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/openssl/include)
 target_link_libraries(edgelink PUBLIC libace_napi.z.so libace_ndk.z.so libnative_window.so libnative_window_manager.so libnative_media_vdec.so libnative_media_codecbase.so libnative_media_core.so libhilog_ndk.z.so ${CMAKE_CURRENT_SOURCE_DIR}/vendor/openssl/lib/libssl.a ${CMAKE_CURRENT_SOURCE_DIR}/vendor/openssl/lib/libcrypto.a)
 

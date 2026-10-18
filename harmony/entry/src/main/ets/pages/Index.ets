@@ -111,6 +111,8 @@ interface Statistics extends WANRouteMetrics {
  cursorSyncApplied: number; cursorSyncStaleSession: number; cursorSyncStaleSequence: number; cursorSyncStaleInput: number; cursorSyncInvalid: number;
  hostCursorOwner: boolean; hostCursorVisible: boolean;
 }
+interface StorePathStatus { paths:StorePathSample[];preferredHost:string; }
+interface StorePathSample {host:string;ready:boolean;route:string;rttMs:number;probeMbps:number;}
 interface StoreLinkStatus { phase:string;code:string;error:string;pairing:string; }
 @Entry
 @Component
@@ -132,6 +134,47 @@ struct Index {
  private storeDiscovery:StoreDiscovery|null=null;
  private storeLinkTimer:number=-1;
  private storeLinkHost:string='';
+ private storeUSBLastReport:string='';
+ private storePathTimer:number=-1;
+ private storePathRefreshAt:number=0;
+ private storeActiveHost:string='';
+ private storeSwitchedAt:number=0;
+ private storeRecoveryUntil:number=0;
+ private storeNextRecovery:number=0;
+ private storeConfigurePaths():void {
+  if(!this.pairing)return;
+  const hosts:string[]=[this.pairing.host,this.host];
+  for(const device of this.storeDevices){if(device.certificate!==this.pairing.cert)continue;hosts.push(device.host);for(const path of device.paths){hosts.push(path.host);}}
+  const unique=hosts.filter((h:string,i:number)=>hosts.indexOf(h)===i).sort().slice(0,4);
+  native.storePathsConfigure(unique.join(','),this.pairing.token,this.pairing.cert);
+ }
+ private storePathState(alive:boolean):StorePathStatus {
+  try{return JSON.parse(native.storePathsStatus(this.storeActiveHost,Date.now()-this.storeSwitchedAt,this.menuVisible||this.dragging||this.mouseHeld.some((v:boolean)=>v)||this.touchScreenButtonHeld||this.commandHeld||this.optionHeld,alive)) as StorePathStatus;}catch(e){return {paths:[],preferredHost:''};}
+ }
+ private storeWatchPaths():void {
+  if(this.storePathTimer>=0)return;
+  this.storePathTimer=setInterval(()=>{
+   if(!this.remoteSessionForeground)return;
+   if(Date.now()-this.storePathRefreshAt>=8000){this.storePathRefreshAt=Date.now();this.storeDiscovery?.refreshPaths();}
+   if(this.active){this.storeConfigurePaths();const status=native.storeUSBInterfaces();if(status!==this.storeUSBLastReport){this.storeUSBLastReport=status;native.input('CLIENTUSB '+new util.Base64Helper().encodeToString(new util.TextEncoder().encodeInto(status)));}}
+
+  },2000);
+ }
+ private checkStoreHandover(s:Statistics):boolean {
+  if(!this.active||this.mode!=='extend'||!this.remoteSessionForeground||!this.localHandoverCapable&& !s.localHandoverSupported||s.stopReason==='mac_end')return false;
+  this.localHandoverCapable=true;const now=Date.now(),state=this.storePathState(s.running);
+  const current=state.paths.find((p:StorePathSample)=>p.host===this.storeActiveHost);
+  this.localRouteLabel=current?.route==='usb-net'?'USB 网络单路传屏 · 无线备用':'局域网单路传屏 · 自动选择更优线路';
+  let target=state.preferredHost;
+  if(s.running){this.storeRecoveryUntil=0;if(s.renderSubmittedFrames<20||now-this.storeSwitchedAt<5000||!this.remoteInputWindowActive)return false;}
+  else {if(this.storeRecoveryUntil===0)this.storeRecoveryUntil=now+8500;if(now>=this.storeRecoveryUntil)return false;
+   if(!target)target=this.pairing?.host || '';if(now<this.storeNextRecovery)return true;
+  }
+  if(!target||(s.running&&target===this.storeActiveHost))return false;
+  this.storeNextRecovery=now+1000;this.localHandoverCount++;this.localHandoverReason=s.running?'measured_better_path':'active_path_lost';
+  this.host=target;this.begin('extend',false,'','',false,false,-1,-1,true,'lan');return true;
+ }
+
  private storeFirstRun():void {
   try{this.applyStorePairing(fileIo.readTextSync(`${this.context().filesDir}/store-pairing.json`),false);}catch(e){this.storeStage=2;}
   this.storeRefreshDiscovery();
@@ -143,10 +186,10 @@ struct Index {
    this.storeDevices=devices;this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
    this.storeDiscoverMessage=devices.length>0?'选择电脑即可连接':'还未发现电脑，请确认 Mac 上的映桥测试版已打开。';
    const known=devices.find((d:StoreDiscoveredMac)=>d.certificate===this.pairing?.cert);
-   if(known&&this.pairing){if(this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
+   if(known&&this.pairing){if(!this.active&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
    if(!this.storeSelectedID&&devices.length===1){this.storeSelectedID=devices[0].id;}
   },(message:string)=>this.storeDiscoverMessage=message,this.pairing?.host || '');
-  this.storeDiscovery.start();
+  this.storeDiscovery.start();this.storeWatchPaths();
  }
  private storeConnectSelected():void {
   if(this.storeLinkPending)return;
@@ -178,7 +221,7 @@ struct Index {
   const pairing=validatePairing(text);if (!pairing) { this.storeError='设备信息已失效，请重新选择附近的 Mac。';this.storeStage=2;return; }
   this.pairing=pairing;this.host=pairing.host;this.pairingLoaded=true;this.transport=1;this.storeCodec=pairing.codecs.includes('hevc') ? 'hevc':'avc';
   if (save) { this.writeFile('store-pairing.json', JSON.stringify(pairing)); }
-  this.storeStage=3;this.message='已记住这台 Mac，可直接开启扩展屏。';this.storeError='';this.localRouteLabel='局域网直连；消费级 USB 接续仍在验证';
+  this.storeStage=3;this.message='已记住这台 Mac，可直接开启扩展屏。';this.storeError='';this.localRouteLabel='自动选择线路 · 普通 USB 接口正在验证';
  }
  private storeSelectProfile(): void {
   const panel=display.getDefaultDisplaySync();const w=panel.width,h=panel.height;
@@ -543,7 +586,7 @@ struct Index {
  aboutToAppear(): void { this.watchInputDevices();this.storeFirstRun();this.loadInputDevices(); }
 
  aboutToDisappear(): void {
-  this.storeDiscovery?.stop();this.storeDiscovery=null;this.storeCancelLink(false);this.stop('view_disappeared');this.inputDeviceEpoch++;
+  if(this.storePathTimer>=0){clearInterval(this.storePathTimer);this.storePathTimer=-1;}native.storePathsStop();this.storeDiscovery?.stop();this.storeDiscovery=null;this.storeCancelLink(false);this.stop('view_disappeared');this.inputDeviceEpoch++;
   this.localRequestGeneration++;this.pendingMacStart = '';
   this.availability?.stop();this.availability = null;
   if (this.availabilityTimer >= 0) { clearInterval(this.availabilityTimer);this.availabilityTimer = -1; }
@@ -841,7 +884,7 @@ struct Index {
   }
   this.cancelRemoteStart();
   // stop() invalidates and unregisters the old callback before any session reset.
-  this.stop(localHandoverRoute ? 'local_handover' : 'restart', false);this.saveSettings();this.mode = mode;
+  this.stop(localHandoverRoute ? 'local_handover' : 'restart', false);this.saveSettings();this.mode = mode;this.storeActiveHost=this.host;this.storeSwitchedAt=Date.now();this.storeConfigurePaths();
   this.clearDesktopTopology();
   this.relativeCursorBlocked = false;this.relativeAnchorReady = false;this.relativeRawEvents = 0;this.relativeMissingRawEvents = 0;this.relativeMissingRawRun = 0;this.relativeRawSamples = [];this.relativeLastRawTimestamp = -1;this.lastAbsoluteMouseX = -1;this.lastAbsoluteMouseY = -1;
   this.relativeDragTrace = [];this.relativeDragTouchMoves = 0;this.relativeDragMouseMoves = 0;
@@ -879,6 +922,7 @@ struct Index {
   this.timer = setInterval(() => this.refresh(generation), 1000);this.focusRemote();
  }
  private stop(reason: string = 'user_end', restore: boolean = true): void {
+  if(reason!=='restart'&&reason!=='local_handover'){native.storePathsStop();this.storeRecoveryUntil=0;this.storeActiveHost='';}
   if (reason !== 'restart' && reason !== 'udp_fallback') { this.dynamicWANRoute.cancel(reason); }
   if (reason !== 'restart' && reason !== 'udp_fallback') { this.internetReconnect?.cancel(reason); }this.internetRecovering = false;
   this.cancelLocalStart();this.cancelRemoteStart();
@@ -1251,7 +1295,7 @@ struct Index {
  private refresh(generation: number = this.sessionGeneration): void {
   if (generation !== this.sessionGeneration) { return; }
   const s = this.saveStatus();if (!s) { return; }
-  if (this.checkLocalHandover(s)) { return; }
+  if (this.checkStoreHandover(s)) { return; }
   if (this.checkMediaFallback(s, generation)) { return; }
   if (this.checkDynamicWANRoute(s, generation)) { return; }
   this.remoteMicEnabled = s.microphoneAllowed === true;
@@ -1262,7 +1306,7 @@ struct Index {
   this.statistics = `接收 ${s.receivedFPS.toFixed(1)} FPS · 提交显示 ${s.renderSubmittedFPS.toFixed(1)} FPS · 解码 ${s.decodeP95ms.toFixed(1)} ms · 丢帧 ${s.lostFrames} · 输入 ${s.inputSent}（触 ${this.touchCount} / 鼠 ${this.mouseCount} / 键 ${this.keyCount + s.nativeKeyEvents}）`;
   if (!s.running) {
    if (this.isInternetTransport(this.sessionTransport) && recoverableInternetFailure(s.stopReason, s.error) && this.internetReconnect?.lost(generation, s.error || 'native_connection_ended')) { this.saveStatus();return; }
-   this.internetReconnect?.cancel('nonrecoverable_session_end');this.internetRecovering = false;
+   this.internetReconnect?.cancel('nonrecoverable_session_end');this.internetRecovering = false;native.storePathsStop();this.storeActiveHost='';this.storeRecoveryUntil=0;
    this.unbindCursorChannel();
    native.input('OBSERVE -1');this.axisInputActive = false;
    if (this.timer >= 0) { clearInterval(this.timer);this.timer = -1; }

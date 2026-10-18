@@ -3,8 +3,9 @@ import { util } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { localIPv4 } from './StorePairing';
-export interface StoreDiscoveredMac { id: string; name: string; host: string; certificate: string; serviceName: string; }
-interface DatagramIdentity {schema:string;nonce:string;id:string;name:string;certificate:string;port:number;}
+export interface StoreDiscoveredPath { host:string;route:string; }
+export interface StoreDiscoveredMac { paths:StoreDiscoveredPath[]; id: string; name: string; host: string; certificate: string; serviceName: string; }
+interface DatagramIdentity {paths?:StoreDiscoveredPath[];schema:string;nonce:string;id:string;name:string;certificate:string;port:number;}
 export class StoreDiscovery {
  private probe:socket.UDPSocket|null=null;
  private probeTimers:number[]=[];
@@ -16,6 +17,13 @@ export class StoreDiscovery {
  private changed:(devices:StoreDiscoveredMac[])=>void;
  private failed:(message:string)=>void;
  constructor(context:common.UIAbilityContext,changed:(devices:StoreDiscoveredMac[])=>void,failed:(message:string)=>void,rememberedHost:string=''){this.rememberedHost=rememberedHost;this.context=context;this.changed=changed;this.failed=failed;}
+ private acceptDevice(item:StoreDiscoveredMac):void {
+  const previous=this.devices.find((d:StoreDiscoveredMac)=>d.id===item.id&&d.certificate===item.certificate);
+  const combined:StoreDiscoveredPath[]=item.paths.slice();combined.push({host:item.host,route:'lan'});
+  if(previous){combined.push(...previous.paths);combined.push({host:previous.host,route:'lan'});}
+  item.paths=combined.filter((p:StoreDiscoveredPath,i:number)=>combined.findIndex((v:StoreDiscoveredPath)=>v.host===p.host)===i).slice(0,8);
+  this.devices=this.devices.filter((d:StoreDiscoveredMac)=>d.id!==item.id);this.devices.push(item);this.devices=this.devices.slice(-16);this.changed(this.devices.slice());
+ }
  private attribute(info:mdns.LocalServiceInfo,key:string):string {let out='';for(const item of info.serviceAttribute || []) {if(item.key===key){for(const byte of item.value){out+=String.fromCharCode(byte);}return out;}}return out;}
  start():void {
   this.stop();const generation=++this.epoch;this.startDatagram(generation);
@@ -33,13 +41,17 @@ export class StoreDiscovery {
      let certificate='';for(let i=0;i<count;i++){certificate+=this.attribute(info,`c${i}`);}
      if(certificate.length>8192||!certificate.startsWith('-----BEGIN CERTIFICATE-----')||!certificate.trim().endsWith('-----END CERTIFICATE-----'))return;
      hilog.info(0x1234,'StoreDiscovery','accepted');
-     const item:StoreDiscoveredMac={id:id,name:info.serviceName.slice(0,80),host:host,certificate:certificate,serviceName:info.serviceName};
-     const next=this.devices.filter((x:StoreDiscoveredMac)=>x.id!==id);next.push(item);this.devices=next.slice(-16);this.changed(this.devices.slice());
+     const item:StoreDiscoveredMac={id:id,name:info.serviceName.slice(0,80),host:host,certificate:certificate,serviceName:info.serviceName,paths:[]};
+     this.acceptDevice(item);
     }).catch((e:Error)=>{hilog.warn(0x1234,'StoreDiscovery','resolve error=%{public}s',e.message);});
    });
    finder.on('serviceLost',(info:mdns.LocalServiceInfo)=>{if(generation!==this.epoch)return;this.devices=this.devices.filter((x:StoreDiscoveredMac)=>x.serviceName!==info.serviceName);this.changed(this.devices.slice());});
    finder.startSearchingMDNS();
   }catch(e){hilog.warn(0x1234,'StoreDiscovery','start failed');this.failed('暂时未能搜索设备，请确认两端连接同一局域网后重试。');}
+ }
+ refreshPaths():void {
+  for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}
+  this.startDatagram(this.epoch);
  }
  private async startDatagram(generation:number):Promise<void> {
   hilog.info(0x1234,'StoreDiscovery','datagram begin');
@@ -51,13 +63,15 @@ export class StoreDiscovery {
    probe.on('message',(event:socket.SocketMessageInfo)=>{
     if(generation!==this.epoch||!localIPv4(event.remoteInfo.address)||event.message.byteLength>8192)return;
     try{
-     const info=JSON.parse(new util.TextDecoder('utf-8').decodeWithStream(new Uint8Array(event.message))) as DatagramIdentity;
+     const text=new util.TextDecoder('utf-8').decodeWithStream(new Uint8Array(event.message));
+     if(text==='YQHELLO1'){owned.send({data:`YQDISC1 ${nonce}`,address:{address:event.remoteInfo.address,port:49565,family:1}}).catch(()=>{});return;}
+     const info=JSON.parse(text) as DatagramIdentity;
      if(info.schema!=='store-discovery-v1'||info.nonce!==nonce||info.port!==49563||!/^[0-9a-f]{24}$/.test(info.id)||typeof info.certificate!=='string'||info.certificate.length>8192||!info.certificate.startsWith('-----BEGIN CERTIFICATE-----')||!info.certificate.trim().endsWith('-----END CERTIFICATE-----'))return;
-     const item:StoreDiscoveredMac={id:info.id,name:typeof info.name==='string'?info.name.slice(0,80):'Mac',host:event.remoteInfo.address,certificate:info.certificate,serviceName:info.id};
-     const next=this.devices.filter((x:StoreDiscoveredMac)=>x.id!==info.id);next.push(item);this.devices=next.slice(-16);this.changed(this.devices.slice());hilog.info(0x1234,'StoreDiscovery','datagram accepted');
+     const item:StoreDiscoveredMac={id:info.id,name:typeof info.name==='string'?info.name.slice(0,80):'Mac',host:event.remoteInfo.address,certificate:info.certificate,serviceName:info.id,paths:(info.paths || []).filter((p:StoreDiscoveredPath)=>localIPv4(p.host)&&(p.route==='usb-net'||p.route==='lan')).slice(0,8)};
+     this.acceptDevice(item);hilog.info(0x1234,'StoreDiscovery','datagram accepted');
     }catch(e){hilog.warn(0x1234,'StoreDiscovery','datagram invalid');}
    });
-   await probe.bind({address:'0.0.0.0',port:0,family:1});await probe.setExtraOptions({broadcast:true});hilog.info(0x1234,'StoreDiscovery','datagram bound');
+   await probe.bind({address:'0.0.0.0',port:49565,family:1});await probe.setExtraOptions({broadcast:true});hilog.info(0x1234,'StoreDiscovery','datagram bound');
    if(generation!==this.epoch){await probe.close();return;}
    const destinations:string[]=['255.255.255.255'];if(localIPv4(this.rememberedHost)){destinations.push(this.rememberedHost);}
    const diagnostic=AppStorage.get<string>('storeProbeAddress') || '';if(localIPv4(diagnostic)){destinations.push(diagnostic);hilog.info(0x1234,'StoreDiscovery','diagnostic unicast requested');}

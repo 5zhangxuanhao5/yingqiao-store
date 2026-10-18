@@ -1,5 +1,5 @@
 {
-  "version": "store-v0.1.11-test.1",
+  "version": "store-v0.1.12-test.1",
   "date": "2026-10-18",
   "status": "development-preview-not-appgallery-ready",
   "publicSource": true,
@@ -34,6 +34,8 @@
   "macSelfTest": "LAN address policy only, no GUI/listener/identity/capture",
   "releaseGateDocument": "docs/APPGALLERY_READINESS.md",
   "discovery": "mDNS and datagram discovery plus bounded refresh of previously approved address; initial multicast-suppressed-network discovery still incomplete",
-  "quality": "Accepted personal-edition NativeCapture/lifecycle/timing/VideoSender/cursor/layout port, HiDPI 2x, 40Mbps initial HEVC. Real user acceptance pending.",
-  "coreProvenance": "docs/ACCEPTED_CORE_PROVENANCE.json"
+  "quality": "0.1.11 original media core, HiDPI output retained; user reported clear relative improvement on LAN.",
+  "coreProvenance": "docs/ACCEPTED_CORE_PROVENANCE.json",
+  "consumerUSBImplementation": "Experimental user-space RNDIS/lwIP TLS bridge; ordinary USB Initialize and device receipt verified, DHCP response and streaming remain unverified.",
+  "networkHandoverImplementation": "Authenticated background path probes and runtime single-path reselection integrated; real cable/wireless handover still unverified."
 }
