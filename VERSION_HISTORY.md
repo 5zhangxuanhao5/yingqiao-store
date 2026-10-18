@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.6-test.1
+
+Pad network information supplies directed subnet broadcast addresses in addition to limited broadcast. Log bounded probe stages and errors, and retain Mac receive-stage diagnostics. Mac own-address request/reply passed without credential fields; actual Pad discovery remains unverified. No consumer USB claim: read-only AOA GetProtocol request stalled on the currently connected Edge after HDC ownership was released.
+
 ## store-v0.1.5-test.1
 
 Real Pad diagnostic showed mDNS start success with no serviceFound events. Add five foreground LAN broadcast probes over 10 seconds, closing the discovery socket after 15 seconds. Mac replies with public certificate/name/protocol and echoed nonce only, with private-address, input-size, peer-count and rate limits. TLS approval and pinned certificate trust remain unchanged. Consumer USB remains unimplemented, not substituted by HDC.

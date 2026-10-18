@@ -1,4 +1,4 @@
-import { mdns, socket } from '@kit.NetworkKit';
+import { mdns, socket, connection } from '@kit.NetworkKit';
 import { util } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
@@ -41,9 +41,10 @@ export class StoreDiscovery {
   }catch(e){hilog.warn(0x1234,'StoreDiscovery','start failed');this.failed('暂时未能搜索设备，请确认两端连接同一局域网后重试。');}
  }
  private async startDatagram(generation:number):Promise<void> {
-  const nonce=util.generateRandomUUID(true).replace(/-/g,'').toLowerCase();
+  hilog.info(0x1234,'StoreDiscovery','datagram begin');
   let probe:socket.UDPSocket|null=null;
   try {
+   const nonce=util.generateRandomUUID(true).replace(/-/g,'').toLowerCase();
    probe=socket.constructUDPSocketInstance();this.probe=probe;
    const owned=probe;
    probe.on('message',(event:socket.SocketMessageInfo)=>{
@@ -55,12 +56,14 @@ export class StoreDiscovery {
      const next=this.devices.filter((x:StoreDiscoveredMac)=>x.id!==info.id);next.push(item);this.devices=next.slice(-16);this.changed(this.devices.slice());hilog.info(0x1234,'StoreDiscovery','datagram accepted');
     }catch(e){hilog.warn(0x1234,'StoreDiscovery','datagram invalid');}
    });
-   await probe.bind({address:'0.0.0.0',port:0,family:1});await probe.setExtraOptions({broadcast:true});
+   await probe.bind({address:'0.0.0.0',port:0,family:1});await probe.setExtraOptions({broadcast:true});hilog.info(0x1234,'StoreDiscovery','datagram bound');
    if(generation!==this.epoch){await probe.close();return;}
-   const send=():void=>{if(generation===this.epoch)owned.send({data:`YQDISC1 ${nonce}`,address:{address:'255.255.255.255',port:49565,family:1}}).catch(()=>{});};
+   const destinations:string[]=['255.255.255.255'];
+   try{for(const net of connection.getAllNetsSync()){const props=connection.getConnectionPropertiesSync(net);for(const link of props.linkAddresses){const address=link.address.address;if(!localIPv4(address)||link.prefixLength<8||link.prefixLength>30)continue;const value=address.split('.').reduce((a:number,b:string)=>(a*256+Number(b))>>>0,0);const mask=(0xffffffff << (32-link.prefixLength))>>>0;const end=(value | ~mask)>>>0;const broadcast=[(end>>>24)&255,(end>>>16)&255,(end>>>8)&255,end&255].join('.');if(!destinations.includes(broadcast))destinations.push(broadcast);hilog.info(0x1234,'StoreDiscovery','network prefix=%{public}d',link.prefixLength);}}}catch(e){hilog.warn(0x1234,'StoreDiscovery','network info unavailable');}
+   const send=():void=>{if(generation===this.epoch){for(const destination of destinations.slice(0,5))owned.send({data:`YQDISC1 ${nonce}`,address:{address:destination,port:49565,family:1}}).then(()=>hilog.info(0x1234,'StoreDiscovery','datagram sent')).catch((e:Error)=>hilog.warn(0x1234,'StoreDiscovery','datagram send error=%{public}s',e.message));}};
    send();for(const delay of [1000,3000,6000,10000]){this.probeTimers.push(setTimeout(send,delay));}
    this.probeTimers.push(setTimeout(()=>{if(this.probe===owned){this.probe=null;owned.close().catch(()=>{});}},15000));
-  }catch(e){hilog.warn(0x1234,'StoreDiscovery','datagram unavailable');if(probe)probe.close().catch(()=>{});}
+  }catch(e){hilog.warn(0x1234,'StoreDiscovery','datagram unavailable error=%{public}s',(e as Error).message);if(probe)probe.close().catch(()=>{});}
  }
  stop():void {this.epoch++;for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}if(this.finder){try{this.finder.stopSearchingMDNS();this.finder.off('discoveryStart');this.finder.off('serviceFound');this.finder.off('serviceLost');}catch(e){}this.finder=null;}this.devices=[];}
 }

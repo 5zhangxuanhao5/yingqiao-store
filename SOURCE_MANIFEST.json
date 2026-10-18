@@ -71,13 +71,13 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 1318,
-    "sha256": "718f3d0c6c71730805fea64471fd9242a5320250fc09cd592ddadba44ab11808"
+    "bytes": 1317,
+    "sha256": "99a43530e88f50171d5605b0f5c5e6756eff186f37c82d769c8a977569d952d3"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 2807,
-    "sha256": "82c8a275d58485eef3d2176a38c2a594d03bbb54e8d8d8ac4036fd802d505736"
+    "bytes": 3250,
+    "sha256": "5d4e066a83f99d4faf32e0876296b9fcb773d61dbdf1632fbad602451de8ba6c"
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
@@ -132,7 +132,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 197,
-    "sha256": "7261573a3a821f4388e19e0be69c718e44f519cc239f21876a1c87fc0f6472ab"
+    "sha256": "ca6d427c3021e6ecc2cfc0084ff613063a2e0553f4c95f5ffee9468c7c2c1c2e"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -441,8 +441,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/store/StoreDiscovery.ets",
-    "bytes": 6041,
-    "sha256": "f8a600834133f491711d78aec76df1c64cd5cd53126b8daaa3b5091c435b0675"
+    "bytes": 7174,
+    "sha256": "c35beef140d38e55c27cf20e423810236438a1a8bf38b7e3ad8441c99c352124"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
