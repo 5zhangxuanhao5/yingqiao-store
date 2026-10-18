@@ -30,6 +30,6 @@ lipo -create "$stage/build/YingqiaoStore-arm64" "$stage/build/YingqiaoStore-x86_
 cp "$stage/Info.plist" "$app/Contents/Info.plist"
 cp "$stage/Resources/AppIcon.icns" "$app/Contents/Resources/AppIcon.icns"
 cp "$stage/../third_party/lwip/COPYING" "$app/Contents/Resources/lwIP-LICENSE.txt"
-# Local preview only. Public release requires Developer ID + notarization.
+# Local preview signature only. GitHub downloads must disclose the lack of Developer ID/notarization; never disable global Gatekeeper.
 codesign --force --sign - "$app"
 "$app/Contents/MacOS/YingqiaoStore" --self-test

@@ -4,11 +4,11 @@
 
 ## 下载与安装
 
-### [下载 Mac 0.3.2 测试版（ZIP）↓](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/store-v0.3.2-test.1/Yingqiao-Mac-0.3.2.zip)
+### [下载 Mac 0.3.5 测试版（ZIP）↓](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/store-v0.3.6-tested-unplug.1/Yingqiao-Mac-0.3.5.zip)
 
-[查看版本说明与所有附件](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/store-v0.3.2-test.1)
+[查看版本说明与所有附件](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/store-v0.3.6-tested-unplug.1)
 
-**普通用户只需下载 `Yingqiao-Mac-0.3.2.zip`。** 下载后双击解压，把“映桥”拖进 Mac 的“应用程序”。源码和依赖是开发资料，不是安装包。
+**普通用户只需下载 `Yingqiao-Mac-0.3.5.zip`。** 下载后双击解压，把“映桥”拖进 Mac 的“应用程序”。源码和依赖是开发资料，不是安装包。
 
 - 第一次安装：阅读 [Mac 逐步安装说明](docs/MAC_INSTALL.md)。
 - 不知道该下载哪个文件：阅读 [下载文件对照](docs/downloads.md)。
@@ -26,11 +26,11 @@
 
 当前版本独立于个人版安装，保留原版界面、画面和输入核心，提供局域网扩展屏，不提供异地远控。0.3.0 的首次使用与附近设备调整见 [版本说明](docs/FIRST_RUN_NEARBY_030.md)；0.3.2 更名与发布准备状态见 [版本说明](docs/NAME_RELEASE_032.md)。
 
-0.3.3 是[正式发布准备候选](docs/FORMAL_PREPARATION_033.md)：正式签名包已通过华为包体合法性检查，尚未提交审核。此候选公开源码与恢复资料，当前 Mac 下载仍是上述0.3.2测试包，不应视为已完成正式发行。
+0.3.3 是[正式发布准备候选](docs/FORMAL_PREPARATION_033.md)：正式签名包已通过华为包体合法性检查，尚未提交审核。此候选保留源码与恢复资料；当前Mac测试下载已更新为0.3.5，不应视为已完成正式发行。
 
 [0.3.4 输入与连接修复](docs/REGRESSION_034.md)已通过本轮Edge局域网拖动、滚动和持续连接验证。0.3.3曾出现触控板按压拖动失效与重复重连，相关问题已记录；消费者USB等发布门槛仍未完成，正式审核尚未提交。
 
-普通USB网络单路已在[0.3.5候选](docs/USB_NETWORK_035.md)打通，但拔线接续失败。已编译、未安装的[0.3.6修复候选与暂停记录](docs/USB_UNPLUG_036.md)保留在候选分支；用户要求明天继续，今晚不再操作设备，尚未发布消费者安装器或提交审核。
+普通USB网络单路已在[0.3.5候选](docs/USB_NETWORK_035.md)打通，但该版拔线接续失败。[0.3.6](docs/USB_UNPLUG_036.md)已在当前Edge完成安装，并实测拔线后自动恢复无线且保留扩展桌面。插回数据线时系统未保留USB共享模式，当前仍需用户重新开启；尚未完成只插线自动恢复USB的目标，未提交审核。
 
 ## 已实现与待验证
 
@@ -40,7 +40,7 @@
 - 精确校验连接证书、使用每会话视频密钥，限制为本地扩展屏用途。
 - 后台比较可用线路，异常断开保留显示器以尝试接续；显式结束时释放。
 
-**消费级 USB 即插即用、真正无缝的有线／无线切换、真实多机型矩阵和上架审核仍是交付门槛。** 目前开发用 USB 对照通道依赖单独的测试环境，不能当作普通用户只插线即可使用的承诺。普通 USB 研究源码保留，但不以编译或策略测试代替实机验收。
+**消费级 USB 即插即用、真正无缝的有线／无线切换、真实多机型矩阵和上架审核仍是交付门槛。** 本轮普通USB网络传屏不使用HDC调试隧道，但要求设备系统已开启USB共享网络；当前设备重插后未自动保留该模式，不能当作普通用户只插线即可使用的承诺。普通USB进展以真机记录为准。
 
 - [真实截图与宣传海报预览](docs/MARKETING_ASSETS.md)
 - [本次真机测试范围](docs/DEVICE_TEST.md)
