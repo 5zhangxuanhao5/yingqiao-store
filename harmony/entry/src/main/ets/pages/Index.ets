@@ -1166,7 +1166,7 @@ struct Index {
    s.cursorSyncApplied = this.cursorSyncApplied;s.cursorSyncStaleSession = this.cursorSyncStaleSession;s.cursorSyncStaleSequence = this.cursorSyncStaleSequence;
    s.cursorSyncStaleInput = this.cursorSyncStaleInput;s.cursorSyncInvalid = this.cursorSyncInvalid;
    s.hostCursorOwner = this.hostCursorOwner;s.hostCursorVisible = this.hostCursorVisible;
-   if(Date.now()-this.lastPerformanceLog>2000){this.lastPerformanceLog=Date.now();hilog.info(0x1234,'StorePerformance','rx=%{public}d rendered=%{public}d fps=%{public}f decodeP95=%{public}f queueP95=%{public}f bytes=%{public}d',s.receivedFrames,s.renderSubmittedFrames,s.renderSubmittedFPS,s.decodeP95ms,s.inputQueueP95ms,s.bytesReceived);}
+   if(Date.now()-this.lastPerformanceLog>2000){this.lastPerformanceLog=Date.now();hilog.info(0x1234,'StorePerformance','rx=%{public}d rendered=%{public}d fps=%{public}s decodeP95=%{public}s queueP95=%{public}s bytes=%{public}d',s.receivedFrames,s.renderSubmittedFrames,String(s.renderSubmittedFPS),String(s.decodeP95ms),String(s.inputQueueP95ms),s.bytesReceived);}
    this.writeFile('session-status.json', JSON.stringify(s));return s;
   } catch (e) { return null; }
  }

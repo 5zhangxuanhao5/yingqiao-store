@@ -71,13 +71,13 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 1541,
-    "sha256": "a45f016acc62f57ae4023392a1cd99aaae97357d84c187d789393b990d2de61c"
+    "bytes": 1543,
+    "sha256": "047650d88b4ccec736c003336e37545a3557c36741eaa5c10a881a4ea8e3e205"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 4004,
-    "sha256": "6a289466a1703e1acf2d492108f34e87ae923fd45778c7f86a08175dc4a7c43d"
+    "bytes": 4627,
+    "sha256": "c6296f07a20c846915d7cd5d65e618771fd75fa8d67d459e7e6195ce606b9079"
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
@@ -96,8 +96,8 @@
   },
   {
     "path": "docs/DISCOVERY_DIAGNOSTIC.md",
-    "bytes": 1334,
-    "sha256": "c7ddb4d994c2b4b1df01219191c44fad8c2f8d58c963b8075bbcb905f028c755"
+    "bytes": 1740,
+    "sha256": "95548337032651f3572969c72c4ba4414f76717847ecb204f584e93e0c88fb74"
   },
   {
     "path": "docs/MAC_INSTALL.md",
@@ -131,8 +131,8 @@
   },
   {
     "path": "harmony/AppScope/app.json5",
-    "bytes": 197,
-    "sha256": "948bc4da5dec7cf9f812527422ed8da812fe25ef1c162907405255aba10e6a7c"
+    "bytes": 198,
+    "sha256": "097456527c85e765dce2e1fb9761128fa88ab5d3f0da62c07cbd3aa36df9fedc"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -406,8 +406,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 144395,
-    "sha256": "e5a302232eb80072f091f9600944940d9b3da1214d5db7f42b7008c92f618e12"
+    "bytes": 144419,
+    "sha256": "2454209fd7618af9089c6a43e9a1faddd1b9db58e6ecf1be2a850804ddfec26c"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -521,8 +521,8 @@
   },
   {
     "path": "mac/Info.plist",
-    "bytes": 1017,
-    "sha256": "8989b77efc9e18e22b3486038aa3e2df0473f874cd4df42827a808e6cea59a43"
+    "bytes": 1018,
+    "sha256": "4b56a1fd8b9aa802277e35d08827d3e4d8a9d9fa96b60ef19f2c84531b5f3182"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -546,8 +546,8 @@
   },
   {
     "path": "mac/Sources/StoreCapture.swift",
-    "bytes": 8516,
-    "sha256": "092ccca15499c38dfc6f678676a6ac6d603eb868bf28ff53e6f7f8a966b5291c"
+    "bytes": 8077,
+    "sha256": "bf07505b9f36fa3ee4e780178bf820d414bb7e1a3f82140036ba0d8a2321cf33"
   },
   {
     "path": "mac/Sources/StoreDashboard.swift",
@@ -558,6 +558,11 @@
     "path": "mac/Sources/StoreDiscovery.swift",
     "bytes": 6283,
     "sha256": "ca4bb631974121b22eacd814882bfb3b6ceff189450706ac11e40d5b08b0b510"
+  },
+  {
+    "path": "mac/Sources/StoreEncoderSettings.swift",
+    "bytes": 1178,
+    "sha256": "a43a4d4c1050a232e9541e38e2693d469dc955f7d48833437ef0b42be2bd0325"
   },
   {
     "path": "mac/Sources/StoreFrameWindow.swift",
@@ -581,8 +586,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 10828,
-    "sha256": "4972b567dcd148c24396be0d5005616c38e403f79f5b3c77f490359fbc6b9717"
+    "bytes": 11219,
+    "sha256": "bf9d41e7956221e14ffc99601783626b8afe8338593c99333007245ef36a77cc"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",

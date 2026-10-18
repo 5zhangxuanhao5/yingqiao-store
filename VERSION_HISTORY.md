@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.9-test.1
+
+0.1.8 failed on the real Mac: HEVC returned -12900 for MaxFrameDelayCount=0, which had incorrectly been treated as a mandatory property. Preserve real-time/reorder settings; optional unsupported frame-delay hints no longer reject the session. A regression calls the same production settings helper with -12900 for the optional property and checks mandatory failures are still rejected. Preserve actual session failure text instead of overwriting it with normal stop text. Pad numeric diagnostic fields now use supported string log formatting. Real native-size streaming acceptance remains pending.
+
 ## store-v0.1.8-test.1
 
 Prefer actual panel dimensions when the hardware capability probe supports them. Bound frame admission using the existing Pad render-submission ACKs, allow no encoder frame delay, and tune bitrate from measured ACK age. This bounds pre-encode production rather than discarding encoded reference frames. Fresh native-profile regression and frame-window invalid/duplicate/cumulative ACK self-tests pass. Remove numeric-code UI as requested; first connection uses explicit Mac approval and pins the selected certificate thereafter, without out-of-band numeric identity verification. Previously approved addresses are probed without a saved preset host. Campus-network initial automatic discovery and consumer USB remain open gates.
