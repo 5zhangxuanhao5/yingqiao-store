@@ -32,7 +32,7 @@
   {
     "path": "DEPENDENCY_ARCHIVE.json",
     "bytes": 290,
-    "sha256": "51086f73e79437dce235f072970471aa9e2a25a7c8c6adab21cd411c30013847"
+    "sha256": "324d6163eb716c43ed0cfc3e9225a8b48960c29227146533ce4e47fc38617441"
   },
   {
     "path": "LICENSE",
@@ -66,18 +66,18 @@
   },
   {
     "path": "VALIDATION.json",
-    "bytes": 1113,
-    "sha256": "4b85a46543590dea44c66871bacd691a1ba2bc09e32d73bfea120a0ac70e4bfb"
+    "bytes": 1288,
+    "sha256": "8347441e8164e1574740f4bf05686b529b80be22da0d72746b3f350d5021b9d5"
   },
   {
     "path": "VERSION.json",
     "bytes": 1214,
-    "sha256": "e4e364b575b0592240efbfe478d338154f8c2ccd058260d023f01dcdbd43d428"
+    "sha256": "80b7c1219127293ca66530b69b71a59e38b31c918456dd99206be08c32952ed3"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 1917,
-    "sha256": "5ee7ddb08caf4388c2dbc2bc287fb9bdd8f6ef0dcecac0ebb64fd01cc353eae0"
+    "bytes": 2347,
+    "sha256": "2436b2e298f70daec43a29f398d4e83841b14be1cec96e2a41c591085e9ea487"
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
@@ -127,7 +127,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 197,
-    "sha256": "94e9f8491636626bd2cf7578baa4dc6634bd1678255d7d4809c353ea2d7d5878"
+    "sha256": "2a4c7c42a7befc43a389fba57dc13017f55e657bcbf622c61de164655fb3b64e"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -517,7 +517,7 @@
   {
     "path": "mac/Info.plist",
     "bytes": 1017,
-    "sha256": "f9dff18afb2993f4131ce751b21d1af6fef1f574a3e60c4eb1b9ca5a6313780b"
+    "sha256": "8487b7e3f61976e643c60fe86f16f5fd5715bf329c604b0a765c884b723a720a"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -551,8 +551,8 @@
   },
   {
     "path": "mac/Sources/StoreDiscovery.swift",
-    "bytes": 3402,
-    "sha256": "b43e8fe5114313ad39aff7a42405a322d7f384455da5e8c5921d3c6b39aed2f6"
+    "bytes": 3452,
+    "sha256": "d5c67c59cc793bdae63d74739b7ed1beb3f1bea75bf054c7f7962a9de2f751ad"
   },
   {
     "path": "mac/Sources/StoreIdentity.swift",
@@ -571,8 +571,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 10143,
-    "sha256": "fd9c76fe0b77696af33dc4a4f52925b065bdef8b89495db231eb24c82f55f4c8"
+    "bytes": 10199,
+    "sha256": "63bec0d065cb108ccd2724d90ab6564b42cf9f988320d1d263ee7ba464c8f94c"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",

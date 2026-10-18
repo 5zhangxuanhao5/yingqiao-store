@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.4-test.1
+
+Observed 0.1.3 readiness callback did not reach ready although Bonjour records were visible on Mac; Pad acceptance was still unverified. Place Mac async setup on the main actor and explicitly schedule Bonjour on the main run loop. Keep the restored dashboard and one-time TLS-code approval flow, with the public project owned by 5zhangxuanhao5. Real device discovery acceptance remains a separate result.
+
 ## store-v0.1.3-test.1
 
 Move the public project to 5zhangxuanhao5/yingqiao-store, preserve all history and tags, restore the accepted personal-edition dashboard theme and tablet card layout. Replace QR/manual configuration with mDNS/Bonjour discovery, strict pinned TLS bootstrap and one-time Mac approval after comparing a TLS-exporter-derived code. Remember approved credentials locally. Consumer USB remains incomplete and AppGallery submission is paused. Device deployment evidence is recorded separately; private profiles stay outside public archives.

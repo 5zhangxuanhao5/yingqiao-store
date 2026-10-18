@@ -10,7 +10,7 @@ extension StoreHost:NetServiceDelegate {
   let certificate=Array(identity.certificate.utf8);var values:[String:Data]=["schema":Data("store-discovery-v1".utf8),"id":Data(hex(Data(SHA256.hash(data:Data(certificate)))).prefix(24).utf8)]
   let chunks=stride(from:0,to:certificate.count,by:208).map{Data(certificate[$0..<min($0+208,certificate.count)])}
   values["count"]=Data(String(chunks.count).utf8);for (i,data) in chunks.enumerated(){values["c\(i)"]=data}
-  service.delegate=self;service.setTXTRecord(NetService.data(fromTXTRecord:values));service.publish();advertisedService=service
+  service.schedule(in:RunLoop.main,forMode:.common);service.delegate=self;service.setTXTRecord(NetService.data(fromTXTRecord:values));service.publish();advertisedService=service
  }
  func netServiceDidPublish(_ sender:NetService){bonjourReady=true;updateDashboard()}
  func netService(_ sender:NetService,didNotPublish errorDict:[String:NSNumber]){advertisedService=nil;bonjourReady=false;statusMessage="局域网设备发现尚未准备好，请允许本地网络访问后重试。"}
