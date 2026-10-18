@@ -29,7 +29,7 @@ extension StoreHost:NetServiceDelegate {
   alert.beginSheetModal(for:window){[weak self,weak peer] response in
    DispatchQueue.main.async{
    guard let self,let peer,self.linkPeer===peer else{return};self.linkAlert=nil;self.linkPeer=nil
-   guard response == .alertFirstButtonReturn,!peer.closed,let host=(peer.usb ? StoreUSB.address():StoreIdentity.addresses().first),let json=try? identity.pairingJSON(host:host) else{peer.send("ERR denied");self.statusMessage="未允许此次连接。";return}
+   guard response == .alertFirstButtonReturn,!peer.closed,let host=(peer.usb ? (StoreUSB.address() ?? StoreIdentity.addresses().first ?? "127.0.0.1"):StoreIdentity.addresses().first),let json=try? identity.pairingJSON(host:host) else{peer.send("ERR denied");self.statusMessage="未允许此次连接。";return}
    peer.send("LINKED "+json);self.statusMessage="已允许平板，正在建立扩展桌面。"
    }
   }

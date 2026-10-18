@@ -1,4 +1,5 @@
 #include "store_policy.h"
+#include "split_proof.h"
 #include <napi/native_api.h>
 #include <openssl/ssl.h>
 #include <openssl/pem.h>
@@ -26,12 +27,12 @@ void cancel(){cancelled=true;{std::lock_guard<std::mutex>g(mutex);if(activeFD>=0
 struct Channel{int fd=-1;SSL_CTX*ctx=nullptr;SSL*ssl=nullptr;~Channel(){if(ssl)SSL_free(ssl);if(ctx)SSL_CTX_free(ctx);{std::lock_guard<std::mutex>g(mutex);if(activeFD==fd)activeFD=-1;}if(fd>=0)close(fd);}};
 void run(std::string host,std::string cert){
  try{
-  Channel c;c.fd=socket(AF_INET,SOCK_STREAM,0);if(c.fd<0)throw std::runtime_error("无法打开局域网连接");
+  Channel c;c.fd=socket(AF_INET,SOCK_STREAM,0);if(c.fd<0)throw std::runtime_error("无法打开设备连接");
   {std::lock_guard<std::mutex>g(mutex);if(cancelled)throw std::runtime_error("已取消连接");activeFD=c.fd;}
-  sockaddr_in addr{};addr.sin_family=AF_INET;addr.sin_port=htons(49563);inet_pton(AF_INET,host.c_str(),&addr.sin_addr);
+  sockaddr_in addr{};addr.sin_family=AF_INET;addr.sin_port=htons(host=="127.0.0.1"?49561:49563);inet_pton(AF_INET,host.c_str(),&addr.sin_addr);
   int flags=fcntl(c.fd,F_GETFL,0);fcntl(c.fd,F_SETFL,flags|O_NONBLOCK);int connected=connect(c.fd,(sockaddr*)&addr,sizeof(addr));
   if(connected<0&&errno==EINPROGRESS){pollfd p{c.fd,POLLOUT,0};int e=0;socklen_t n=sizeof(e);if(poll(&p,1,5000)>0&&getsockopt(c.fd,SOL_SOCKET,SO_ERROR,&e,&n)==0&&e==0)connected=0;}
-  if(connected!=0||cancelled)throw std::runtime_error("电脑暂时无法连接，请确认两端在同一局域网");
+  if(connected!=0||cancelled)throw std::runtime_error("电脑暂时无法连接，请确认两端映桥已打开并保持设备连接");
   fcntl(c.fd,F_SETFL,flags);timeval timeout{5,0};setsockopt(c.fd,SOL_SOCKET,SO_RCVTIMEO,&timeout,sizeof(timeout));setsockopt(c.fd,SOL_SOCKET,SO_SNDTIMEO,&timeout,sizeof(timeout));
   c.ctx=SSL_CTX_new(TLS_client_method());if(!c.ctx)throw std::runtime_error("安全连接尚未就绪");SSL_CTX_set_min_proto_version(c.ctx,TLS1_2_VERSION);SSL_CTX_set_verify(c.ctx,SSL_VERIFY_PEER,nullptr);
   BIO*b=BIO_new_mem_buf(cert.data(),int(cert.size()));X509*expected=b?PEM_read_bio_X509(b,nullptr,nullptr,nullptr):nullptr;if(b)BIO_free(b);if(!expected)throw std::runtime_error("设备身份信息不完整，请刷新设备");
@@ -49,9 +50,40 @@ void run(std::string host,std::string cert){
  }catch(const std::exception&e){state(cancelled?"idle":"error",e.what());}
 }
 napi_value Start(napi_env env,napi_callback_info info){size_t n=2;napi_value args[2];napi_get_cb_info(env,info,&n,args,nullptr,nullptr);bool ok=false;
- if(n==2){auto h=arg(env,args[0]),c=arg(env,args[1]);if(edgelinkstore::PrivateAddress(h)&&h.find(':')==std::string::npos&&c.size()>=100&&c.size()<=8192){cancel();{std::lock_guard<std::mutex>g(mutex);phase="connecting";error.clear();result.clear();code.clear();}cancelled=false;worker=std::thread(run,h,c);ok=true;}}
+ if(n==2){auto h=arg(env,args[0]),c=arg(env,args[1]);if((edgelinkstore::PrivateAddress(h)
+#ifdef ORIGINAL_USB_TEST
+ || h=="127.0.0.1"
+#endif
+ )&&h.find(':')==std::string::npos&&c.size()>=100&&c.size()<=8192){cancel();{std::lock_guard<std::mutex>g(mutex);phase="connecting";error.clear();result.clear();code.clear();}cancelled=false;worker=std::thread(run,h,c);ok=true;}}
  napi_value value;napi_get_boolean(env,ok,&value);return value;}
 napi_value Status(napi_env env,napi_callback_info){std::string s;{std::lock_guard<std::mutex>g(mutex);s="{\"phase\":"+quote(phase)+",\"code\":"+quote(code)+",\"error\":"+quote(error)+",\"pairing\":"+quote(result)+"}";}napi_value value;napi_create_string_utf8(env,s.data(),s.size(),&value);return value;}
 napi_value Stop(napi_env env,napi_callback_info){cancel();{std::lock_guard<std::mutex>g(mutex);phase="idle";code.clear();result.clear();error.clear();}napi_value v;napi_get_undefined(env,&v);return v;}
+struct DiscoveryWork { napi_async_work work=nullptr;napi_deferred deferred=nullptr;std::string result; };
+void USBIdentity(napi_env,void* data){
+#ifdef ORIGINAL_USB_TEST
+ auto*w=static_cast<DiscoveryWork*>(data);
+ // Bootstrap public identity only on the explicitly enabled debug USB loopback.
+ // No token/input/media is sent here. LINK uses pinned certificate verification.
+ int fd=socket(AF_INET,SOCK_STREAM,0);if(fd<0)return;
+ SSL_CTX*ctx=nullptr;SSL*ssl=nullptr;
+ auto cleanup=[&]{if(ssl)SSL_free(ssl);if(ctx)SSL_CTX_free(ctx);close(fd);};
+ timeval timeout{2,0};setsockopt(fd,SOL_SOCKET,SO_RCVTIMEO,&timeout,sizeof(timeout));setsockopt(fd,SOL_SOCKET,SO_SNDTIMEO,&timeout,sizeof(timeout));
+ sockaddr_in a{};a.sin_family=AF_INET;a.sin_port=htons(49561);inet_pton(AF_INET,"127.0.0.1",&a.sin_addr);
+ int f=fcntl(fd,F_GETFL,0);fcntl(fd,F_SETFL,f|O_NONBLOCK);int rc=connect(fd,(sockaddr*)&a,sizeof(a));
+ if(rc<0&&errno==EINPROGRESS){pollfd p{fd,POLLOUT,0};int e=0;socklen_t n=sizeof(e);if(poll(&p,1,800)>0&&getsockopt(fd,SOL_SOCKET,SO_ERROR,&e,&n)==0&&e==0)rc=0;}
+ if(rc!=0){cleanup();return;}fcntl(fd,F_SETFL,f);
+ ctx=SSL_CTX_new(TLS_client_method());if(!ctx){cleanup();return;}SSL_CTX_set_min_proto_version(ctx,TLS1_2_VERSION);
+ ssl=SSL_new(ctx);SSL_set_fd(ssl,fd);if(SSL_connect(ssl)!=1){cleanup();return;}
+ X509*cert=SSL_get1_peer_certificate(ssl);BIO*b=BIO_new(BIO_s_mem());std::string pem;
+ if(cert&&b&&PEM_write_bio_X509(b,cert)==1){char*ptr=nullptr;long n=BIO_get_mem_data(b,&ptr);if(n>0&&n<8192)pem.assign(ptr,n);}if(b)BIO_free(b);X509_free(cert);
+ const std::string q="DISCOVER store-v1 "+edgelinkavailability::CurrentDeviceMetadata()+"\n";if(pem.empty()||SSL_write(ssl,q.data(),int(q.size()))!=int(q.size())){cleanup();return;}
+ std::string line;for(int i=0;i<8&&line.find('\n')==std::string::npos;i++){char buf[2048];int n=SSL_read(ssl,buf,sizeof(buf));if(n<=0)break;line.append(buf,n);if(line.size()>12288)break;}
+ if(line.rfind("DISCOVERED ",0)==0&&line.size()<=12288&&line.find('\n')!=std::string::npos)w->result="{\"certificate\":"+quote(pem)+",\"identity\":"+line.substr(11,line.find('\n')-11)+"}";
+ cleanup();
+#endif
 }
-void RegisterStoreLinkAPI(napi_env env,napi_value exports){napi_add_env_cleanup_hook(env,[](void*){cancel();},nullptr);napi_property_descriptor methods[]={{"storeLinkStart",nullptr,Start,nullptr,nullptr,nullptr,napi_default,nullptr},{"storeLinkStatus",nullptr,Status,nullptr,nullptr,nullptr,napi_default,nullptr},{"storeLinkCancel",nullptr,Stop,nullptr,nullptr,nullptr,napi_default,nullptr}};napi_define_properties(env,exports,3,methods);}
+void USBIdentityDone(napi_env env,napi_status status,void*data){auto*w=static_cast<DiscoveryWork*>(data);napi_value v;napi_create_string_utf8(env,w->result.data(),w->result.size(),&v);napi_resolve_deferred(env,w->deferred,v);napi_delete_async_work(env,w->work);delete w;}
+napi_value Discover(napi_env env,napi_callback_info){auto*w=new DiscoveryWork();napi_value promise,name;napi_create_promise(env,&w->deferred,&promise);napi_create_string_utf8(env,"publicUSBIdentity",NAPI_AUTO_LENGTH,&name);if(napi_create_async_work(env,nullptr,name,USBIdentity,USBIdentityDone,w,&w->work)!=napi_ok||napi_queue_async_work(env,w->work)!=napi_ok){napi_value v;napi_get_undefined(env,&v);napi_resolve_deferred(env,w->deferred,v);if(w->work)napi_delete_async_work(env,w->work);delete w;}return promise;}
+
+}
+void RegisterStoreLinkAPI(napi_env env,napi_value exports){napi_add_env_cleanup_hook(env,[](void*){cancel();},nullptr);napi_property_descriptor methods[]={{"storeLinkStart",nullptr,Start,nullptr,nullptr,nullptr,napi_default,nullptr},{"storeLinkStatus",nullptr,Status,nullptr,nullptr,nullptr,napi_default,nullptr},{"storeLinkCancel",nullptr,Stop,nullptr,nullptr,nullptr,napi_default,nullptr}};napi_define_properties(env,exports,3,methods);napi_property_descriptor discovery={"storeUSBDiscover",nullptr,Discover,nullptr,nullptr,nullptr,napi_default,nullptr};napi_define_properties(env,exports,1,&discovery);}

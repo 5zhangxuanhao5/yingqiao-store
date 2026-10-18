@@ -26,6 +26,8 @@ jobs:
       - name: Compile and run Linux fixtures
         if: runner.os == 'Linux'
         run: |
+          g++ -std=c++17 -Wall -Wextra -Werror tests/route_selection_test.cpp -o route-test
+          ./route-test
           g++ -std=c++17 -Wall -Wextra -Werror tests/portable_profile_test.cpp -o portable-test
           ./portable-test
           g++ -std=c++17 -Wall -Wextra -Werror tests/usb_test.cpp -o usb-test

@@ -989,11 +989,12 @@ class Client {
   auto audioDone=std::make_shared<std::atomic<bool>>(true),micDone=std::make_shared<std::atomic<bool>>(true);
   try{
    int authKbps=isTailnet()?4000:(options.bitrateKbps>0?options.bitrateKbps:(!options.splitPath&&options.host=="127.0.0.1"&&options.port==49561?80000:40000));
-   auto authenticate=[&](){Write(control,"AUTH "+options.token+" "+options.mode+" "+std::to_string(options.width)+" "+std::to_string(options.height)+" "+std::to_string(options.fps)+" "+(isUDP()?"udp":"tcp")+" "+std::to_string(authKbps)+" store-v1 codec-"+(options.transport=="store-hevc"?"hevc":"avc")+"-v1\n");std::string line;uint8_t ch;while(line.size()<1024&&Read(control,&ch,1)){if(ch=='\n')break;line+=char(ch);}return line;};
+   auto authenticate=[&](){Write(control,"AUTH "+options.token+" "+options.mode+" "+std::to_string(options.width)+" "+std::to_string(options.height)+" "+std::to_string(options.fps)+" "+(isUDP()?"udp":"tcp")+" "+std::to_string(authKbps)+" store-v1 codec-"+(options.transport=="store-hevc"?"hevc":"avc")+"-v1 edge-session-"+edgelinkavailability::CurrentProcessSession()+"\n");std::string line;uint8_t ch;while(line.size()<1024&&Read(control,&ch,1)){if(ch=='\n')break;line+=char(ch);}return line;};
    ctrl=connectWithRetry(false);control=ctrl.get();std::string answer=authenticate();
    // One exact legacy bitrate rejection permits one same-pinned TLS retry.
    // No retry weakens certificates or hides an unrelated AUTH/network failure.
    if(isTailnet()&&answer=="ERR bitrate_configuration"&&running&&!stopRequested){control=nullptr;ctrl.reset();authKbps=8000;ctrl=connectWithRetry(false);control=ctrl.get();answer=authenticate();}
+   if(answer=="ERR permissions_required")throw std::runtime_error("请先在 Mac 的映桥中完成屏幕共享和键鼠权限设置，再重新连接");
    if(answer=="ERR remote_local_authorization_required")throw std::runtime_error("请先在 Mac 的映桥中开启“远控待机”，再重新连接");
    std::istringstream input(answer);std::string tag,sidHex,keyHex,sp,cp;int w=0,h=0,fps=0;input>>tag>>sidHex>>keyHex>>sp>>cp>>viewerToken>>w>>h>>fps;
    if(tag!="OK")throw std::runtime_error("Mac 拒绝会话，可能已有连接或配对不一致");key=Unhex(keyHex);serverPrefix=Unhex(sp);clientPrefix=Unhex(cp);auto sb=Unhex(sidHex);if(sb.size()!=4||key.size()!=16||serverPrefix.size()!=4||clientPrefix.size()!=4||w!=options.width||h!=options.height||fps!=options.fps)throw std::runtime_error("会话参数无效");sid=uint32_t(ReadBE(sb.data(),4));

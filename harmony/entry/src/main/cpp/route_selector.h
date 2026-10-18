@@ -55,16 +55,13 @@ public:
  }
  StartPlan start(Mode mode,uint64_t now)const{
   StartPlan p;
-  std::optional<Choice> usb;
   for(const auto&v:samples_){
    if(!eligible(v,mode,now))continue;
    auto candidate=choice(v,now);
-   if(v.kind==Kind::USB)usb=candidate;
    if(!p.immediate||candidate.scoreMs<p.immediate->scoreMs)p.immediate=std::move(candidate);
   }
-  // Available paired USB wins until an end-to-end video trial proves a better
-  // path. Tiny startup probes are noisy and cannot justify silently using Wi-Fi.
-  if(mode==Mode::Extend&&usb)p.immediate=usb;
+  // Compare authenticated latency/jitter and measured frame transfer cost.
+  // Unknown/tied paths preserve insertion order (USB first), without waiting.
   // No synchronously waiting for a better measurement if a verified path is
   // available. Both local probes are independently cancellable background work.
   p.backgroundProbes={Kind::USB,Kind::LAN};

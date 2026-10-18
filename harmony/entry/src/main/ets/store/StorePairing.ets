@@ -10,7 +10,7 @@ export function validatePairing(text: string): StorePairing | null {
  if (text.length>12288) { return null; }
  try {
   const p=JSON.parse(text) as StorePairing;
-  if (p.schema!=='yingqiao-pairing-v1'||typeof p.host!=='string'||!localIPv4(p.host)||typeof p.token!=='string'||!/^[0-9a-f]{64}$/.test(p.token)||p.port!==49563||p.udpPort!==49564||typeof p.cert!=='string'||p.cert.length>8192||!p.cert.startsWith('-----BEGIN CERTIFICATE-----')||!p.cert.trim().endsWith('-----END CERTIFICATE-----')||!Array.isArray(p.codecs)||!p.codecs.every((v:string)=>['avc','hevc'].includes(v))||p.codecs.length===0||p.codecs.length>2) { return null; }
+  if (p.schema!=='yingqiao-pairing-v1'||typeof p.host!=='string'||!(localIPv4(p.host)||p.host==='127.0.0.1')||typeof p.token!=='string'||!/^[0-9a-f]{64}$/.test(p.token)||p.port!==49563||p.udpPort!==49564||typeof p.cert!=='string'||p.cert.length>8192||!p.cert.startsWith('-----BEGIN CERTIFICATE-----')||!p.cert.trim().endsWith('-----END CERTIFICATE-----')||!Array.isArray(p.codecs)||!p.codecs.every((v:string)=>['avc','hevc'].includes(v))||p.codecs.length===0||p.codecs.length>2) { return null; }
   return {schema:p.schema,host:p.host,token:p.token,cert:p.cert,port:p.port,udpPort:p.udpPort,codecs:p.codecs};
  } catch (e) { return null; }
 }

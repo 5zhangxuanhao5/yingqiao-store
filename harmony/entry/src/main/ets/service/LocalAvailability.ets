@@ -72,7 +72,7 @@ export class LocalAvailability {
  private configure(): void {
   if (!this.alive) { return; }
   const epoch = this.epoch;
-  native.availabilityConfigure(this.numericIPv4(this.host) ? this.host : '', 49562, this.token, this.certificate,
+  native.availabilityConfigure(this.numericIPv4(this.host) && !this.host.startsWith('127.') ? this.host : '', 49562, this.token, this.certificate,
    (event: AvailabilityEvent) => { if (this.alive && epoch === this.epoch) { this.callback(event); } });
  }
  status(): LocalAvailabilityStatus {

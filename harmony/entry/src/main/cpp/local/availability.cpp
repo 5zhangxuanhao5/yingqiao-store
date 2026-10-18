@@ -51,6 +51,9 @@ public:
  void Stop();
  void Refresh();
  std::string Status();
+ std::string ProcessSession(){std::lock_guard<std::mutex>g(lock_);return session_;}
+ std::string DeviceMetadata(){std::lock_guard<std::mutex>g(lock_);return deviceMetadata_;}
+ void DeviceMetadata(std::string value){std::lock_guard<std::mutex>g(lock_);deviceMetadata_=std::move(value);}
  bool CanUsePath(const std::string& route,const std::string& host,int port,const std::string& token,const std::string& certificate);
  bool Ready(const std::shared_ptr<Worker>& worker);
  void Lost(const std::shared_ptr<Worker>& worker,const std::string& error);
@@ -79,7 +82,7 @@ private:
  struct Request{std::string id,route;std::weak_ptr<Worker> worker;uint64_t epoch=0,deadline=0;bool replied=false;};
  std::mutex lock_,callbackLock_;
  std::shared_ptr<Worker> usb_,lan_;
- std::string token_,certificate_,session_,host_,state_="idle",preferred_;
+ std::string token_,certificate_,session_,host_,state_="idle",preferred_,deviceMetadata_;
  int port_=0;uint64_t nextEpoch_=1;
  Path usbPath_,lanPath_;
  std::unique_ptr<Request> request_;
@@ -193,7 +196,7 @@ private:
  bool Session(Socket& socket,TLS& tls){
   const uint64_t connectDeadline=NowMs()+2000;
   if(!Connect(socket,tls,connectDeadline))return false;
-  std::string hello="STANDBY "+options_.token+' '+options_.processSession+' '+options_.route+' '+Manager::Get().CurrentState();
+  std::string hello="STANDBY "+options_.token+' '+options_.processSession+' '+options_.route+' '+Manager::Get().CurrentState()+' '+Manager::Get().DeviceMetadata();
   const bool sent=Send(tls.ssl,hello,connectDeadline);OPENSSL_cleanse(hello.data(),hello.size());if(!sent)return false;
   std::string line;if(!ReadLine(tls.ssl,line,256,connectDeadline)||line!="READY OK standby-v1")return false;
   if(!Manager::Get().Ready(shared_from_this()))return false;
@@ -481,6 +484,8 @@ bool Manager::Emit(Event event){
 #endif
 } // anonymous namespace
 
+std::string CurrentProcessSession(){return Manager::Get().ProcessSession();}
+std::string CurrentDeviceMetadata(){return Manager::Get().DeviceMetadata();}
 bool CanUseVerifiedLocalPath(const std::string& route,const std::string& host,int standbyPort,const std::string& token,const std::string& certificate){return Manager::Get().CanUsePath(route,host,standbyPort,token,certificate);}
 
 #ifdef EDGELINK_AVAILABILITY_TEST
@@ -516,6 +521,7 @@ napi_value ReplyJS(napi_env env,napi_callback_info info){napi_value args[2];size
 napi_value StopJS(napi_env env,napi_callback_info){Manager::Get().Stop();return Undefined(env);}
 napi_value RefreshJS(napi_env env,napi_callback_info){Manager::Get().Refresh();return Undefined(env);}
 napi_value StatusJS(napi_env env,napi_callback_info){const auto json=Manager::Get().Status();napi_value value;napi_create_string_utf8(env,json.data(),json.size(),&value);return value;}
+napi_value IdentityJS(napi_env env,napi_callback_info info){napi_value arg;size_t n=1;napi_get_cb_info(env,info,&n,&arg,nullptr,nullptr);std::string value;if(n==1&&StringArgument(env,arg,256,value)&&value.rfind("device-v1:",0)==0&&value.find_first_of(" \r\n")==std::string::npos)Manager::Get().DeviceMetadata(value);return Undefined(env);}
 void Cleanup(void*){Manager::Get().Stop();}
 }
 void RegisterAvailability(napi_env env,napi_value exports){
@@ -525,6 +531,7 @@ void RegisterAvailability(napi_env env,napi_value exports){
   {"availabilityReply",nullptr,ReplyJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityStop",nullptr,StopJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityRefresh",nullptr,RefreshJS,nullptr,nullptr,nullptr,napi_default,nullptr},
+  {"availabilityIdentity",nullptr,IdentityJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityStatus",nullptr,StatusJS,nullptr,nullptr,nullptr,napi_default,nullptr}
  };
  napi_define_properties(env,exports,sizeof(methods)/sizeof(methods[0]),methods);napi_add_env_cleanup_hook(env,Cleanup,nullptr);

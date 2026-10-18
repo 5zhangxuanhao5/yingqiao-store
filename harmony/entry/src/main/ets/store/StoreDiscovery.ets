@@ -1,13 +1,19 @@
+import native from 'libedgelink.so';
 import { mdns, socket, connection } from '@kit.NetworkKit';
 import { util } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { common } from '@kit.AbilityKit';
 import { localIPv4 } from './StorePairing';
 export interface StoreDiscoveredPath { host:string;route:string; }
-export interface StoreDiscoveredMac { paths:StoreDiscoveredPath[]; id: string; name: string; host: string; certificate: string; serviceName: string; }
-interface DatagramIdentity {paths?:StoreDiscoveredPath[];schema:string;nonce:string;id:string;name:string;certificate:string;port:number;}
+export interface StoreDiscoveredMac { startRequested?:boolean; paths:StoreDiscoveredPath[]; id: string; name: string; host: string; certificate: string; serviceName: string; }
+interface USBIdentity {certificate:string;identity:DatagramIdentity;}
+interface DatagramIdentity {startRequested?:boolean;paths?:StoreDiscoveredPath[];schema:string;nonce:string;id:string;name:string;certificate:string;port:number;}
 export class StoreDiscovery {
  private probe:socket.UDPSocket|null=null;
+ private usbTimer:number=-1;
+ private usbPending:boolean=false;
+ private seen:Map<string,number>=new Map();
+ private serviceIDs:Map<string,string>=new Map();
  private probeTimers:number[]=[];
  private finder: mdns.DiscoveryService | null = null;
  private devices: StoreDiscoveredMac[] = [];
@@ -17,16 +23,17 @@ export class StoreDiscovery {
  private changed:(devices:StoreDiscoveredMac[])=>void;
  private failed:(message:string)=>void;
  constructor(context:common.UIAbilityContext,changed:(devices:StoreDiscoveredMac[])=>void,failed:(message:string)=>void,rememberedHost:string=''){this.rememberedHost=rememberedHost;this.context=context;this.changed=changed;this.failed=failed;}
- private acceptDevice(item:StoreDiscoveredMac):void {
+ acceptDevice(item:StoreDiscoveredMac):void {
+  this.seen.set(item.id,Date.now());
   const previous=this.devices.find((d:StoreDiscoveredMac)=>d.id===item.id&&d.certificate===item.certificate);
-  const combined:StoreDiscoveredPath[]=item.paths.slice();combined.push({host:item.host,route:'lan'});
-  if(previous){combined.push(...previous.paths);combined.push({host:previous.host,route:'lan'});}
+  const combined:StoreDiscoveredPath[]=item.paths.slice();combined.push({host:item.host,route:item.host==='127.0.0.1'?'usb':'lan'});
+  if(previous){combined.push(...previous.paths);combined.push({host:previous.host,route:previous.host==='127.0.0.1'?'usb':'lan'});}
   item.paths=combined.filter((p:StoreDiscoveredPath,i:number)=>combined.findIndex((v:StoreDiscoveredPath)=>v.host===p.host)===i).slice(0,8);
   this.devices=this.devices.filter((d:StoreDiscoveredMac)=>d.id!==item.id);this.devices.push(item);this.devices=this.devices.slice(-16);this.changed(this.devices.slice());
  }
  private attribute(info:mdns.LocalServiceInfo,key:string):string {let out='';for(const item of info.serviceAttribute || []) {if(item.key===key){for(const byte of item.value){out+=String.fromCharCode(byte);}return out;}}return out;}
  start():void {
-  this.stop();const generation=++this.epoch;this.startDatagram(generation);
+  this.stop();const generation=++this.epoch;this.startDatagram(generation);this.scanUSB(generation);this.usbTimer=setInterval(()=>this.scanUSB(generation),5000);
   try {
    const finder=mdns.createDiscoveryService(this.context,'_yingqiaostore._tcp');this.finder=finder;
    hilog.info(0x1234,'StoreDiscovery','created');
@@ -42,13 +49,23 @@ export class StoreDiscovery {
      if(certificate.length>8192||!certificate.startsWith('-----BEGIN CERTIFICATE-----')||!certificate.trim().endsWith('-----END CERTIFICATE-----'))return;
      hilog.info(0x1234,'StoreDiscovery','accepted');
      const item:StoreDiscoveredMac={id:id,name:info.serviceName.slice(0,80),host:host,certificate:certificate,serviceName:info.serviceName,paths:[]};
-     this.acceptDevice(item);
+     this.serviceIDs.set(info.serviceName,id);this.acceptDevice(item);
     }).catch((e:Error)=>{hilog.warn(0x1234,'StoreDiscovery','resolve error=%{public}s',e.message);});
    });
-   finder.on('serviceLost',(info:mdns.LocalServiceInfo)=>{if(generation!==this.epoch)return;this.devices=this.devices.filter((x:StoreDiscoveredMac)=>x.serviceName!==info.serviceName);this.changed(this.devices.slice());});
+   finder.on('serviceLost',(info:mdns.LocalServiceInfo)=>{if(generation!==this.epoch)return;const id=this.serviceIDs.get(info.serviceName);this.serviceIDs.delete(info.serviceName);if(id)this.seen.set(id,0);this.devices=this.devices.filter((x:StoreDiscoveredMac)=>x.id!==id||x.host==='127.0.0.1');this.changed(this.devices.slice());});
    finder.startSearchingMDNS();
-  }catch(e){hilog.warn(0x1234,'StoreDiscovery','start failed');this.failed('暂时未能搜索设备，请确认两端连接同一局域网后重试。');}
+  }catch(e){hilog.warn(0x1234,'StoreDiscovery','start failed');this.failed('暂时未能搜索设备，请确认两端软件已打开并保持设备连接。');}
  }
+ private async scanUSB(generation:number):Promise<void>{
+  if(this.usbPending)return;this.usbPending=true;
+  try{const raw=await native.storeUSBDiscover();if(generation!==this.epoch)return;
+   if(!raw){this.devices=this.devices.filter((d:StoreDiscoveredMac)=>d.host!=='127.0.0.1');this.changed(this.devices.slice());return;}
+   const value=JSON.parse(raw) as USBIdentity;const info=value.identity;
+   if(info.schema!=='store-discovery-v1'||info.certificate!==value.certificate||!/^[0-9a-f]{24}$/.test(info.id)||info.port!==49563)return;
+   this.acceptDevice({startRequested:info.startRequested===true,id:info.id,name:info.name.slice(0,80),host:'127.0.0.1',certificate:info.certificate,serviceName:info.id,paths:[{host:'127.0.0.1',route:'usb'}]});
+  }catch(e){}finally{this.usbPending=false;}
+ }
+ probeHost(host:string):void{if(localIPv4(host)){this.rememberedHost=host;this.refreshPaths();}}
  refreshPaths():void {
   for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}
   this.startDatagram(this.epoch);
@@ -81,5 +98,5 @@ export class StoreDiscovery {
    this.probeTimers.push(setTimeout(()=>{if(this.probe===owned){this.probe=null;owned.close().catch(()=>{});}},15000));
   }catch(e){hilog.warn(0x1234,'StoreDiscovery','datagram unavailable error=%{public}s',(e as Error).message);if(probe)probe.close().catch(()=>{});}
  }
- stop():void {this.epoch++;for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}if(this.finder){try{this.finder.stopSearchingMDNS();this.finder.off('discoveryStart');this.finder.off('serviceFound');this.finder.off('serviceLost');}catch(e){}this.finder=null;}this.devices=[];}
+ stop():void {this.epoch++;if(this.usbTimer>=0){clearInterval(this.usbTimer);this.usbTimer=-1;}for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}if(this.finder){try{this.finder.stopSearchingMDNS();this.finder.off('discoveryStart');this.finder.off('serviceFound');this.finder.off('serviceLost');}catch(e){}this.finder=null;}this.devices=[];this.seen.clear();this.serviceIDs.clear();}
 }

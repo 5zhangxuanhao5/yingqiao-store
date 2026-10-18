@@ -1,7 +1,8 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { NearbyPad } from '../store/NearbyPad';
 import { StoreDiscovery, StoreDiscoveredMac } from '../store/StoreDiscovery';
 import { HarmonyAccessoryCandidate } from '../store/HarmonyAccessory';
-import { pasteboard, systemDateTime } from '@kit.BasicServicesKit';
+import { pasteboard, systemDateTime, deviceInfo } from '@kit.BasicServicesKit';
 import { validatePairing, STORE_DOWNLOAD_URL, StorePairing } from '../store/StorePairing';
 import native, { NativeMouseSample, NativeCursorSample, AvailabilityEvent } from 'libedgelink.so';
 import { webview } from '@kit.ArkWeb';
@@ -119,6 +120,13 @@ interface StoreLinkStatus { phase:string;code:string;error:string;pairing:string
 @Component
 struct Index {
  @State storeStage: number = 0;
+ @State storeIntroDone:boolean=false;
+ @State storeReadyNearby:boolean=false;
+ @State storePicker:boolean=false;
+ private rememberedMacs:StorePairing[]=[];
+ private nearbyPad:NearbyPad|null=null;
+ private padIdentity:string='';
+ private pendingNearbyStart:string='';
  @State storePairingText: string = '';
  @State storeError: string = '';
  @State storeProfileLabel: string = '自动匹配屏幕与硬件能力';
@@ -190,6 +198,14 @@ struct Index {
  }
 
  private storeFirstRun():void {
+  try{this.storeIntroDone=fileIo.readTextSync(`${this.context().filesDir}/store-intro-v1.json`)==='done';}catch(e){}
+  try{this.rememberedMacs=(JSON.parse(fileIo.readTextSync(`${this.context().filesDir}/store-macs.json`)) as StorePairing[]).map((v:StorePairing)=>validatePairing(JSON.stringify(v))).filter((v:StorePairing|null)=>v!==null) as StorePairing[];}catch(e){}
+  try{this.padIdentity=fileIo.readTextSync(`${this.context().filesDir}/store-pad-id.txt`);}catch(e){}
+  if(!/^[0-9a-f]{32}$/.test(this.padIdentity)){this.padIdentity=util.generateRandomUUID(true).replace(/-/g,'').toLowerCase();this.writeFile('store-pad-id.txt',this.padIdentity);}
+  const padName=(deviceInfo.marketName || '华为平板').slice(0,48);
+  native.availabilityIdentity('device-v1:'+this.padIdentity+':'+new util.Base64Helper().encodeToStringSync(new util.TextEncoder().encodeInto(padName)).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_'));
+  this.nearbyPad=new NearbyPad(this.context(),this.padIdentity,padName,(id:string,host:string)=>{if(!this.storeIntroDone||this.active||this.storeLinkPending)return;this.pendingNearbyStart=id;this.storeDiscovery?.probeHost(host);this.tryNearbyStart();});this.nearbyPad.start();
+
   try{this.applyStorePairing(fileIo.readTextSync(`${this.context().filesDir}/store-pairing.json`),false);}catch(e){this.storeStage=2;}
   this.storeRefreshDiscovery();
  }
@@ -197,7 +213,7 @@ struct Index {
   if(this.storeLinkPending)return;
   this.storeDiscovery?.stop();this.storeDevices=[];this.storeDiscoverMessage='正在寻找附近的 Mac…';
   this.storeDiscovery=new StoreDiscovery(this.context(),(devices:StoreDiscoveredMac[])=>{
-   this.storeDevices=devices;this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
+   this.storeDevices=devices;this.storeReadyNearby=devices.length>0;const invitation=devices.find((d:StoreDiscoveredMac)=>d.startRequested===true);if(invitation&&this.storeIntroDone&&!this.active&&!this.storeLinkPending){invitation.startRequested=false;this.pendingNearbyStart=invitation.id;}this.tryNearbyStart();this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
    this.storeDiscoverMessage=devices.length>0?'选择电脑即可连接':'还未发现电脑，请确认 Mac 上的映桥测试版已打开。';
    const known=devices.find((d:StoreDiscoveredMac)=>d.certificate===this.pairing?.cert);
    if(known&&this.pairing){if(!this.active&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.availability?.setHost(known.host);this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
@@ -205,13 +221,21 @@ struct Index {
   },(message:string)=>this.storeDiscoverMessage=message,this.pairing?.host || '');
   this.storeDiscovery.start();
  }
+ private tryNearbyStart():void{if(!this.pendingNearbyStart)return;const device=this.storeDevices.find((d:StoreDiscoveredMac)=>d.id===this.pendingNearbyStart);if(!device)return;this.pendingNearbyStart='';this.storeSelectedID=device.id;this.storeConnectSelected();}
+ private storeCanStart():boolean{return this.storeIntroDone&&!this.storeLinkPending&&!this.active&&(this.storeDevices.length>0||this.storeReadyNearby);}
+ private storeStartExtension():void{
+  if(!this.storeCanStart())return;
+  if(this.storeDevices.length>1){this.storePicker=true;return;}
+  this.storeSelectedID=this.storeDevices[0]?.id || '';this.storeConnectSelected();
+ }
  private storeConnectSelected():void {
-  if(this.storeLinkPending)return;
+  if(this.storeLinkPending||!this.storeIntroDone)return;
   const device=this.storeDevices.find((d:StoreDiscoveredMac)=>d.id===this.storeSelectedID) || (this.storeDevices.length===1?this.storeDevices[0]:undefined);
-  if(!device&&this.pairingLoaded&&this.pairing){this.storeStage=3;this.begin('extend');return;}
-  if(!device){this.message=this.storeDevices.length>1?'请在右侧选择要连接的 Mac。':'正在寻找电脑，请先确认两端在同一局域网。';if(this.storeDevices.length===0)this.storeRefreshDiscovery();return;}
+  if(!device&&this.pairingLoaded&&this.pairing&&this.localRoute()){this.storeStage=3;this.begin('extend');return;}
+  if(!device){this.message='未发现可连接的电脑，请打开电脑端映桥。';return;}
   this.storeSelectedID=device.id;this.storeError='';
-  if(this.pairing?.cert===device.certificate){this.pairing.host=device.host;this.host=device.host;this.storeStage=3;this.begin('extend');return;}
+  const remembered=this.rememberedMacs.find((v:StorePairing)=>v.cert===device.certificate) || (this.pairing?.cert===device.certificate?this.pairing:null);
+  if(remembered){if(device.host!=='127.0.0.1')remembered.host=device.host;this.applyStorePairing(JSON.stringify(remembered),true);this.begin('extend');return;}
   if(!native.storeLinkStart(device.host,device.certificate)){this.storeError='未能发起连接，请刷新设备后再试。';return;}
   this.storeLinkPending=true;this.storeLinkHost=device.host;this.message='正在安全连接电脑…';
   this.storeLinkTimer=setInterval(()=>{
@@ -219,7 +243,7 @@ struct Index {
     const status=JSON.parse(native.storeLinkStatus()) as StoreLinkStatus;
     if(status.phase==='awaiting'){this.message='首次连接，请在 Mac 点击允许连接。';}
     else if(status.phase==='ready'){
-     const value=JSON.parse(status.pairing) as StorePairing;value.host=this.storeLinkHost;
+     const value=JSON.parse(status.pairing) as StorePairing;if(this.storeLinkHost!=='127.0.0.1')value.host=this.storeLinkHost;
      this.storeCancelLink(false);this.applyStorePairing(JSON.stringify(value),true);this.begin('extend');
     }else if(status.phase==='error'){this.storeError=status.error;this.storeCancelLink(false);}
    }catch(e){this.storeError='连接未完成，请重新选择设备。';this.storeCancelLink(false);}
@@ -236,7 +260,7 @@ struct Index {
   const pairing=validatePairing(text);if (!pairing) { this.storeError='设备信息已失效，请重新选择附近的 Mac。';this.storeStage=2;return; }
   if(this.pairing && (this.pairing.cert!==pairing.cert || this.pairing.token!==pairing.token)){this.availability?.stop();this.availability=null;if(this.availabilityTimer>=0){clearInterval(this.availabilityTimer);this.availabilityTimer=-1;}}
   this.pairing=pairing;this.host=pairing.host;this.availability?.setHost(pairing.host);this.pairingLoaded=true;this.transport=1;this.storeCodec=pairing.codecs.includes('hevc') ? 'hevc':'avc';
-  if (save) { this.writeFile('store-pairing.json', JSON.stringify(pairing)); }
+  if(save){this.rememberedMacs=this.rememberedMacs.filter((v:StorePairing)=>v.cert!==pairing.cert);this.rememberedMacs.push(pairing);this.rememberedMacs=this.rememberedMacs.slice(-16);this.writeFile('store-macs.json',JSON.stringify(this.rememberedMacs));this.writeFile('store-pairing.json',JSON.stringify(pairing));}
   this.storeStage=3;this.prepareLocalAvailability();this.message='已记住这台 Mac，可直接开启扩展屏。';this.storeError='';this.localRouteLabel='原版扩展屏连接流程';
  }
  private storeSelectProfile(): void {
@@ -602,6 +626,7 @@ struct Index {
  aboutToAppear(): void { this.watchInputDevices();this.storeFirstRun();this.loadInputDevices(); }
 
  aboutToDisappear(): void {
+  this.nearbyPad?.stop();this.nearbyPad=null;
   if(this.storePathTimer>=0){clearInterval(this.storePathTimer);this.storePathTimer=-1;}native.storePathsStop();this.storeDiscovery?.stop();this.storeDiscovery=null;this.storeCancelLink(false);this.stop('view_disappeared');this.inputDeviceEpoch++;
   this.localRequestGeneration++;this.pendingMacStart = '';
   this.availability?.stop();this.availability = null;
@@ -611,6 +636,7 @@ struct Index {
   if (this.networkObserver) { this.networkObserver.unregister(() => {});this.networkObserver = null; }
  }
  onBackPress(): boolean {
+  if(this.storePicker){this.storePicker=false;return true;}
   if (!this.active) { return false; }
   this.openSessionMenu();return true;
  }
@@ -680,7 +706,7 @@ struct Index {
   return status.preferredRoute;
  }
  private refreshLocalAvailability(): void {
-  this.availability?.refreshDiscovery();
+  this.availability?.refreshDiscovery();this.storeReadyNearby=this.storeDevices.length>0||!!this.localRoute();
   const status = this.availability?.status();if (!status) { return; }
   const usb = status.paths.some((p: LocalPath) => p.route === 'usb' && p.ready), lan = status.paths.some((p: LocalPath) => p.route === 'lan' && p.ready);
   this.localRouteLabel = usb && lan ? (this.active && this.mode === 'extend'
@@ -703,8 +729,8 @@ struct Index {
  }
  private waitForLocalStart(): void {
   if (this.waitingLocalStart) { this.cancelLocalStart();this.message = '已取消连接，Mac 保持待命。';return; }
-  this.availability?.refresh();this.waitingLocalStart = true;this.message = '正在寻找 USB 或同一局域网的 Mac…';
-  this.localStartTimer = setTimeout(() => { this.localStartTimer = -1;this.waitingLocalStart = false;this.message = '未发现本地连接。扩展屏需要 USB 数据线或同一局域网。'; }, 10000);
+  this.availability?.refresh();this.waitingLocalStart = true;this.message = '正在连接附近的 Mac…';
+  this.localStartTimer = setTimeout(() => { this.localStartTimer = -1;this.waitingLocalStart = false;this.message = '暂时无法连接这台电脑，请确认两端软件已打开。'; }, 10000);
  }
  private onAvailabilityEvent(event: AvailabilityEvent): void {
   if (event.type === 'end' && event.requestId && this.active && this.mode === 'extend') {
@@ -1779,43 +1805,11 @@ struct Index {
    Text(title).fontSize(26).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
    Text(description).fontSize(16).lineHeight(25).fontColor('#607A74').width('100%')
    Text(detail).fontSize(13).fontColor('#789089').width('100%')
-   Button(this.storeLinkPending ? '连接中…' : '开启扩展屏').onClick(() => this.storeConnectSelected())
-    .fontSize(16).fontWeight(FontWeight.Medium).fontColor('#FFFFFF').backgroundColor('#23796C')
+   Button(this.storeLinkPending ? '连接中…' : '开启扩展屏').enabled(this.storeCanStart()).onClick(() => this.storeStartExtension())
+    .fontSize(16).fontWeight(FontWeight.Medium).fontColor('#FFFFFF').backgroundColor(this.storeCanStart()?'#23796C':'#B6C5BE')
     .height(48).width('100%').borderRadius(12).margin({ top: 4 }).hitTestBehavior(HitTestMode.Default)
   }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF')
-   .border({ width: 1, color: '#E0E8E4' }).borderRadius(22).hitTestBehavior(HitTestMode.Default)
- }
- @Builder
- private connectionSettings() {
-  Column({ space: 14 }) {
-   Text(this.localRouteLabel).fontSize(13).fontColor('#23796C').width('100%')
-   Text('扩展屏自动比较 USB 与局域网；下方选择用于远控。').fontSize(12).fontColor('#789089').width('100%')
-   Text('远控连接方式').fontSize(14).fontWeight(FontWeight.Medium).fontColor('#172D2C').width('100%')
-   Select([{ value: 'USB 数据线' }, { value: '局域网直连' }, { value: '互联网连接' }])
-    .selected(this.transport === 0 ? 0 : (this.isInternetTransport() ? 2 : 1))
-    .onSelect((v: number) => { this.chooseTransport([0, 1, 3][v]);if (this.isInternetTransport()) { this.startNetwork(); } })
-    .width('100%').height(46).font({ size: 15 }).fontColor('#172D2C').backgroundColor('#F5F7F6').borderRadius(11)
-   if (this.transport === 2 || this.transport === 4) {
-    Text('当前使用 UDP 试验连接').fontSize(12).fontColor('#789089').width('100%')
-   }
-   if (this.transport === 1 || this.transport === 2) {
-    TextInput({ text: this.host, placeholder: 'Mac 的局域网地址' }).onChange((v: string) => { this.host = v;this.availability?.setHost(v.trim());this.saveSettings(); })
-     .width('100%').height(46).backgroundColor('#F5F7F6').fontColor('#172D2C').placeholderColor('#8A9B96').borderRadius(11)
-   } else if (this.transport === 0) {
-    Text('用数据线连接后，选择扩展屏或远控即可。').fontSize(13).fontColor('#789089').width('100%')
-   } else {
-    Text(this.networkMessage).fontSize(13).lineHeight(21).fontColor('#607A74').width('100%')
-    Flex({ wrap: FlexWrap.Wrap, alignItems: ItemAlign.Center }) {
-     Button(this.networkStarting ? '准备连接中…' : '检查互联网连接').onClick(() => this.startNetwork())
-      .enabled(!this.networkStarting).fontSize(13).fontColor('#23796C').backgroundColor('#EDF5F1')
-      .height(38).borderRadius(10).margin({ right: 10, bottom: 4 }).hitTestBehavior(HitTestMode.Default)
-     if (this.networkAuthURL) {
-      Button('登录连接服务').onClick(() => this.openNetworkLogin()).fontSize(13).fontColor('#FFFFFF')
-       .backgroundColor('#23796C').height(38).borderRadius(10).margin({ bottom: 4 }).hitTestBehavior(HitTestMode.Default)
-     }
-    }.width('100%')
-   }
-  }.alignItems(HorizontalAlign.Start).width('100%')
+   .border({ width: 1, color: '#E0E8E4' }).borderRadius(22).height(370).hitTestBehavior(HitTestMode.Default)
  }
  @Builder
  private qualitySettings() {
@@ -1841,30 +1835,56 @@ struct Index {
     Button('刷新').onClick(()=>this.storeRefreshDiscovery()).fontSize(13).fontColor('#23796C').backgroundColor('#EAF3EE').height(32).borderRadius(9)
    }.width('100%')
    if(this.storeDevices.length===0){Text(this.storeDiscoverMessage).fontSize(15).lineHeight(25).fontColor('#607A74').width('100%')}
-   ForEach(this.storeDevices,(device:StoreDiscoveredMac)=>{
+   Scroll(){Column({space:10}){ForEach(this.storeDevices,(device:StoreDiscoveredMac)=>{
     Button({type:ButtonType.Normal}) {
      Row({space:14}) {
       Text('Mac').fontSize(13).fontWeight(FontWeight.Medium).fontColor('#23796C').width(46).height(46).textAlign(TextAlign.Center).backgroundColor('#EDF5F1').borderRadius(12)
       Column({space:5}) {
        Text(device.name).fontSize(17).fontWeight(FontWeight.Medium).fontColor('#172D2C').maxLines(1).textOverflow({overflow:TextOverflow.Ellipsis}).width('100%')
-       Text(this.pairing?.cert===device.certificate ? '已记住 · 局域网':'局域网 · 可连接').fontSize(12).fontColor('#789089').width('100%')
+       Text(this.rememberedMacs.some((v:StorePairing)=>v.cert===device.certificate)||this.pairing?.cert===device.certificate ? '已记住 · 可连接':'可连接').fontSize(12).fontColor('#789089').width('100%')
       }.alignItems(HorizontalAlign.Start).layoutWeight(1)
       Text(this.storeLinkPending && this.storeSelectedID===device.id ? '连接中…':'连接').fontSize(14).fontColor('#23796C')
      }.width('100%').padding(14)
     }.width('100%').backgroundColor(this.storeSelectedID===device.id?'#F0F6F2':'#F7F9F8').borderRadius(14).enabled(!this.storeLinkPending).onClick(()=>{this.storeSelectedID=device.id;this.storeConnectSelected();})
-   },(device:StoreDiscoveredMac)=>device.id)
+   },(device:StoreDiscoveredMac)=>device.id)}}.width('100%').layoutWeight(1)
    if(this.storeLinkPending){
     Column({space:8}) {
      Text('在 Mac 点“允许连接”即可，无需输入匹配码。以后无需再次确认。').fontSize(13).lineHeight(21).fontColor('#607A74')
      Button('取消').onClick(()=>this.storeCancelLink()).fontSize(13).height(34).backgroundColor('#EAF3EE').fontColor('#23796C')
     }.padding(16).width('100%').backgroundColor('#EDF5F1').borderRadius(14)
    }
-   Text('打开电脑端映桥测试版，连接同一 Wi-Fi，即可自动发现。').fontSize(13).lineHeight(22).fontColor('#789089').width('100%')
-  }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22)
+   Text('两端打开映桥后会自动寻找设备，连接方式由后台选择。').fontSize(13).lineHeight(22).fontColor('#789089').width('100%')
+  }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22).height(370)
+ }
+ @Builder
+ private storeDevicePicker(){
+  Stack(){
+   Column(){}.width('100%').height('100%').backgroundColor('#66000000').onClick(()=>this.storePicker=false)
+   Column({space:18}){
+    Text('选择要连接的 Mac').fontSize(23).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
+    Scroll(){Column({space:10}){ForEach(this.storeDevices,(device:StoreDiscoveredMac)=>{
+     Button(device.name).width('100%').height(48).backgroundColor('#EAF3EE').fontColor('#23796C').onClick(()=>{this.storePicker=false;this.storeSelectedID=device.id;this.storeConnectSelected();})
+    },(device:StoreDiscoveredMac)=>device.id)}}.width('100%').constraintSize({maxHeight:330})
+    Button('取消').width('100%').height(42).onClick(()=>this.storePicker=false).backgroundColor('#F1F4F2').fontColor('#607A74')
+   }.padding(26).width('82%').constraintSize({maxWidth:520}).backgroundColor('#FFFFFF').borderRadius(22)
+  }.width('100%').height('100%').zIndex(200)
+ }
+ @Builder
+ private storeWelcome(){
+  Column({space:22}){
+   Text('欢迎使用映桥').fontSize(32).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
+   Text('让平板成为 Mac 的另一块屏幕').fontSize(20).fontColor('#23796C').width('100%')
+   Text('映桥需要在平板和 Mac 上同时安装。请先在 Mac 下载并打开电脑端，再回到这里连接。').fontSize(17).lineHeight(28).fontColor('#607A74').width('100%')
+   Text('1. 复制下方链接，在 Mac 浏览器打开。\n2. 在 Releases 下载 Mac 版，安装到“应用程序”并打开。\n3. 阅读电脑端的权限说明，按系统提示完成设置。\n4. 两端都打开映桥，选择附近设备即可开始。').fontSize(15).lineHeight(27).fontColor('#607A74').width('100%')
+   Text(STORE_DOWNLOAD_URL).fontSize(14).fontColor('#23796C').copyOption(CopyOptions.LocalDevice).width('100%')
+   Button('复制 Mac 下载链接').onClick(()=>this.storeCopyLink()).width('100%').height(46).backgroundColor('#EAF3EE').fontColor('#23796C')
+   Button('Mac 已安装，开始使用').onClick(()=>{this.storeIntroDone=true;this.writeFile('store-intro-v1.json','done');this.storeRefreshDiscovery();}).width('100%').height(48).backgroundColor('#23796C').fontColor('#FFFFFF')
+   Text('以后也可在首页查看下载与安装说明。').fontSize(12).fontColor('#789089')
+  }.padding(32).margin({top:36,bottom:36}).width('90%').constraintSize({maxWidth:720}).backgroundColor('#FFFFFF').borderRadius(24).alignItems(HorizontalAlign.Start)
  }
  @Builder
  private home() {
-  Column({space:26}) {
+  if(!this.storeIntroDone){this.storeWelcome()}else{Column({space:26}) {
    Row({space:18}) {
     Column({space:4}) {
      Text('映桥测试版').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#172D2C')
@@ -1899,13 +1919,13 @@ struct Index {
     Divider().color('#E5ECE8')
     Button('电脑端下载与安装说明').onClick(()=>this.storeShowInstallGuide=!this.storeShowInstallGuide).fontSize(14).fontColor('#23796C').backgroundColor('#EAF3EE').height(38).borderRadius(10)
     if(this.storeShowInstallGuide){
-     Text('1. 在电脑打开下方链接，查看 Releases 和安装说明。\n2. 打开电脑端映桥，按系统提示允许录屏和键鼠控制。\n3. 两端连接同一 Wi-Fi，设备会自动出现在这里。').fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
+     Text('1. 在电脑打开下方链接，查看 Releases 和安装说明。\n2. 打开电脑端映桥，按系统提示允许录屏和键鼠控制。\n3. 两端打开后，在附近设备中选择电脑即可连接。').fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
      Text(STORE_DOWNLOAD_URL).copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor('#23796C').width('100%')
      Button('复制电脑端下载链接').onClick(()=>this.storeCopyLink()).fontSize(14).fontColor('#FFFFFF').backgroundColor('#23796C').height(40).borderRadius(10)
     }
     if(this.storeError){Text(this.storeError).fontSize(13).fontColor('#A04444').width('100%')}
    }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22)
-  }.padding(this.homeWidth>=740?32:20).width('100%').constraintSize({maxWidth:1240}).alignItems(HorizontalAlign.Start)
+  }.padding(this.homeWidth>=740?32:20).width('100%').constraintSize({maxWidth:1240}).alignItems(HorizontalAlign.Start)}
  }
  @Builder
  private controls() {
@@ -1995,6 +2015,7 @@ struct Index {
      }.padding(24).width('76%').backgroundColor('#FFFFFF').borderRadius(20).position({ x: '12%', y: '12%' }).zIndex(50).hitTestBehavior(HitTestMode.Default)
     }
    }
+   if(this.storePicker&&!this.active){this.storeDevicePicker()}
   }.width('100%').height('100%').backgroundColor('#F5F7F6')
  }
 }
