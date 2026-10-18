@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.13-test.1
+
+Mac-only correction: 0.1.12 real-device testing exposed an empty USB address passed to the LAN parser, causing an out-of-range trap during discovery. Reject empty/scope-only/NUL addresses, guard USB address export, and exercise the actual path in the headless self-test. Correct the loopback NWListener creation to use its already specified local endpoint without a second port override. Harmony remains the separately installed 0.1.12 diagnostic client. USB DHCP/streaming and cable handover remain unaccepted.
+
 ## store-v0.1.12-test.2
 
 Preserve imported lwIP line endings explicitly so the Git archive matches the audited SHA-256 bytes. The test.1 candidate exposed Git normalization of upstream CRLF after manifest generation; it is not an accepted recovery archive and was not installed. Application sources/binaries are otherwise unchanged from the 0.1.12 candidate.

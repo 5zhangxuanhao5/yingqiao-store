@@ -12,7 +12,7 @@ extension Data {
  func uintBE(_ start:Int,_ count:Int)->UInt64{guard start>=0,count>0,start+count<=self.count else{return 0};return self[start..<start+count].reduce(0){($0<<8)|UInt64($1)}}
 }
 func privateLANAddress(_ value:String)->Bool {
- let s=value.lowercased().split(separator:"%")[0].description
+ guard !value.contains("\0"),let part=value.lowercased().split(separator:"%").first else{return false};let s=String(part)
  var ipv4=in_addr();if inet_pton(AF_INET,s,&ipv4)==1 {let v=UInt32(bigEndian:ipv4.s_addr);return (v>>24)==10 || (v>>20)==0xac1 || (v>>16)==0xc0a8 || (v>>16)==0xa9fe}
  var ipv6=in6_addr();guard inet_pton(AF_INET6,s,&ipv6)==1 else{return false};let b=withUnsafeBytes(of:&ipv6){Array($0)}
  if b.prefix(10).allSatisfy({$0==0}) && b[10]==255 && b[11]==255{return privateLANAddress(b[12...15].map(String.init).joined(separator:"."))}

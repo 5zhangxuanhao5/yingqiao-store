@@ -71,13 +71,13 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 1903,
-    "sha256": "8147e9d8e4c569693a92177bb8d10f643d51edefe639473626e9e955fe88dcd5"
+    "bytes": 1981,
+    "sha256": "7e64545a3b9ab4fa278970a5c792def3f4511db15eeda055539e01491fce3edf"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 7062,
-    "sha256": "2eea63a2b760c92275b1bccd6e981ca9ccdef0bda5ec6bf3f140acef541b6677"
+    "bytes": 7600,
+    "sha256": "4536aeef503b1a897f981515ef7ca278964957831015e238dea3e03661c0d422"
   },
   {
     "path": "docs/ACCEPTED_CORE_PROVENANCE.json",
@@ -101,8 +101,8 @@
   },
   {
     "path": "docs/DISCOVERY_DIAGNOSTIC.md",
-    "bytes": 2652,
-    "sha256": "c90ac15a3c4906f3985d4e36516c2e1d5c8e3e2df4970eac7e0c80025f339ec0"
+    "bytes": 2953,
+    "sha256": "d58e476bd3f33d6283605e0f43783ff2c565d72baec7fc6875d4b911dfb3a4c3"
   },
   {
     "path": "docs/MAC_INSTALL.md",
@@ -532,7 +532,7 @@
   {
     "path": "mac/Info.plist",
     "bytes": 1019,
-    "sha256": "dbd7312c0729b8cb1dc022f8922655fab39b2f75f305d2c5613a5c86370285fd"
+    "sha256": "a539e359c5c278cbeacb1b98266bc77a748b2b23808944cbcdf638882bf116e1"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -636,13 +636,13 @@
   },
   {
     "path": "mac/Sources/StoreUSB.swift",
-    "bytes": 1390,
-    "sha256": "cd46cad93e7c9f95522d9762f971f54f90a393350f91d396bf9bb7a30345b8f3"
+    "bytes": 1629,
+    "sha256": "18cc12cb1de5c88567f8f4f78ce76ffd2510e698dd630b9ba1751344d4e75d7e"
   },
   {
     "path": "mac/Sources/StoreWire.swift",
-    "bytes": 2660,
-    "sha256": "5ad3db2b8571a760d68a8c09b5fc9f178b27a0b6028698697891be5b2caae7b8"
+    "bytes": 2720,
+    "sha256": "fa9bcc59bbd8f82be27a0b08a345e2cb2ccb2a2d28ef27ba8a52018d19d4a564"
   },
   {
     "path": "mac/Sources/VisualTheme.swift",
@@ -651,8 +651,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 15132,
-    "sha256": "a9cef1d5a8947e35420cfc003f3f86525602ed15484a38635e0e543eaf7e3d0c"
+    "bytes": 15284,
+    "sha256": "e36dd5e95887f7fdf5b397a44f3cce077659aa4b801d03331928da71e799cfe9"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
