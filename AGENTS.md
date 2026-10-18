@@ -1,6 +1,6 @@
 # Store-edition development boundaries
 
-- This is an isolated public-source prototype. Do not install or launch the GUI on the owner's current Mac/Edge or modify the installed personal edition without a new explicit deployment request.
+- This is an isolated public-source prototype. On 2026-10-18 the owner explicitly requested named 映桥测试版 installation on the current Mac and MatePad. Test deployment alongside the personal edition is authorized; preserve personal binaries, settings, pairing and permissions. Do not replace the personal edition or submit to AppGallery.
 - Consumer USB/wireless handover is a required release gate, not an optional feature to silently remove. USB accessory SDK/IOKit compilation and offline fixtures are not real hardware verification. No HDC/debug-mode requirement in the consumer product.
 - Use actual panel/window geometry and hardware codec capabilities; model catalog entries are documentation/geometry fixtures, not certified-device claims.
 - Use the official SDK. Keep the personal tablet/easyGo descriptor only as a reference until a distributable, officially valid input configuration has been tested. Do not patch a global SDK.

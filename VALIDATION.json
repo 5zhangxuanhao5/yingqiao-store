@@ -1,11 +1,11 @@
 {
-  "sourceVersion": "store-v0.1.1-dev.1",
+  "sourceVersion": "store-v0.1.2-test.1",
   "macUniversalArchitectures": [
     "x86_64",
     "arm64"
   ],
-  "macBinarySHA256": "2d85d63bd0f9daabc6d3e8a66f83ea33202d13e2a01233bd475acded114204c9",
-  "harmonyUnsignedHAPSHA256": "582c9f200ba7adf0b7ed773e64e26c447b2c975ea86b5b28e0c11affe7dc98d7",
+  "macBinarySHA256": "2baaac883fe0f52bbfda8bd261dbd37da64e64617878416314eaba13efb76575",
+  "harmonyUnsignedHAPSHA256": "451b827711c1dd03920cbc636695ad6bdc5e8f45f8b005fd600a6292b818df0a",
   "installedOnUserDevices": false,
   "newEditionSessionTested": false,
   "consumerUSBHandoverTested": false,
@@ -13,7 +13,7 @@
   "originalPersonalMacExecutableUnchanged": true,
   "newPreviewRuntimeIdentityDirectoryExists": false,
   "tests": [
-    "This version: official SDK Harmony release compilation, Mac universal compilation and headless LAN policy check. Prior dev.1 offline fixtures retained; new cloud run pending."
+    "This source revision: official SDK Harmony release compilation and Mac universal/headless build passed. User authorized independent test-device deployment; detailed result recorded separately."
   ],
   "buildSDK": "official DevEco SDK; no schema modification",
   "usbSDKCandidateCompiled": true,

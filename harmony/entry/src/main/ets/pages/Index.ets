@@ -1720,7 +1720,7 @@ struct Index {
  @Builder
  private home() {
   Column({ space: 24 }) {
-   Text('映桥').fontSize(32).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
+   Text('映桥测试版').fontSize(32).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
    Text('让每一块屏幕，自然相连。').fontSize(19).fontColor('#607A74').width('100%')
    if (this.storeStage === 0) { Text('正在准备首次使用引导…').fontColor('#607A74') }
    if (this.storeStage === 1) {

@@ -9,7 +9,7 @@ for arch in arm64 x86_64; do
     -framework CoreGraphics -framework Security -framework CryptoKit -framework ApplicationServices \
     -o "$stage/build/YingqiaoStore-$arch"
 done
-app="$stage/build/映桥上架版预览.app"
+app="$stage/build/映桥测试版.app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 lipo -create "$stage/build/YingqiaoStore-arm64" "$stage/build/YingqiaoStore-x86_64" -output "$app/Contents/MacOS/YingqiaoStore"
 cp "$stage/Info.plist" "$app/Contents/Info.plist"

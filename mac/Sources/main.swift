@@ -11,9 +11,9 @@ final class StoreHost:NSObject,NSApplicationDelegate {
  var retainedDisplay:CGVirtualDisplay?,retentionTimer:Timer?
  let input=RemoteInput()
  func applicationDidFinishLaunching(_ n:Notification){
-  window=NSWindow(contentRect:NSRect(x:0,y:0,width:740,height:690),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false);window.title="映桥 · 上架版开发预览";window.center()
+  window=NSWindow(contentRect:NSRect(x:0,y:0,width:740,height:690),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false);window.title="映桥测试版";window.center()
   let title=NSTextField(labelWithString:"让平板，成为另一块屏幕。");title.font = .systemFont(ofSize:27,weight:.semibold)
-  let note=NSTextField(wrappingLabelWithString:"此独立预览不会读取个人版配置。只提供同一局域网扩展屏，不开启异地远控、合盖服务或麦克风。尚未完成多机型认证，请勿用于正式分发。")
+  let note=NSTextField(wrappingLabelWithString:"此独立测试版不会读取个人版配置。只提供同一局域网扩展屏，不开启异地远控、合盖服务或麦克风。普通USB尚未接入；先测试局域网扩展屏，尚未完成多机型认证。")
   status=NSTextField(wrappingLabelWithString:"点击准备后检查权限；首次允许录屏和键鼠控制需要你在系统设置中完成。")
   enable=NSButton(title:"准备局域网扩展屏",target:self,action:#selector(prepare))
   let copy=NSButton(title:"复制配对信息",target:self,action:#selector(copyPairing));let end=NSButton(title:"结束会话",target:self,action:#selector(endSession))
@@ -31,7 +31,7 @@ final class StoreHost:NSObject,NSApplicationDelegate {
   guard let host=StoreIdentity.addresses().first else{status.stringValue="未找到局域网地址，请让电脑和平板连接同一 Wi-Fi。";return}
   enable.isEnabled=false;status.stringValue="正在生成这台电脑专属的加密配对身份…"
   Task{do{let id=try await Task.detached{try StoreIdentity.createOrRead()}.value;identity=id;let tcp=NWProtocolTCP.Options();tcp.noDelay=true;tcp.enableKeepalive=true;let params=NWParameters(tls:try id.tlsOptions(),tcp:tcp);params.allowLocalEndpointReuse=true
-   let l=try NWListener(using:params,on:49563);listener=l;l.service=NWListener.Service(name:"映桥-商店版",type:"_yingqiaostore._tcp")
+   let l=try NWListener(using:params,on:49563);listener=l;l.service=NWListener.Service(name:"映桥测试版",type:"_yingqiaostore._tcp")
    l.newConnectionHandler={[weak self] c in self?.accept(c)};l.stateUpdateHandler={[weak self] state in if case .failed=state{self?.status.stringValue="局域网监听失败，请检查端口占用。";self?.listener=nil;self?.enable.isEnabled=true}};l.start(queue:.main)
    pairing.string=try id.pairingJSON(host:host);drawQR(pairing.string);status.stringValue="电脑已准备：\(host)。在平板扫码或粘贴配对信息，然后开启扩展屏。";enable.title="局域网已准备"
   }catch{listener?.cancel();listener=nil;enable.isEnabled=true;status.stringValue=error.localizedDescription}}

@@ -16,8 +16,8 @@
   },
   {
     "path": "AGENTS.md",
-    "bytes": 1889,
-    "sha256": "00c269d38207a06dd07ae652efcca4c8b6f448c2a52caf420d3dc755f8e9a76c"
+    "bytes": 2038,
+    "sha256": "abdf3d8285811ca928c4e37d4e11afe9510b681f6ec078370f0a3470f2d846ec"
   },
   {
     "path": "BASELINE.json",
@@ -31,8 +31,8 @@
   },
   {
     "path": "DEPENDENCY_ARCHIVE.json",
-    "bytes": 289,
-    "sha256": "8a75562d3871dd198bfe3fc5fd646e0f2f4077d0b46af512b3e6634d8d0c31ca"
+    "bytes": 290,
+    "sha256": "34f94fcda68fcac130b52e1942727fdaa5535c068a7f969567c2a10ad882106b"
   },
   {
     "path": "LICENSE",
@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 2056,
-    "sha256": "7fc6a9233623cbad148d186ffdc7e71e121524d355e8c137a6318414c6f79407"
+    "bytes": 2154,
+    "sha256": "c4ec4fd3716735273fb3b8d9dbc47a8845c6a12121f88fca2ddd3e24292ba99c"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -66,18 +66,18 @@
   },
   {
     "path": "VALIDATION.json",
-    "bytes": 1124,
-    "sha256": "b37bb6f4c3a75a3d4b7605671ab1647f221d633d27f5c662d9e4fe56beb51d75"
+    "bytes": 1143,
+    "sha256": "3b8de9bdc8e1098fdbcedd8bb3013ef7809df6d65ad09db4fa4048d5052294a1"
   },
   {
     "path": "VERSION.json",
-    "bytes": 1055,
-    "sha256": "e09efdd250b3822e1f77a799ab9974c441c8e4f8556907c4fe8385358b6145ce"
+    "bytes": 1214,
+    "sha256": "e524543a19cbc8593b36202747b3c19362597821a52973137483cdc8ee2aeb8d"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 962,
-    "sha256": "9e61bcc09d6ab0f1f06c55bd704fc4beba7df56487269e03cef711cc1b5e43c3"
+    "bytes": 1359,
+    "sha256": "ee0b0e193ff25d2ff9ea023b3a84b70dff743623ac7aa69c91e4aabc74f6130d"
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
@@ -88,6 +88,11 @@
     "path": "docs/BUILD.md",
     "bytes": 3274,
     "sha256": "9c3f89d6cb8366410065c86c68e327b97f889e7a6f6027f9597517057293d081"
+  },
+  {
+    "path": "docs/DEVICE_TEST.md",
+    "bytes": 1101,
+    "sha256": "dd97fad873d1c665a0cfb7b17baa61fb1db60c75a8557bdfe638ee0676e4b965"
   },
   {
     "path": "docs/MAC_INSTALL.md",
@@ -122,12 +127,12 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 197,
-    "sha256": "61d062d34905afdb749a079bad21a1c2d041cbb57aa7b7ca601e64d0829442fd"
+    "sha256": "4aa1337a42fecdaf2fbcdde5e5d82c1f464e9a18bb21eb84e07f9c905678feab"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
-    "bytes": 198,
-    "sha256": "b4826332b279598e0c789b9269b6647e16f62e8a9d72d0ac2bacf7eb8dcb2a6d"
+    "bytes": 207,
+    "sha256": "0ae8b9e620812cf5ff192f9e71e392a2800967f56a1192030c6759a843294ae5"
   },
   {
     "path": "harmony/AppScope/resources/base/media/app_icon.svg",
@@ -391,8 +396,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 138709,
-    "sha256": "e927a7d0eef41c7d2dd1bd23c694e22402c55a93986dfd95d7b4a17333eb4e3b"
+    "bytes": 138718,
+    "sha256": "95cc9f15e3808308e655160ff33be9e6cf45c24b2c6519a12a875414aafb9d07"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -441,8 +446,8 @@
   },
   {
     "path": "harmony/entry/src/main/resources/base/element/string.json",
-    "bytes": 198,
-    "sha256": "b4826332b279598e0c789b9269b6647e16f62e8a9d72d0ac2bacf7eb8dcb2a6d"
+    "bytes": 207,
+    "sha256": "0ae8b9e620812cf5ff192f9e71e392a2800967f56a1192030c6759a843294ae5"
   },
   {
     "path": "harmony/entry/src/main/resources/base/media/app_icon.svg",
@@ -501,8 +506,8 @@
   },
   {
     "path": "mac/Info.plist",
-    "bytes": 1029,
-    "sha256": "23e54c673d62449697d6e9a49b713d16043d2349be1cf8398503df149fb0f625"
+    "bytes": 1017,
+    "sha256": "4c848ee8802ff2cf1dc2ecf84d6d11c3fe95b1e889af7f2ed2bb16eea947620b"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -541,8 +546,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 11080,
-    "sha256": "f6c5d63e5a324b7710a15053fb69d5553a2805cba7d82363a77d431a3e854d76"
+    "bytes": 11093,
+    "sha256": "d794f2e373b7d207adf4b5fa65c9212f7641d6130eb48326d0c48e5d8e402887"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
@@ -551,8 +556,8 @@
   },
   {
     "path": "mac/build.sh",
-    "bytes": 1063,
-    "sha256": "e39c0f039c0e2701f49fd7a0e1760723bc258ee017c3f98b9af519cb09b68abf"
+    "bytes": 1057,
+    "sha256": "77f8695bbedb1e7ca79ac80d4c3a4d6c2aef5de78353aeca9595ae85cddec410"
   },
   {
     "path": "shared/DisplayProfile.hpp",
