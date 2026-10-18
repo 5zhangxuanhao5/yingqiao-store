@@ -4,7 +4,7 @@
 
 ## Mac
 
-在具备 Xcode 和 macOS SDK 的 Mac 上运行 `bash mac/build.sh`。它仅在 `mac/build/` 生成 arm64、x86_64 和 universal 本地预览，用 ad-hoc 签名；只运行 `--self-test` 的纯地址策略检查，不打开窗口、监听网络、生成身份、请求权限或安装系统组件。正式分发须换 Developer ID 签名／公证和真实系统验证。最低部署目标13.0代表编译目标，不能代表所有这类Mac已通过功能测试。
+在具备 Xcode 和 macOS SDK 的 Mac 上运行 `bash mac/build.sh`。它仅在 `mac/build/` 生成 arm64、x86_64 和 universal 本地预览，用 ad-hoc 签名；只运行 `--self-test` 的纯地址策略检查，不打开窗口、监听网络、生成身份、请求权限或安装系统组件。GitHub测试分发必须披露未完成Developer ID签名／公证的现状，并提供校验及Apple官方单应用确认说明；真实系统验证仍不可省略。最低部署目标13.0代表编译目标，不能代表所有这类Mac已通过功能测试。
 
 ## HarmonyOS
 

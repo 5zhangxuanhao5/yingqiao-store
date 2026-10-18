@@ -4,7 +4,7 @@ import { NearbyPad } from '../store/NearbyPad';
 import { StoreDiscovery, StoreDiscoveredMac } from '../store/StoreDiscovery';
 import { HarmonyAccessoryCandidate } from '../store/HarmonyAccessory';
 import { pasteboard, systemDateTime, deviceInfo } from '@kit.BasicServicesKit';
-import { validatePairing, STORE_DOWNLOAD_URL, STORE_INSTALL_STEPS, StorePairing } from '../store/StorePairing';
+import { validatePairing, STORE_DOWNLOAD_URL, STORE_INSTALL_STEPS, STORE_CONNECTION_STEPS, StorePairing } from '../store/StorePairing';
 import native, { NativeMouseSample, NativeCursorSample, AvailabilityEvent } from 'libedgelink.so';
 import { webview } from '@kit.ArkWeb';
 import { RTCArkWebTransport, RTCIceServer } from '../service/RTCArkWebTransport';
@@ -168,6 +168,7 @@ struct Index {
  @State storeLinkPending:boolean=false;
  @State storeVerification:string='';
  @State storeShowInstallGuide:boolean=false;
+ @State storeShowConnectionGuide:boolean=false;
  private storeDiscovery:StoreDiscovery|null=null;
  private storeLinkTimer:number=-1;
  private storeLinkHost:string='';
@@ -2005,6 +2006,8 @@ struct Index {
      Toggle({type:ToggleType.Switch,isOn:this.ctrlToCmd}).onChange((v:boolean)=>this.ctrlToCmd=v).selectedColor('#23796C')
     }.width('100%')
     Divider().color('#E5ECE8')
+    Button(this.storeShowConnectionGuide?'收起连接说明':'连接方式与有线使用说明').onClick(()=>this.storeShowConnectionGuide=!this.storeShowConnectionGuide).fontSize(14).fontColor('#23796C').backgroundColor('#EAF3EE').height(38).borderRadius(10)
+    if(this.storeShowConnectionGuide){Text(STORE_CONNECTION_STEPS).fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')}
     Button('电脑端下载与安装说明').onClick(()=>this.storeShowInstallGuide=!this.storeShowInstallGuide).fontSize(14).fontColor('#23796C').backgroundColor('#EAF3EE').height(38).borderRadius(10)
     if(this.storeShowInstallGuide){
      Text(STORE_INSTALL_STEPS).fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')

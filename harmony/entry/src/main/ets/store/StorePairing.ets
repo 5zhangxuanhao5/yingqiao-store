@@ -1,4 +1,4 @@
-export const STORE_DOWNLOAD_URL: string = 'https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/store-v0.3.2-test.1';
+export const STORE_DOWNLOAD_URL: string = 'https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/store-v0.3.6-tested-unplug.1';
 export interface StorePairing { schema: string; token: string; cert: string; host: string; port: number; udpPort: number; codecs: string[]; }
 export function localIPv4(host: string): boolean {
  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(host)) { return false; }
@@ -15,4 +15,6 @@ export function validatePairing(text: string): StorePairing | null {
  } catch (e) { return null; }
 }
 
-export const STORE_INSTALL_STEPS:string='1. 点“复制电脑端下载链接”，发送到你的 Mac，在电脑浏览器地址栏粘贴并打开。\n\n2. 在网页 Assets（附件）里点击 Yingqiao-Mac-0.3.2.zip。不要下载 Source code 或 native-dependencies，它们是开发资料，不是安装包。\n\n3. 在 Mac 的“访达 → 下载”找到 ZIP，双击解压。把“映桥”拖进“应用程序”，再双击打开。\n\n4. 阅读电脑端用途说明后点“继续设置”。按 macOS 的权限通知完成“录屏与系统录音”和“辅助功能”授权，分别用于显示画面和键鼠操作。系统密码或触控 ID 只在你自己的 Mac 上完成，不要发给任何人。\n\n5. 保持两端映桥都打开，回到平板点“Mac 已安装，开始使用”，选择附近的 Mac。首次连接，在 Mac 点“允许连接”；以后可直接开启扩展屏。\n\nMac 客户端仅通过 GitHub 下载，不上架 Mac App Store。当前未经过 Apple 公证，系统可能阻止直接打开。请核对来源和下载校验值，再按下载页链接的 Apple 官方单应用确认说明，由本人判断是否打开；不关闭全局安全保护。若提示软件损坏、将损坏电脑，或校验值不符，请停止并反馈。';
+export const STORE_INSTALL_STEPS:string='1. 点“复制电脑端下载链接”，发送到你的 Mac，在电脑浏览器地址栏粘贴并打开。\n\n2. 在网页 Assets（附件）里点击 Yingqiao-Mac-0.3.5.zip。不要下载 Source code 或 native-dependencies，它们是开发资料，不是安装包。\n\n3. 在 Mac 的“访达 → 下载”找到 ZIP，双击解压。把“映桥”拖进“应用程序”，再双击打开。\n\n4. 阅读电脑端用途说明后点“继续设置”。按 macOS 的权限通知完成“录屏与系统录音”和“辅助功能”授权，分别用于显示画面和键鼠操作。系统密码或触控 ID 只在你自己的 Mac 上完成，不要发给任何人。\n\n5. 保持两端映桥都打开，回到平板点“Mac 已安装，开始使用”，选择附近的 Mac。首次连接，在 Mac 点“允许连接”；以后可直接开启扩展屏。\n\nMac 客户端仅通过 GitHub 下载，不上架 Mac App Store。当前未经过 Apple 公证，系统可能阻止直接打开。请核对来源和下载校验值，再按下载页链接的 Apple 官方单应用确认说明，由本人判断是否打开；不关闭全局安全保护。若提示软件损坏、将损坏电脑，或校验值不符，请停止并反馈。';
+
+export const STORE_CONNECTION_STEPS:string='无线使用：让 Mac 和平板连接同一局域网，在两端打开映桥，选择附近设备即可。校园或公司网络若限制设备互访，可用同一手机热点检查。\n\n有线使用：用支持数据传输的数据线连接，在平板系统设置搜索并开启“USB 共享网络”，然后回到映桥。无需打开开发者选项，也无需安装调试工具或系统驱动。\n\n两条线路都可用时，映桥会在后台比较并选择，不用手动切换。拔线后会尝试通过已就绪的无线线路继续使用同一个桌面，切换可能短暂停顿。\n\n如果重新插线后系统关闭了“USB 共享网络”，请重新开启；在此之前映桥会继续使用可用的无线连接。有些设备不提供此系统开关，可先使用无线。';
