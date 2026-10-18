@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.3.3-rc.2
+
+Documentation-only clarification requested by owner: the Mac companion is downloaded through GitHub, not the Mac App Store. An Apple Developer account is not a prerequisite for hosting those downloads or a verified Huawei package requirement. Disclose the absence of Developer ID/notarization and link Apple's official per-app opening guidance; preserve global security settings and user control. No application code or uploaded Huawei package changes from RC1.
+
 ## store-v0.3.3-rc.1
 
 Release-preparation source candidate. Add explicit first-run privacy consent and withdrawal; prevent discovery and input-device enumeration before consent; allowlist tablet settings/credentials persistence and stop storing input/performance trace files. Build using the unmodified official API26 SDK with the default tablet descriptor. Create the owner-authorized project release certificate/Profile and sign both HAP and outer APP; the first outer-unsigned attempt failed AGC991, the corrected APP passed package legality. Save a 3+ rating and function-only privacy labels in the release draft. Tablet cloud self-check is unsupported. No final review submission, consumer USB acceptance, Mac notarization or new device acceptance is claimed; installed applications and the personal edition were not changed during this preparation.
