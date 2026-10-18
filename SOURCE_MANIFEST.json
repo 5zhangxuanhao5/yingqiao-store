@@ -125,6 +125,11 @@
     "sha256": "a59dc5f1263d69a423130c917568175ed13b6acae551a5fb8ed1eb5ee56330c0"
   },
   {
+    "path": "docs/TRACKPAD_TEST_021.md",
+    "bytes": 1161,
+    "sha256": "8025518a56037a3828c5fab08a5fcba1761b3eca3051b510a40a4d16738cf847"
+  },
+  {
     "path": "docs/USB_AND_HANDOVER.md",
     "bytes": 7421,
     "sha256": "6345f2b47828f6d18380b685f81f121289349ad3d03d63a975808eda4696f040"
@@ -142,7 +147,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 198,
-    "sha256": "66014fdd1e7936ecb3dff40ee350683b57aad9ddfe61d7b8c70f939e24dbdc9a"
+    "sha256": "dcf01a876b333d2d142226315094f366bad58c437f16ca3cc076428ab8ae4544"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -1793,6 +1798,11 @@
     "path": "tools/check-source.py",
     "bytes": 1744,
     "sha256": "0b7e552985dde7e64b0dbd489f77f268b6016b4942134a0df324252e7b0a9d5a"
+  },
+  {
+    "path": "tools/prepare-original-tablet-test.py",
+    "bytes": 2214,
+    "sha256": "03b2cdb53be78d7b56d47ddbf0706bac06a10e64d9a557eb8d5aa3da62b1a250"
   },
   {
     "path": "tools/test-pairing.cjs",
