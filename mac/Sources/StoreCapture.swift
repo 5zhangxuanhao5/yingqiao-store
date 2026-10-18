@@ -8,6 +8,7 @@ final class StoreCapture:NSObject,SCStreamOutput,SCStreamDelegate {
  let queue=DispatchQueue(label:"cn.edgelink.store.capture",qos:.userInteractive)
  var stream:SCStream?,encoder:VTCompressionSession?,virtual:CGVirtualDisplay?
  private var alive=false,inFlight=false,needsIDR=true
+ private var targetBitrate=24_000_000
  var onFailure:((String)->Void)?
  init(width:Int,height:Int,fps:Int,codec:String,sender:StoreFrameSender){self.width=width;self.height=height;self.fps=fps;self.codec=codec;self.sender=sender}
  static func supports(_ codec:CMVideoCodecType)->Bool {var encoder:VTCompressionSession?;let r=VTCompressionSessionCreate(allocator:nil,width:1280,height:720,codecType:codec,encoderSpecification:[kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder:true] as CFDictionary,imageBufferAttributes:nil,compressedDataAllocator:nil,outputCallback:nil,refcon:nil,compressionSessionOut:&encoder);if let encoder{VTCompressionSessionInvalidate(encoder)};return r==noErr}
@@ -30,7 +31,7 @@ final class StoreCapture:NSObject,SCStreamOutput,SCStreamDelegate {
   let type=codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264
   let result=VTCompressionSessionCreate(allocator:nil,width:Int32(width),height:Int32(height),codecType:type,encoderSpecification:[kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder:true] as CFDictionary,imageBufferAttributes:nil,compressedDataAllocator:nil,outputCallback:{refcon,_,status,_,buffer in guard status==noErr,let refcon,let buffer else{return};Unmanaged<StoreCapture>.fromOpaque(refcon).takeUnretainedValue().encoded(buffer)},refcon:Unmanaged.passUnretained(self).toOpaque(),compressionSessionOut:&encoder)
   guard result==noErr,let encoder else{throw failure("这台 Mac 不支持所选硬件编码器，请改用 H.264")}
-  for (key,value):(CFString,CFTypeRef) in [(kVTCompressionPropertyKey_RealTime,kCFBooleanTrue),(kVTCompressionPropertyKey_AllowFrameReordering,kCFBooleanFalse),(kVTCompressionPropertyKey_ExpectedFrameRate,fps as CFNumber),(kVTCompressionPropertyKey_AverageBitRate,24_000_000 as CFNumber),(kVTCompressionPropertyKey_MaxKeyFrameInterval,(fps*2) as CFNumber)] {let r=VTSessionSetProperty(encoder,key:key,value:value);guard r==noErr else{throw failure("硬件编码参数不支持：\(r)")}}
+  for (key,value):(CFString,CFTypeRef) in [(kVTCompressionPropertyKey_RealTime,kCFBooleanTrue),(kVTCompressionPropertyKey_AllowFrameReordering,kCFBooleanFalse),(kVTCompressionPropertyKey_ExpectedFrameRate,fps as CFNumber),(kVTCompressionPropertyKey_MaxFrameDelayCount,0 as CFNumber),(kVTCompressionPropertyKey_AverageBitRate,24_000_000 as CFNumber),(kVTCompressionPropertyKey_MaxKeyFrameInterval,(fps*2) as CFNumber)] {let r=VTSessionSetProperty(encoder,key:key,value:value);guard r==noErr else{throw failure("硬件编码参数不支持：\(r)")}}
   let c=SCStreamConfiguration();c.width=width;c.height=height;c.minimumFrameInterval=CMTime(value:1,timescale:Int32(fps));c.queueDepth=3;c.pixelFormat=kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;c.showsCursor=true;c.capturesAudio=false
   let s=SCStream(filter:SCContentFilter(display:target,excludingWindows:[]),configuration:c,delegate:self);stream=s;try s.addStreamOutput(self,type:.screen,sampleHandlerQueue:queue);queue.sync{alive=true};try await s.startCapture();return display.displayID
  }
@@ -49,6 +50,7 @@ final class StoreCapture:NSObject,SCStreamOutput,SCStreamDelegate {
   while offset+4<=bytes.count{let count=Int(bytes.uintBE(offset,4));offset+=4;guard count>0,offset+count<=bytes.count else{return};frame.append(contentsOf:[0,0,0,1]);frame.append(bytes[offset..<offset+count]);offset+=count}
   guard offset==bytes.count,frame.count<4*1024*1024 else{return};self.sender.send(frame,keyframe:keyframe)
  }}
+ func updateRate(ackP95ms:Double){queue.async{[weak self] in guard let self,self.alive,let encoder=self.encoder,ackP95ms>=0 else{return};var next=self.targetBitrate;if ackP95ms>120{next=max(6_000_000,next*4/5)}else if ackP95ms<45{next=min(48_000_000,next*11/10)};if next != self.targetBitrate,VTSessionSetProperty(encoder,key:kVTCompressionPropertyKey_AverageBitRate,value:next as CFNumber)==noErr{self.targetBitrate=next}}}
  func requestKeyframe(){queue.async{self.needsIDR=true}}
  func stop(keepingDisplay:Bool=false)async ->CGVirtualDisplay? {queue.sync{alive=false};if let stream{try? await stream.stopCapture();try? stream.removeStreamOutput(self,type:.screen)};stream=nil;queue.sync{if let encoder{VTCompressionSessionCompleteFrames(encoder,untilPresentationTimeStamp:.invalid);VTCompressionSessionInvalidate(encoder)};encoder=nil;inFlight=false};let kept=keepingDisplay ? virtual:nil;virtual=nil;sender.stop();return kept}
  private func failure(_ message:String)->NSError{NSError(domain:"StoreCapture",code:1,userInfo:[NSLocalizedDescriptionKey:message])}

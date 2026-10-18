@@ -24,7 +24,7 @@ extension StoreHost:NetServiceDelegate {
  func clearLinkPrompt(){if let alert=linkAlert,alert.window.sheetParent != nil{window.endSheet(alert.window,returnCode:.abort)};linkAlert=nil;linkPeer=nil}
  func requestLink(_ peer:LinePeer,code:String){
   guard peer !== controller,controller==nil,linkPeer==nil,let identity,code.count==6,code.allSatisfy({$0.isNumber}),tlsLinkCode(peer.connection)==code else{peer.send("ERR link_unavailable");peer.close();return}
-  linkPeer=peer;let alert=NSAlert();linkAlert=alert;alert.messageText="允许这台平板连接？";alert.informativeText="请确认平板也显示 \(code)。允许后可使用键盘、触控板和触屏操作扩展桌面；以后无需再次确认。";alert.addButton(withTitle:"允许连接");alert.addButton(withTitle:"取消")
+  linkPeer=peer;let alert=NSAlert();linkAlert=alert;alert.messageText="允许这台平板连接？";alert.informativeText="平板正在申请连接这台 Mac。确认是你正在使用的平板后，点击允许即可；以后无需再次确认。";alert.addButton(withTitle:"允许连接");alert.addButton(withTitle:"取消")
   statusMessage="平板正在请求连接，确认后自动保存此设备。"
   alert.beginSheetModal(for:window){[weak self,weak peer] response in
    guard let self,let peer,self.linkPeer===peer else{return};self.linkAlert=nil;self.linkPeer=nil

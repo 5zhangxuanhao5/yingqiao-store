@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.8-test.1
+
+Prefer actual panel dimensions when the hardware capability probe supports them. Bound frame admission using the existing Pad render-submission ACKs, allow no encoder frame delay, and tune bitrate from measured ACK age. This bounds pre-encode production rather than discarding encoded reference frames. Fresh native-profile regression and frame-window invalid/duplicate/cumulative ACK self-tests pass. Remove numeric-code UI as requested; first connection uses explicit Mac approval and pins the selected certificate thereafter, without out-of-band numeric identity verification. Previously approved addresses are probed without a saved preset host. Campus-network initial automatic discovery and consumer USB remain open gates.
+
 ## store-v0.1.6-test.1
 
 Pad network information supplies directed subnet broadcast addresses in addition to limited broadcast. Log bounded probe stages and errors, and retain Mac receive-stage diagnostics. Mac own-address request/reply passed without credential fields; actual Pad discovery remains unverified. No consumer USB claim: read-only AOA GetProtocol request stalled on the currently connected Edge after HDC ownership was released.

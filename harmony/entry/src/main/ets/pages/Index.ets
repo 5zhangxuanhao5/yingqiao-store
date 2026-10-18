@@ -1,3 +1,4 @@
+import { hilog } from '@kit.PerformanceAnalysisKit';
 import { StoreDiscovery, StoreDiscoveredMac } from '../store/StoreDiscovery';
 import { HarmonyAccessoryCandidate } from '../store/HarmonyAccessory';
 import { pasteboard, systemDateTime } from '@kit.BasicServicesKit';
@@ -144,7 +145,7 @@ struct Index {
    const known=devices.find((d:StoreDiscoveredMac)=>d.certificate===this.pairing?.cert);
    if(known&&this.pairing){if(this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
    if(!this.storeSelectedID&&devices.length===1){this.storeSelectedID=devices[0].id;}
-  },(message:string)=>this.storeDiscoverMessage=message);
+  },(message:string)=>this.storeDiscoverMessage=message,this.pairing?.host || '');
   this.storeDiscovery.start();
  }
  private storeConnectSelected():void {
@@ -158,7 +159,7 @@ struct Index {
   this.storeLinkTimer=setInterval(()=>{
    try{
     const status=JSON.parse(native.storeLinkStatus()) as StoreLinkStatus;
-    if(status.phase==='awaiting'){this.storeVerification=status.code;this.message='首次连接，请在 Mac 允许此平板。';}
+    if(status.phase==='awaiting'){this.message='首次连接，请在 Mac 点击允许连接。';}
     else if(status.phase==='ready'){
      const value=JSON.parse(status.pairing) as StorePairing;value.host=this.storeLinkHost;
      this.storeCancelLink(false);this.applyStorePairing(JSON.stringify(value),true);this.begin('extend');
@@ -1120,6 +1121,7 @@ struct Index {
   }));
  }
  private lastDiscoveryReport: string = '';
+ private lastPerformanceLog: number = 0;
  private saveStatus(): Statistics | null {
   try {
    const discoveryReport = JSON.stringify({ host: this.availability?.host || '', discovery: this.availability?.discoveryStatus || '', status: this.availability?.status() });
@@ -1164,6 +1166,7 @@ struct Index {
    s.cursorSyncApplied = this.cursorSyncApplied;s.cursorSyncStaleSession = this.cursorSyncStaleSession;s.cursorSyncStaleSequence = this.cursorSyncStaleSequence;
    s.cursorSyncStaleInput = this.cursorSyncStaleInput;s.cursorSyncInvalid = this.cursorSyncInvalid;
    s.hostCursorOwner = this.hostCursorOwner;s.hostCursorVisible = this.hostCursorVisible;
+   if(Date.now()-this.lastPerformanceLog>2000){this.lastPerformanceLog=Date.now();hilog.info(0x1234,'StorePerformance','rx=%{public}d rendered=%{public}d fps=%{public}f decodeP95=%{public}f queueP95=%{public}f bytes=%{public}d',s.receivedFrames,s.renderSubmittedFrames,s.renderSubmittedFPS,s.decodeP95ms,s.inputQueueP95ms,s.bytesReceived);}
    this.writeFile('session-status.json', JSON.stringify(s));return s;
   } catch (e) { return null; }
  }
@@ -1779,10 +1782,9 @@ struct Index {
      }.width('100%').padding(14)
     }.width('100%').backgroundColor(this.storeSelectedID===device.id?'#F0F6F2':'#F7F9F8').borderRadius(14).enabled(!this.storeLinkPending).onClick(()=>{this.storeSelectedID=device.id;this.storeConnectSelected();})
    },(device:StoreDiscoveredMac)=>device.id)
-   if(this.storeVerification){
+   if(this.storeLinkPending){
     Column({space:8}) {
-     Text(this.storeVerification).fontSize(26).fontWeight(FontWeight.Bold).fontColor('#23796C').letterSpacing(5)
-     Text('确认 Mac 显示相同数字，再在 Mac 点“允许连接”。以后无需再次确认。').fontSize(13).lineHeight(21).fontColor('#607A74')
+     Text('在 Mac 点“允许连接”即可，无需输入匹配码。以后无需再次确认。').fontSize(13).lineHeight(21).fontColor('#607A74')
      Button('取消').onClick(()=>this.storeCancelLink()).fontSize(13).height(34).backgroundColor('#EAF3EE').fontColor('#23796C')
     }.padding(16).width('100%').backgroundColor('#EDF5F1').borderRadius(14)
    }

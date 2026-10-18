@@ -71,13 +71,13 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 1313,
-    "sha256": "e750d96cdf19231852c6208dfcaaaa6b72f852071e587dff1fb7f7624bb6d075"
+    "bytes": 1541,
+    "sha256": "a45f016acc62f57ae4023392a1cd99aaae97357d84c187d789393b990d2de61c"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 3250,
-    "sha256": "5d4e066a83f99d4faf32e0876296b9fcb773d61dbdf1632fbad602451de8ba6c"
+    "bytes": 4004,
+    "sha256": "6a289466a1703e1acf2d492108f34e87ae923fd45778c7f86a08175dc4a7c43d"
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
@@ -91,8 +91,8 @@
   },
   {
     "path": "docs/DEVICE_TEST.md",
-    "bytes": 1569,
-    "sha256": "86aade6931e27b16e8272fecc9cd41435fcd77cdfa8e396b22374b1ddb1b775b"
+    "bytes": 1903,
+    "sha256": "3503d7dc811df275e0542add958ec5e1dd645602705f5188266ff03ea05383e8"
   },
   {
     "path": "docs/DISCOVERY_DIAGNOSTIC.md",
@@ -106,8 +106,8 @@
   },
   {
     "path": "docs/PRIVACY.md",
-    "bytes": 7131,
-    "sha256": "313c8fd36ef606974d27c37321fc86bea8b0779d0c0bfedcab70e5dd7c0c6a5f"
+    "bytes": 7222,
+    "sha256": "79ecde1eda475daebf31020da63b41764142b2c2aaa8854c49fb1c268d1bd49e"
   },
   {
     "path": "docs/PRIVACY_DRAFT.md",
@@ -132,7 +132,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 197,
-    "sha256": "9549ef5b4c48de2cecd9d339072ddac135dd3198c4ce6110f1c36c9ffbc18af5"
+    "sha256": "948bc4da5dec7cf9f812527422ed8da812fe25ef1c162907405255aba10e6a7c"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -406,8 +406,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 144086,
-    "sha256": "c709b8fc923f70eb4a2cd7d88bc9f500e5171d5f7789850d9c6684bfe2a56e24"
+    "bytes": 144395,
+    "sha256": "e5a302232eb80072f091f9600944940d9b3da1214d5db7f42b7008c92f618e12"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -441,8 +441,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/store/StoreDiscovery.ets",
-    "bytes": 7369,
-    "sha256": "376a4f11e6d6c23217bc943d2a2de0441d44e2d6c24d11611647e86bcc6b0981"
+    "bytes": 7539,
+    "sha256": "c611c69c28ca4db01f3b5da142de53aee5309eb0a6b1e59f487121c8b45c50e2"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
@@ -522,7 +522,7 @@
   {
     "path": "mac/Info.plist",
     "bytes": 1017,
-    "sha256": "c843c4fb928eebf163c57238ab0c6c4f6518dc7ad24e3ee5e8e73f1d24a2bed6"
+    "sha256": "8989b77efc9e18e22b3486038aa3e2df0473f874cd4df42827a808e6cea59a43"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -546,8 +546,8 @@
   },
   {
     "path": "mac/Sources/StoreCapture.swift",
-    "bytes": 7992,
-    "sha256": "dcb06ef5103c559c84d16fcaffd35efd289914978fd9ae77de8e21573b7a9ba8"
+    "bytes": 8516,
+    "sha256": "092ccca15499c38dfc6f678676a6ac6d603eb868bf28ff53e6f7f8a966b5291c"
   },
   {
     "path": "mac/Sources/StoreDashboard.swift",
@@ -556,8 +556,13 @@
   },
   {
     "path": "mac/Sources/StoreDiscovery.swift",
-    "bytes": 6287,
-    "sha256": "d9ccbae69dc672b3378ef1e46b206f1968db08c5a0c573f8ac34928a5b1d5d24"
+    "bytes": 6283,
+    "sha256": "ca4bb631974121b22eacd814882bfb3b6ceff189450706ac11e40d5b08b0b510"
+  },
+  {
+    "path": "mac/Sources/StoreFrameWindow.swift",
+    "bytes": 1214,
+    "sha256": "97107d3ebc0b065d91c190638fd26298e2c87a856004565c94e2487ae3ac2e26"
   },
   {
     "path": "mac/Sources/StoreIdentity.swift",
@@ -566,8 +571,8 @@
   },
   {
     "path": "mac/Sources/StoreWire.swift",
-    "bytes": 4625,
-    "sha256": "3add0b70167ba703866e4eeed578f34260194df583b4d4ba8827d55ba64842d7"
+    "bytes": 5140,
+    "sha256": "fc151a6eb704a534e1030eafa4f8ca69910aca9d3c395b6c2b9a5e2446cb18fe"
   },
   {
     "path": "mac/Sources/VisualTheme.swift",
@@ -576,8 +581,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 10351,
-    "sha256": "36880158bc344f8cfda1f206890a7b230f09abb5c41ce627138c529ec16e8d0b"
+    "bytes": 10828,
+    "sha256": "4972b567dcd148c24396be0d5005616c38e403f79f5b3c77f490359fbc6b9717"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
@@ -591,8 +596,8 @@
   },
   {
     "path": "shared/DisplayProfile.hpp",
-    "bytes": 1147,
-    "sha256": "67fe7f34c1c342987f0922d90974ca3bb8d95232605bfe41aac64f4a1089ad2c"
+    "bytes": 1180,
+    "sha256": "05daf4eb3eed666f646b9d6adcd801b151e5f9e05664939530b62de43adbf4c8"
   },
   {
     "path": "shared/TransportPolicy.hpp",
@@ -626,8 +631,8 @@
   },
   {
     "path": "tests/portable_profile_test.cpp",
-    "bytes": 2876,
-    "sha256": "12379eee852948e2bd759f0b42c06e406e65d02aeedd72a2d4db818c938c6709"
+    "bytes": 3116,
+    "sha256": "90672a4edc61b9b455bea41bd506c71c9b247d401ec9b867f12418f687d65e31"
   },
   {
     "path": "tests/usb_test.cpp",

@@ -11,10 +11,11 @@ export class StoreDiscovery {
  private finder: mdns.DiscoveryService | null = null;
  private devices: StoreDiscoveredMac[] = [];
  private epoch: number = 0;
+ private rememberedHost:string='';
  private context:common.UIAbilityContext;
  private changed:(devices:StoreDiscoveredMac[])=>void;
  private failed:(message:string)=>void;
- constructor(context:common.UIAbilityContext,changed:(devices:StoreDiscoveredMac[])=>void,failed:(message:string)=>void){this.context=context;this.changed=changed;this.failed=failed;}
+ constructor(context:common.UIAbilityContext,changed:(devices:StoreDiscoveredMac[])=>void,failed:(message:string)=>void,rememberedHost:string=''){this.rememberedHost=rememberedHost;this.context=context;this.changed=changed;this.failed=failed;}
  private attribute(info:mdns.LocalServiceInfo,key:string):string {let out='';for(const item of info.serviceAttribute || []) {if(item.key===key){for(const byte of item.value){out+=String.fromCharCode(byte);}return out;}}return out;}
  start():void {
   this.stop();const generation=++this.epoch;this.startDatagram(generation);
@@ -58,7 +59,7 @@ export class StoreDiscovery {
    });
    await probe.bind({address:'0.0.0.0',port:0,family:1});await probe.setExtraOptions({broadcast:true});hilog.info(0x1234,'StoreDiscovery','datagram bound');
    if(generation!==this.epoch){await probe.close();return;}
-   const destinations:string[]=['255.255.255.255'];
+   const destinations:string[]=['255.255.255.255'];if(localIPv4(this.rememberedHost)){destinations.push(this.rememberedHost);}
    const diagnostic=AppStorage.get<string>('storeProbeAddress') || '';if(localIPv4(diagnostic)){destinations.push(diagnostic);hilog.info(0x1234,'StoreDiscovery','diagnostic unicast requested');}
    try{for(const net of connection.getAllNetsSync()){const props=connection.getConnectionPropertiesSync(net);for(const link of props.linkAddresses){const address=link.address.address;if(!localIPv4(address)||link.prefixLength<8||link.prefixLength>30)continue;const value=address.split('.').reduce((a:number,b:string)=>(a*256+Number(b))>>>0,0);const mask=(0xffffffff << (32-link.prefixLength))>>>0;const end=(value | ~mask)>>>0;const broadcast=[(end>>>24)&255,(end>>>16)&255,(end>>>8)&255,end&255].join('.');if(!destinations.includes(broadcast))destinations.push(broadcast);hilog.info(0x1234,'StoreDiscovery','network prefix=%{public}d',link.prefixLength);}}}catch(e){hilog.warn(0x1234,'StoreDiscovery','network info unavailable');}
    const send=():void=>{if(generation===this.epoch){for(const destination of destinations.slice(0,5))owned.send({data:`YQDISC1 ${nonce}`,address:{address:destination,port:49565,family:1}}).then(()=>hilog.info(0x1234,'StoreDiscovery','datagram sent')).catch((e:Error)=>hilog.warn(0x1234,'StoreDiscovery','datagram send error=%{public}s',e.message));}};

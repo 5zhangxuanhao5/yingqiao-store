@@ -29,16 +29,18 @@ final class LinePeer {
 final class StoreFrameSender {
  let sid:UInt32,key:SymmetricKey,serverPrefix:Data,clientPrefix:Data,viewerToken:String
  let queue=DispatchQueue(label:"cn.edgelink.store.video",qos:.userInteractive)
- private let lock=NSLock();private var pending=0,alive=true;private var nextID:UInt64=1
+ private let lock=NSLock();private var pending=0,alive=true;private var frameWindow=StoreFrameWindow();private var sentFrames:UInt64=0,sentBytes:UInt64=0
  var connection:NWConnection?
  init(){sid=UInt32(randomBytes(4).uintBE(0,4));key=SymmetricKey(data:randomBytes(16));serverPrefix=randomBytes(4);clientPrefix=randomBytes(4);viewerToken=hex(randomBytes(32))}
- var canEncode:Bool{lock.lock();defer{lock.unlock()};return alive && connection != nil && pending<2}
+ var canEncode:Bool{lock.lock();defer{lock.unlock()};return alive && connection != nil && pending<2 && frameWindow.canEncode}
  func handshake(width:Int,height:Int,fps:Int,topology:DesktopInputTopology,codec:String)->String {var s=Data();s.appendBE(sid);return "OK \(hex(s)) \(key.withUnsafeBytes{hex(Data($0))}) \(hex(serverPrefix)) \(hex(clientPrefix)) \(viewerToken) \(width) \(height) \(fps)"+topology.wireFields()+" local-handover-v1 codec-\(codec)-v1"}
  func attach(_ value:NWConnection){lock.lock();connection=value;lock.unlock()}
- func send(_ frame:Data,keyframe:Bool){queue.async{[weak self] in guard let self else{return};self.lock.lock();guard self.alive,let connection=self.connection else{self.lock.unlock();return};self.pending+=1;self.lock.unlock();let id=self.nextID;self.nextID+=1
+ func send(_ frame:Data,keyframe:Bool){lock.lock();guard alive,let connection else{lock.unlock();return};pending+=1;let id=frameWindow.sent(now:ProcessInfo.processInfo.systemUptime);sentFrames+=1;sentBytes+=UInt64(frame.count);lock.unlock();queue.async{[weak self] in guard let self else{return}
   do {var h=Data("EDL1".utf8);h.appendBE(self.sid);h.appendBE(id);h.appendBE(UInt16(0));h.appendBE(UInt16(1));h.appendBE(UInt32(frame.count+16));h.append(keyframe ? 1:0);h.append(0);h.appendBE(UInt16(0));var aad=Data(h[4..<16]);aad.append(h[20..<28]);var n=self.serverPrefix;n.appendBE(id);let box=try AES.GCM.seal(frame,using:self.key,nonce:AES.GCM.Nonce(data:n),authenticating:aad);h.append(box.ciphertext);h.append(box.tag)
    connection.send(content:h,completion:.contentProcessed{[weak self] error in guard let self else{return};self.lock.lock();self.pending=max(0,self.pending-1);if error != nil{self.alive=false};self.lock.unlock()})
   }catch{self.stop()}
  }}
+ func acknowledge(_ id:UInt64){lock.lock();frameWindow.acknowledge(id,now:ProcessInfo.processInfo.systemUptime);lock.unlock()}
+ func health()->[String:Any]{lock.lock();defer{lock.unlock()};return ["framesSent":sentFrames,"bytesSent":sentBytes,"renderSubmissionAck":frameWindow.lastAck,"outstanding":frameWindow.outstanding.count,"ackP95ms":frameWindow.p95,"pendingSocketWrites":pending]}
  func stop(){lock.lock();alive=false;let c=connection;connection=nil;lock.unlock();c?.cancel()}
 }

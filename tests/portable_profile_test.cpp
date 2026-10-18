@@ -19,6 +19,9 @@ int main() {
     assert(std::abs(double(profile.width) / profile.height -
                     double(panel.first) / panel.second) < .005);
   }
+  auto native = ChooseDisplayProfile(3120,2080,120,"hevc",
+      [](const std::string&,int w,int h,int fps){return w<=3840 && h<=3200 && fps<=60;});
+  assert(native.supported && native.width==3120 && native.height==2080 && native.fps==60);
   auto fallback = ChooseDisplayProfile(2800, 1840, 60, "hevc",
       [](const std::string &codec, int w, int, int fps) {
         return codec == "avc" && w <= 1920 && fps <= 30;
