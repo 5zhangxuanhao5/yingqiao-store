@@ -29,7 +29,7 @@ namespace {
 double now(){return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count();}
 std::mutex lock;std::condition_variable changed;std::thread worker;std::atomic<bool>cancelled{true};int activeFD=-1;
 struct Sample {yingqiao::Path path;int successes=0,failures=0;};
-std::vector<Sample> samples;std::string configuration;
+std::vector<Sample> samples;std::string configuration;yingqiao::StablePathChoice selection;
 std::string str(napi_env e,napi_value v){size_t n=0;napi_get_value_string_utf8(e,v,nullptr,0,&n);if(n>12288)return {};std::string s(n+1,'\0');napi_get_value_string_utf8(e,v,s.data(),s.size(),&n);s.resize(n);return s;}
 bool waitIO(int fd,int events,double deadline){while(!cancelled&&now()<deadline){pollfd p{fd,short(events),0};const int n=poll(&p,1,std::min(50,std::max(1,int((deadline-now())*1000))));if(n>0)return (p.revents&events)!=0;if(n<0&&errno!=EINTR)return false;}return false;}
 bool tlsIO(SSL*s,int fd,unsigned char*bytes,size_t count,bool writing,double deadline){while(count&&!cancelled&&now()<deadline){int n=writing?SSL_write(s,bytes,int(count)):SSL_read(s,bytes,int(count));if(n>0){bytes+=n;count-=size_t(n);continue;}int e=SSL_get_error(s,n);if((e!=SSL_ERROR_WANT_READ&&e!=SSL_ERROR_WANT_WRITE)||!waitIO(fd,e==SSL_ERROR_WANT_READ?POLLIN:POLLOUT,deadline))return false;}return count==0;}
@@ -53,7 +53,7 @@ bool probe(Sample&sample,const std::string&token,const std::string&cert){
  const double first=now();unsigned char body[32768];if(!tlsIO(c.ssl,c.fd,body,sizeof(body),false,deadline))return false;
  sample.path.authenticated=true;sample.path.consumerSupported=true;sample.path.peer="pinned";sample.path.wired=route=="usb-net";sample.path.measuredAt=now();sample.path.p95ms=std::max(.05,(first-began)*1000);sample.path.goodputMbps=std::min(10000.0,(sizeof(body)*8.0/1e6)/std::max(.0001,now()-began));return true;
 }
-void stop(){cancelled=true;changed.notify_all();{std::lock_guard<std::mutex>g(lock);if(activeFD>=0)shutdown(activeFD,SHUT_RDWR);}if(worker.joinable())worker.join();std::lock_guard<std::mutex>g(lock);samples.clear();configuration.clear();}
+void stop(){cancelled=true;changed.notify_all();{std::lock_guard<std::mutex>g(lock);if(activeFD>=0)shutdown(activeFD,SHUT_RDWR);}if(worker.joinable())worker.join();std::lock_guard<std::mutex>g(lock);samples.clear();configuration.clear();selection.reset();}
 void run(std::string token,std::string cert){sigset_t blocked;sigemptyset(&blocked);sigaddset(&blocked,SIGPIPE);pthread_sigmask(SIG_BLOCK,&blocked,nullptr);
  while(!cancelled){std::vector<Sample> next;{std::lock_guard<std::mutex>g(lock);next=samples;}
   for(size_t i=0;i<next.size()&&!cancelled;++i){auto s=next[i];if(probe(s,token,cert)){s.successes++;s.failures=0;}else{++s.failures;s.successes=0;if(s.failures>=2)s.path.authenticated=false;}
@@ -71,7 +71,7 @@ napi_value Configure(napi_env env,napi_callback_info info){size_t n=3;napi_value
 napi_value Status(napi_env env,napi_callback_info info){size_t n=4;napi_value a[4];napi_get_cb_info(env,info,&n,a,nullptr,nullptr);std::string active=n?str(env,a[0]):"";double elapsed=0;bool dragging=false,alive=false;if(n>1)napi_get_value_double(env,a[1],&elapsed);if(n>2)napi_get_value_bool(env,a[2],&dragging);if(n>3)napi_get_value_bool(env,a[3],&alive);if(!std::isfinite(elapsed)||elapsed<0)elapsed=0;
  std::vector<yingqiao::Path> ready;const double time=now();std::ostringstream out;out<<"{\"paths\":[";std::lock_guard<std::mutex>g(lock);bool comma=false;
  for(auto&s:samples){bool valid=s.path.authenticated&&s.successes>=2&&time-s.path.measuredAt<=10;if(valid)ready.push_back(s.path);if(comma)out<<',';comma=true;out<<"{\"host\":\""<<s.path.id<<"\",\"ready\":"<<(valid?"true":"false")<<",\"route\":\""<<(s.path.wired?"usb-net":"lan")<<"\",\"rttMs\":"<<s.path.p95ms<<",\"probeMbps\":"<<s.path.goodputMbps<<'}';}
- std::string preferred=yingqiao::PreferredPath(ready,"pinned",active,time,time-elapsed/1000,dragging,alive);if(alive&&!active.empty()&&std::none_of(ready.begin(),ready.end(),[&](auto&p){return p.id==active;}))preferred=active;
+ std::string preferred=selection.choose(ready,"pinned",active,time,time-elapsed/1000,dragging,alive);if(alive&&!active.empty()&&std::none_of(ready.begin(),ready.end(),[&](auto&p){return p.id==active;}))preferred=active;
  out<<"],\"preferredHost\":\""<<preferred<<"\"}";auto s=out.str();napi_value value;napi_create_string_utf8(env,s.data(),s.size(),&value);return value;
 }
 napi_value Interfaces(napi_env env,napi_callback_info){

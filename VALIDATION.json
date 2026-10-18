@@ -1,6 +1,6 @@
 {
-  "sourceVersion": "store-v0.1.15-test.1",
-  "status": "built-candidate-awaiting-device-handover-acceptance",
+  "sourceVersion": "store-v0.1.16-diagnostic.1",
+  "status": "built-not-installed-superseded-by-original-flow-port",
   "macUniversalArchitectures": [
     "arm64",
     "x86_64"
@@ -27,12 +27,15 @@
     "Actual native module exports/profile fixture passed",
     "Headless Mac production address/encoder/window policies passed"
   ],
-  "previousCI": "0.1.14 Windows and Linux portable fixtures plus Mac ARM runner passed; Intel runner pending when this candidate was prepared. 0.1.15 policy fixture rejects a freshly measured but known-failed active route.",
+  "previousCI": "0.1.14 all four cloud jobs passed (Mac ARM/Intel, Linux and Windows policies).",
   "observedV14Switch": {
     "direction": "LAN to ordinary USB",
     "sameDisplay": true,
     "macStopToRenderACKms": 278.417292,
     "displayAdoptionMs": 0.046459,
-    "includesPhysicalUnplugDetection": false
-  }
+    "includesPhysicalUnplugDetection": false,
+    "secondMacStopToRenderACKms": 1207.009708,
+    "secondDisplayAdoptionMs": 1.108917
+  },
+  "v14PhysicalUnplugAcceptance": "User answered no; no successful recovery observed. Do not mark seamless switching accepted."
 }

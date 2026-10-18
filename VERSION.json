@@ -1,7 +1,7 @@
 {
-  "version": "store-v0.1.15-test.1",
+  "version": "store-v0.1.16-diagnostic.1",
   "date": "2026-10-18",
-  "status": "development-preview-not-appgallery-ready",
+  "status": "superseded-uninstalled-candidate-original-extension-flow-port-requested",
   "publicSource": true,
   "minimumHarmonyAPI": 24,
   "macBuildArchitectures": [
@@ -37,9 +37,9 @@
   "quality": "0.1.11 original media core, HiDPI output retained; user reported clear relative improvement on LAN.",
   "coreProvenance": "docs/ACCEPTED_CORE_PROVENANCE.json",
   "consumerUSBImplementation": "0.1.13 real user-space RNDIS USB/TLS streaming verified on current Edge; no HDC connection. Other models unverified.",
-  "networkHandoverImplementation": "0.1.14 observed automatic LAN to ordinary USB switch, same display, 278ms from Mac old-stream stop to new render ACK. 0.1.15 additionally excludes known-failed active route from cached-probe selection; unplug pause acceptance pending.",
+  "networkHandoverImplementation": "0.1.14 automatic local switches observed at 278ms and 1207ms (Mac old stop to first render ACK), both retained the display. 0.1.15 excludes known-failed cached routes; 0.1.16 queues one authenticated start while old capture stops, avoiding a one-second retry. Physical unplug acceptance pending. Healthy improvement switches now require three distinct paired probe wins to prevent route flapping; failures bypass debounce.",
   "components": {
-    "mac": "0.1.14 (15), unchanged",
-    "harmony": "0.1.15 (16)"
+    "mac": "0.1.16 (17)",
+    "harmony": "0.1.16 (17)"
   }
 }

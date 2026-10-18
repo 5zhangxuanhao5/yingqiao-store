@@ -16,8 +16,8 @@ final class StoreHost:NSObject,NSApplicationDelegate {
  var advertisedService:NetService?,linkPeer:LinePeer?,linkAlert:NSAlert?
  var usbListener:NWListener?;var listener:NWListener?,identity:StoreIdentity?,controller:LinePeer?,viewer:LinePeer?,sender:VideoSender?,capture:StoreCapture?,heartbeat:Timer?
  var peers:[ObjectIdentifier:LinePeer]=[:],lastPing=Date(),generation=0,busy=false
- var retainedDisplay:CGVirtualDisplay?,retentionTimer:Timer?
- var handoverStartedNs:UInt64?,handoverAdoptMs:Double=0,handoverReusedDisplay=false
+ var retainedDisplay:CGVirtualDisplay?,retentionTimer:Timer?,pendingController:LinePeer?
+ var handoverStartedNs:UInt64?,handoverAdoptMs:Double=0,handoverReusedDisplay=false,handoverStartWaitMs:Double=0
  let input=RemoteInput()
  func applicationDidFinishLaunching(_ n:Notification){
   window=NSWindow(contentRect:NSRect(x:0,y:0,width:880,height:660),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
@@ -53,7 +53,22 @@ final class StoreHost:NSObject,NSApplicationDelegate {
   }
   if p !== controller {
    if a.count==2,a[0]=="VIEW",let sender,constantEqual(a[1],sender.viewerToken),viewer==nil{viewer=p;sender.attachViewer(p.connection);return}
-   guard a.count>=8,a[0]=="AUTH",let identity,constantEqual(a[1],identity.token),a[2]=="extend",a[6]=="tcp",a.contains("store-v1"),!busy,controller==nil,let w=Int(a[3]),let h=Int(a[4]),let fps=Int(a[5]),w>=640,h>=480,w<=3840,h<=3200,w*h<=8_000_000,w%2==0,h%2==0,[30,60].contains(fps) else{p.send("ERR local_extension_only");p.close();return}
+   guard a.count>=8,a[0]=="AUTH",let identity,constantEqual(a[1],identity.token),a[2]=="extend",a[6]=="tcp",a.contains("store-v1"),controller==nil,let w=Int(a[3]),let h=Int(a[4]),let fps=Int(a[5]),w>=640,h>=480,w<=3840,h<=3200,w*h<=8_000_000,w%2==0,h%2==0,[30,60].contains(fps) else{p.send("ERR local_extension_only");p.close();return}
+   // Handover AUTH can arrive before ScreenCaptureKit finishes Stop. Queue
+   // one already authenticated, validated request instead of rejecting it and
+   // forcing a full one-second client retry. Explicit End invalidates the epoch.
+   if busy {
+    guard pendingController==nil else{p.send("ERR capture_busy");p.close();return}
+    pendingController=p;let epoch=generation,started=monotonicNanoseconds()
+    Task{@MainActor in
+     while self.busy && self.generation==epoch && !p.closed && monotonicNanoseconds()-started<2_000_000_000 {
+      try? await Task.sleep(nanoseconds:10_000_000)
+     }
+     guard self.pendingController===p else{return};self.pendingController=nil
+     guard self.generation==epoch,!p.closed,!self.busy,self.controller==nil else{p.send("ERR capture_busy");p.close();return}
+     self.handoverStartWaitMs=Double(monotonicNanoseconds()-started)/1e6;self.line(p,line)
+    };return
+   }
    let codec=a.contains("codec-hevc-v1") && StoreCapture.supports(kCMVideoCodecType_HEVC) ? "hevc":"avc";guard StoreCapture.supports(codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264) else{p.send("ERR hardware_encoder_unavailable");p.close();return}
    lastSessionError=nil;controller=p;busy=true;generation+=1;let g=generation;let sender:VideoSender;do{sender=try VideoSender(port:49564,tcpMode:true,targetFPS:fps,timedFrames:true)}catch{p.send("ERR sender_setup");failSession(error.localizedDescription);return};sender.setTargetBitrate(kbps:40000);self.sender=sender;let capture=StoreCapture(width:w,height:h,fps:fps,codec:codec,sender:sender);self.capture=capture;capture.onFailure={[weak self] text in DispatchQueue.main.async{self?.failSession(text)}};sender.onRecovery={[weak capture] in capture?.requestKeyframe()};sender.onReady={[weak self,weak capture] in Task{@MainActor in guard let self,let capture,self.capture===capture else{return};do{try await capture.startMedia();self.startCoreCursor()}catch{self.failSession(error.localizedDescription)}}};sender.start()
    statusMessage="正在创建独立扩展屏…";Task{@MainActor in do{let retained=retainedDisplay;retainedDisplay=nil;retentionTimer?.invalidate();retentionTimer=nil;let adoptionStarted=monotonicNanoseconds();let display=try await capture.start(adopting:retained);handoverAdoptMs=Double(monotonicNanoseconds()-adoptionStarted)/1e6;handoverReusedDisplay=capture.reusedDisplay;guard generation==g,controller===p,!p.closed else{_ = await capture.stop();return};try input.configure(displayID:display,extended:true);guard let topology=input.desktopTopology else{throw NSError(domain:"Topology",code:1)};p.send(sender.handshake(width:w,height:h,fps:fps,desktop:topology)+" local-handover-v1 codec-\(codec)-v1");busy=false;lastPing=Date();statusMessage="扩展屏运行中 · \(p.usb ? "USB":"局域网") · \(w) × \(h) · \(codec.uppercased()) · \(fps)FPS目标";heartbeat=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in guard let self else{return};if Date().timeIntervalSince(self.lastPing)>12{self.endSession()};if var health=self.sender?.transportStats(){health["width"]=w;health["height"]=h;health["codec"]=codec;health["route"]=(p.usb || StoreNetworkPath.isUSB(p.connection)) ? "usb-network-tcp":"lan-tcp";health["hiDPI"]=true;health["usb"]=StoreUSB.status();health["capture"]=self.capture?.stats();if let bytes=try? JSONSerialization.data(withJSONObject:health){try? bytes.write(to:StoreIdentity.directory.appendingPathComponent("stream-health.json"),options:.atomic)}}}}catch{p.send("ERR capture_start_failed");failSession(error.localizedDescription)}};return
@@ -63,7 +78,7 @@ final class StoreHost:NSObject,NSApplicationDelegate {
   case "DESKTOP":if a==["DESKTOP","overview"]{Task{@MainActor in if self.overview==nil{self.overview=DesktopOverview()};self.overview?.request(active:self.capture?.media?.startupReady==true,permission:AXIsProcessTrusted(),heldKeys:self.input.pressed.count,heldButtons:self.input.buttons.count,onChange:{})}}
   case "TIME":if a.count==2,let t0=UInt64(a[1]){let t1=monotonicNanoseconds(),t2=monotonicNanoseconds();p.send("TIME \(t0) \(t1) \(t2)")}
   case "CURSOR":if a.count==2{cursorRequested=a[1]=="1";sender?.enableCursor(cursorRequested);Task{@MainActor in if self.cursorRequested{self.startCoreCursor()}else{self.hostCursor?.stop();self.hostCursor=nil}}}
-  case "ACK":if a.count==2,let id=UInt64(a[1]){sender?.acknowledge(id);if let started=handoverStartedNs{handoverStartedNs=nil;let report:[String:Any]=["stoppedToFirstRenderACKms":Double(monotonicNanoseconds()-started)/1e6,"displayAdoptionMs":handoverAdoptMs,"reusedDisplay":handoverReusedDisplay,"route":p.usb ? "usb-network-tcp":"lan-tcp","at":Date().timeIntervalSince1970];if let data=try? JSONSerialization.data(withJSONObject:report){try? data.write(to:StoreIdentity.directory.appendingPathComponent("handover-health.json"),options:.atomic)}}}
+  case "ACK":if a.count==2,let id=UInt64(a[1]){sender?.acknowledge(id);if let started=handoverStartedNs{handoverStartedNs=nil;let report:[String:Any]=["stoppedToFirstRenderACKms":Double(monotonicNanoseconds()-started)/1e6,"displayAdoptionMs":handoverAdoptMs,"authenticatedStartWaitMs":handoverStartWaitMs,"reusedDisplay":handoverReusedDisplay,"route":p.usb ? "usb-network-tcp":"lan-tcp","at":Date().timeIntervalSince1970];if let data=try? JSONSerialization.data(withJSONObject:report){try? data.write(to:StoreIdentity.directory.appendingPathComponent("handover-health.json"),options:.atomic)}}}
   case "STOP":endSession()
   case "HANDOVER":stopSession(keepDisplay:true)
   case "RELEASE":input.reset()
@@ -88,7 +103,7 @@ final class StoreHost:NSObject,NSApplicationDelegate {
   DispatchQueue.main.asyncAfter(deadline:.now()+0.3){[weak self] in guard let self,self.generation==current else{return};self.endSession()}
  }
  @objc func endSession(){handoverStartedNs=nil;if controller==nil && capture==nil{generation+=1;busy=false};retentionTimer?.invalidate();retentionTimer=nil;retainedDisplay=nil;stopSession(keepDisplay:false)}
- func stopSession(keepDisplay:Bool){guard controller != nil || capture != nil else{return};if keepDisplay{if handoverStartedNs==nil{handoverStartedNs=monotonicNanoseconds()}}else{handoverStartedNs=nil};generation+=1;let stopGeneration=generation;heartbeat?.invalidate();heartbeat=nil;cursorRequested=false;Task{@MainActor in self.hostCursor?.stop();self.hostCursor=nil};input.reset();let old=capture;capture=nil;sender?.stop();sender=nil;let c=controller,v=viewer;controller=nil;viewer=nil;c?.onClose=nil;v?.onClose=nil;c?.close();v?.close();busy=true
+ func stopSession(keepDisplay:Bool){guard controller != nil || capture != nil else{return};if keepDisplay{if handoverStartedNs==nil{handoverStartedNs=monotonicNanoseconds()}}else{handoverStartedNs=nil};handoverStartWaitMs=0;generation+=1;let stopGeneration=generation;heartbeat?.invalidate();heartbeat=nil;cursorRequested=false;Task{@MainActor in self.hostCursor?.stop();self.hostCursor=nil};input.reset();let old=capture;capture=nil;sender?.stop();sender=nil;let c=controller,v=viewer;controller=nil;viewer=nil;c?.onClose=nil;v?.onClose=nil;c?.close();v?.close();busy=true
   Task{@MainActor in let kept=await old?.stop(keepingDisplay:keepDisplay);guard generation==stopGeneration else{return};if keepDisplay,let kept{retainedDisplay=kept;retentionTimer=Timer.scheduledTimer(withTimeInterval:10,repeats:false){[weak self] _ in self?.retainedDisplay=nil;self?.retentionTimer=nil}};busy=false;statusMessage=lastSessionError ?? (keepDisplay ? "线路暂时断开，保留工作桌面10秒等待接续。":"会话已结束，画面采集和编码已停止；可从平板再次连接。") }
  }
  func applicationWillTerminate(_ notification:Notification){YQUSBStop()}

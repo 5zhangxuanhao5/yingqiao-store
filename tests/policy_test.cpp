@@ -11,6 +11,14 @@ int main(){using namespace yingqiao;int cases=0;
  // was held when the cable disappeared.
  assert(PreferredPath(paths,"paired","usb",101,100,true,false)=="wifi");
  assert(PreferredPath(std::vector<Path>{paths[1]},"paired","usb",101,100,false,false).empty());
- paths[1].consumerSupported=false;assert(PreferredPath(paths,"paired","wifi",101,90,false)=="wifi");paths[1].consumerSupported=true;paths[1].peer="other";assert(PreferredPath(paths,"paired","wifi",101,90,false)=="wifi");paths[1].peer="paired";paths[0].authenticated=false;assert(PreferredPath(paths,"paired","wifi",101,100,true)=="usb");assert(PreferredPath(paths,"paired","usb",120,90,false).empty());DisplayLease l;l.retain("paired",100);assert(!l.adopt("other",101));assert(l.adopt("paired",105));l.retain("paired",110);l.explicitEnd();assert(!l.adopt("paired",111));
+ paths[1].consumerSupported=false;assert(PreferredPath(paths,"paired","wifi",101,90,false)=="wifi");paths[1].consumerSupported=true;paths[1].peer="other";assert(PreferredPath(paths,"paired","wifi",101,90,false)=="wifi");paths[1].peer="paired";paths[0].authenticated=false;assert(PreferredPath(paths,"paired","wifi",101,100,true)=="usb");assert(PreferredPath(paths,"paired","usb",120,90,false).empty());paths[0].authenticated=true;StablePathChoice stable;
+ assert(stable.choose(paths,"paired","wifi",101,90,false,true)=="wifi");
+ assert(stable.choose(paths,"paired","wifi",101.1,90,false,true)=="wifi"); // Same probe is not another win.
+ paths[0].measuredAt=paths[1].measuredAt=101;
+ assert(stable.choose(paths,"paired","wifi",101.2,90,false,true)=="wifi");
+ paths[0].measuredAt=paths[1].measuredAt=102;
+ assert(stable.choose(paths,"paired","wifi",102,90,false,true)=="usb");
+ assert(stable.choose(paths,"paired","usb",102,102,true,false)=="wifi"); // No debounce on failure.
+ DisplayLease l;l.retain("paired",100);assert(!l.adopt("other",101));assert(l.adopt("paired",105));l.retain("paired",110);l.explicitEnd();assert(!l.adopt("paired",111));
  assert(edgelinkstore::Allowed("192.168.1.10",49563,"extend","store-avc"));for(auto ip:{"127.0.0.1","8.8.8.8","100.64.1.1","example.com","192.168.1.5.evil","::1"})assert(!edgelinkstore::Allowed(ip,49563,"extend","store-avc"));assert(!edgelinkstore::Allowed("10.0.0.5",49563,"remote","store-avc"));assert(!edgelinkstore::Allowed("10.0.0.5",48561,"extend","tcp"));std::cout<<"PASS "<<cases<<" panel ratios, codec/FPS fallback, authenticated route hysteresis/failure, display lease, local-only gate. Policy simulation, not USB integration proof.\n";
 }
