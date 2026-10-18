@@ -1,1887 +1,1514 @@
 [
   {
     "path": ".gitattributes",
-    "bytes": 147,
     "sha256": "38b10d332da5b8da22e9b186f4b8519deea0737ef8fafe77a671b16d7c7b4243"
   },
   {
     "path": ".github/workflows/compatibility.yml",
-    "bytes": 4838,
     "sha256": "b4acf75cc7e36dec1d5fda194a02d7fde30cf23863b046bccc8c372b6a77cb2e"
   },
   {
     "path": ".gitignore",
-    "bytes": 203,
     "sha256": "680f0e7374c3e8503a9a01fcded591c733c0ee50c722c855ef0a84334a8314c6"
   },
   {
     "path": "AGENTS.md",
-    "bytes": 2038,
     "sha256": "abdf3d8285811ca928c4e37d4e11afe9510b681f6ec078370f0a3470f2d846ec"
   },
   {
     "path": "BASELINE.json",
-    "bytes": 441,
     "sha256": "b36f92821fdb26b2afbf1cf6cceaf3aa1b7266bfb42646a207609ec9641dc660"
   },
   {
     "path": "DEPENDENCIES.json",
-    "bytes": 28974,
     "sha256": "6eb1fbe5800dd1ab4c3a3876d81bd2030a47f40d2d095b4b1957117fc7eeaf00"
   },
   {
     "path": "DEPENDENCY_ARCHIVE.json",
-    "bytes": 290,
     "sha256": "324d6163eb716c43ed0cfc3e9225a8b48960c29227146533ce4e47fc38617441"
   },
   {
     "path": "LICENSE",
-    "bytes": 557,
     "sha256": "011df007c48b0d0b6bb77b0ffe5265cf234f5fc3e52349e212165b7f75aff61f"
   },
   {
     "path": "LICENSES/DeskPad-MIT.txt",
-    "bytes": 1075,
     "sha256": "65817005ed84270e73fe24bb0aff422dceeabd12418aa96e81c6749a62dced13"
   },
   {
     "path": "LICENSES/OpenSSL-Apache-2.0.txt",
-    "bytes": 10175,
     "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
   },
   {
     "path": "LICENSES/Opus-BSD.txt",
-    "bytes": 1945,
     "sha256": "01e1167d54a096d123cf6dfbbeb19587278845c6481d2d66d545669846079551"
   },
   {
     "path": "README.md",
-    "bytes": 3780,
-    "sha256": "164c0cc69b17584718351301cd76aa30922279b70a19704f25d213b8a46ccc6f"
+    "sha256": "040b51e56acb67ccda11b54d178fb14ff581d2fb847dd2bb1cf6ad20c10fb3f7"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
-    "bytes": 538,
     "sha256": "b1822bd0d9ba051d940a1c483552daff9dc7cccd2160a50112f6d11dc74efe61"
   },
   {
     "path": "VALIDATION.json",
-    "bytes": 1203,
     "sha256": "7cd63cf87775fbd80b4d6c5ad319cb011958dbe9dcaa400358d2fbd22cc14fd8"
   },
   {
     "path": "VERSION.json",
-    "bytes": 2178,
     "sha256": "100ed2e5977377b58841c9a976cd2f81987e5d7ca36a62932edcfc171b335cd9"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 10373,
     "sha256": "fd2f8a9c3bad6f1067144c86f27a416dc6901e713a2dbd089e4af0cd81fb9c4c"
   },
   {
     "path": "docs/ACCEPTED_CORE_PROVENANCE.json",
-    "bytes": 5603,
     "sha256": "721ac9ea5caaa87cf3937eae50f1c80903fd90442606a5588d4f7d399d32356f"
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
-    "bytes": 3863,
     "sha256": "576e0d7032bf28b2dc9cd04f41a95ee0f46d670503f7a8f8954d7d6add68c64d"
   },
   {
     "path": "docs/BUILD.md",
-    "bytes": 3274,
     "sha256": "9c3f89d6cb8366410065c86c68e327b97f889e7a6f6027f9597517057293d081"
   },
   {
     "path": "docs/CONNECTION_CLEANUP_022.md",
-    "bytes": 653,
     "sha256": "8e47415017defc0e0e908711345d703ae2e3dec4c391d9b2f40ce447e7d0ad1e"
   },
   {
     "path": "docs/DEVICE_TEST.md",
-    "bytes": 2396,
     "sha256": "17fdc99f2da48e218889749d409a89e5d16876414e5a27f82c8f269edc8b7f57"
   },
   {
     "path": "docs/DISCOVERY_DIAGNOSTIC.md",
-    "bytes": 2953,
     "sha256": "d58e476bd3f33d6283605e0f43783ff2c565d72baec7fc6875d4b911dfb3a4c3"
   },
   {
     "path": "docs/DISCOVERY_LAYOUT_031.md",
-    "bytes": 1952,
     "sha256": "24148f52a37e37eb2c060b6de4be7b5d63c488f9f8a99c2d8310d7e67a059b79"
   },
   {
     "path": "docs/FIRST_RUN_NEARBY_030.md",
-    "bytes": 2146,
     "sha256": "517190d8608c70e2722bbead4f6c870bbd02ac3274a211e3258e2ab0696048c4"
   },
   {
     "path": "docs/MAC_INSTALL.md",
-    "bytes": 4129,
-    "sha256": "44bef678196c0501177ad4ee21415087b2544812c1c91465903c422811bfad61"
+    "sha256": "68e69af286c10006de013dc569c2e64a24d8af85b2fd5c6946c7efb18b76fd00"
+  },
+  {
+    "path": "docs/NAME_RELEASE_032.md",
+    "sha256": "3a32ddbfcd1cf0561385829eb16abd0140b63f64fabd37c1f57f2db7d4a65ffd"
   },
   {
     "path": "docs/ORIGINAL_EXTENSION_PORT.md",
-    "bytes": 1995,
     "sha256": "1b3b9c4d48bc64ae066ee8d991be49556fcbfcc5ab80a23887b5d270956da195"
   },
   {
     "path": "docs/PRIVACY.md",
-    "bytes": 7297,
     "sha256": "b98859714fb89330572888253517ad371f63cc9663856562e8850d2fe6ad46a0"
   },
   {
     "path": "docs/PRIVACY_DRAFT.md",
-    "bytes": 295,
     "sha256": "a59dc5f1263d69a423130c917568175ed13b6acae551a5fb8ed1eb5ee56330c0"
   },
   {
     "path": "docs/TRACKPAD_TEST_021.md",
-    "bytes": 1161,
     "sha256": "8025518a56037a3828c5fab08a5fcba1761b3eca3051b510a40a4d16738cf847"
   },
   {
     "path": "docs/USB_AND_HANDOVER.md",
-    "bytes": 7421,
     "sha256": "6345f2b47828f6d18380b685f81f121289349ad3d03d63a975808eda4696f040"
   },
   {
     "path": "docs/compatibility-catalog.json",
-    "bytes": 2310,
     "sha256": "83865aa00f614375a963d13bea94bc3eb456c4489b996518dde777afbd59fc18"
   },
   {
     "path": "docs/downloads.md",
-    "bytes": 1481,
-    "sha256": "95a099f6011195f7b9b74b18cc21372e314e2435223acde49f107a20839e457e"
+    "sha256": "8fe98a63904483f688c9516980e8aa76211b0fd80793524cf9bcf254a97df9db"
   },
   {
     "path": "docs/tablet-input-compatibility-reference.json",
-    "bytes": 117,
     "sha256": "4acabdfeddbd24821560cf8c9f48ca46f8ae7305e9071877cc696e9b67f3fd37"
   },
   {
     "path": "harmony/AppScope/app.json5",
-    "bytes": 198,
-    "sha256": "625f57ccf81777e0fec80508402daa5035384093577df262af6b73061907968a"
+    "sha256": "cfce6bbefa8107eb640a477f3ba591db750e4fae26dfed5d7cf120ad407fcacb"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
-    "bytes": 207,
-    "sha256": "0ae8b9e620812cf5ff192f9e71e392a2800967f56a1192030c6759a843294ae5"
+    "sha256": "b4826332b279598e0c789b9269b6647e16f62e8a9d72d0ac2bacf7eb8dcb2a6d"
   },
   {
     "path": "harmony/AppScope/resources/base/media/app_icon.svg",
-    "bytes": 505,
     "sha256": "73d267351f591eb836c591506ecd283f2c588c7715cbbb71fdc0cb6f937970b5"
   },
   {
     "path": "harmony/README.md",
-    "bytes": 300,
     "sha256": "69887b1033db493c20a72c5add27c9b838be0f4d2ea483a97200264dc7a3f592"
   },
   {
     "path": "harmony/build-profile.json5",
-    "bytes": 538,
     "sha256": "721c81618fcdd51bc30689a75636c5280a13704a9760e9b038d266fb10efc57c"
   },
   {
     "path": "harmony/entry/build-profile.json5",
-    "bytes": 320,
     "sha256": "63ce32421bb5acbdf4003f81ef8ab52834c1c99b1d7536f1d4699729770e6ee2"
   },
   {
     "path": "harmony/entry/hvigorfile.ts",
-    "bytes": 103,
     "sha256": "f547983dcab9c8fff87cc3ddedb22bb98063663c5b8afe18bb32e131311ec289"
   },
   {
     "path": "harmony/entry/oh-package-lock.json5",
-    "bytes": 530,
     "sha256": "7755d1c344ca244fcecc0385917d9209f0d1ca3a9b2e0cfcc8b3a3a5fe98a2c7"
   },
   {
     "path": "harmony/entry/oh-package.json5",
-    "bytes": 158,
     "sha256": "899f1d7693ed0c1d47e1f6dc5aa767dca90995c6a61610180cf34c051a481242"
   },
   {
     "path": "harmony/entry/src/main/cpp/CMakeLists.txt",
-    "bytes": 1391,
     "sha256": "ae7ddc827e6ea5e675c21ff852b22a111676e29e94f170f038d350ecbcc1ad72"
   },
   {
     "path": "harmony/entry/src/main/cpp/audio_crypto.cpp",
-    "bytes": 5163,
     "sha256": "f72f9c0a9334d4ff052086a568c5c147795e390b24b27139a5666f180d28c342"
   },
   {
     "path": "harmony/entry/src/main/cpp/audio_crypto.h",
-    "bytes": 1474,
     "sha256": "19e63bbce6548dbc239092f71cb7bc6f861db383fd55f54439ed3eadbbd024f9"
   },
   {
     "path": "harmony/entry/src/main/cpp/audio_read_liveness.h",
-    "bytes": 780,
     "sha256": "a63cf6c33d9734ab3c9e01c160e2bde69dcedc2e1be8fb1f410c323186625537"
   },
   {
     "path": "harmony/entry/src/main/cpp/audio_ring.h",
-    "bytes": 3333,
     "sha256": "4662676d392864228f8cb37d2a34781ef6db28c43bdc48433d4ec6597981a557"
   },
   {
     "path": "harmony/entry/src/main/cpp/axis_observer.cpp",
-    "bytes": 3638,
     "sha256": "b8c6b6728f1d359b8e063c48a522661081f7986b2b9bfca38b3f8722d563a157"
   },
   {
     "path": "harmony/entry/src/main/cpp/axis_observer.h",
-    "bytes": 706,
     "sha256": "c5232fd682a19cc112963085b998f4f453c8f17166f0f68ccacdffb61d0590de"
   },
   {
     "path": "harmony/entry/src/main/cpp/client.cpp",
-    "bytes": 107988,
     "sha256": "ea4705319db17da73d60126a3ca709528c5b1a83461df1c2efb2341243d56064"
   },
   {
     "path": "harmony/entry/src/main/cpp/clock_refresh.h",
-    "bytes": 3094,
     "sha256": "b00484b99174f71cdc07a95e6b73455d67db3e5c93147c6f79f4d69f759bfdbb"
   },
   {
     "path": "harmony/entry/src/main/cpp/codec_probe_reference.c",
-    "bytes": 1014,
     "sha256": "d4ec016b164d395d11bdbd4ad4c0c6c29752b4357c1b912890d56522b1a1a04f"
   },
   {
     "path": "harmony/entry/src/main/cpp/control_stream_owner.h",
-    "bytes": 520,
     "sha256": "96e4cdfcaf1db83597a62233be8c4309f796810b3920702adcf03b79128e30a9"
   },
   {
     "path": "harmony/entry/src/main/cpp/cursor_channel.cpp",
-    "bytes": 11749,
     "sha256": "54416d61587dadaf3da53a4888753569a481c3bfa8ebed0dada95def147550cd"
   },
   {
     "path": "harmony/entry/src/main/cpp/cursor_channel.h",
-    "bytes": 705,
     "sha256": "f185bd0d87d6cc273440d4165f129272e4edfa8238aa8282e7c64d9ebbd4a518"
   },
   {
     "path": "harmony/entry/src/main/cpp/cursor_lock.cpp",
-    "bytes": 7835,
     "sha256": "d58e0acae74bb68197e34aff052d5eda88068b271b77e0bcefbaea404dd8a49e"
   },
   {
     "path": "harmony/entry/src/main/cpp/cursor_lock.h",
-    "bytes": 410,
     "sha256": "eaa751f28308280b95511eb3e206951fede5f387712c8121e7fbc5da31c0f2e2"
   },
   {
     "path": "harmony/entry/src/main/cpp/desktop_shortcut.h",
-    "bytes": 1549,
     "sha256": "76a0c102f5ed25527b15499b72ce18b814976d4169efa508b9774747c3a49ac3"
   },
   {
     "path": "harmony/entry/src/main/cpp/desktop_topology.h",
-    "bytes": 2378,
     "sha256": "6466cd818ecadbbeca508f68abf1f4dc081e482ad83415724a54e86abe9b3201"
   },
   {
     "path": "harmony/entry/src/main/cpp/local/availability.cpp",
-    "bytes": 38193,
     "sha256": "0bf8106129b478d0bdcbf6ad94b44afc91c2f1820532dd54f06d364906615bef"
   },
   {
     "path": "harmony/entry/src/main/cpp/local/availability.h",
-    "bytes": 632,
     "sha256": "f7e14a362241fd70d349976a1c9514fca0afbe89fb12d6acfe168d6ed8e3910d"
   },
   {
     "path": "harmony/entry/src/main/cpp/mouse_node.cpp",
-    "bytes": 13141,
     "sha256": "c361392b09d5fc605a1afb70c2f07ac9d7bf584243089f6a8c0a6ca4292e1875"
   },
   {
     "path": "harmony/entry/src/main/cpp/mouse_node.h",
-    "bytes": 159,
     "sha256": "9e14378c77b65be7a97b8963ceec5ee21a89e30606a320dc0b39d850c146a3f7"
   },
   {
     "path": "harmony/entry/src/main/cpp/network.cpp",
-    "bytes": 512,
     "sha256": "a5f4a29f278b69bec8b0a5d5bc192542f0f156bcb51e1a79365d4f6396f280c0"
   },
   {
     "path": "harmony/entry/src/main/cpp/network.h",
-    "bytes": 744,
     "sha256": "90da484b8909ce4d9a14dadbde1148c4669f1e701b9e80502f4fd495bde50d29"
   },
   {
     "path": "harmony/entry/src/main/cpp/network_snapshot_freshness.h",
-    "bytes": 1443,
     "sha256": "b1616975215d90c3136604e3b42bc8b288582af088776341699c08208eebae6c"
   },
   {
     "path": "harmony/entry/src/main/cpp/opus_audio_codec.c",
-    "bytes": 2547,
     "sha256": "858b7e10ac855d71032390cd481252c26c182e599403c5d8d4dcbb96bde8f62b"
   },
   {
     "path": "harmony/entry/src/main/cpp/opus_audio_codec.h",
-    "bytes": 905,
     "sha256": "49e73fa5b3166c5d1e0b097768f34b43d4f85ec21cc15ee39b238c0a2d1dc9fa"
   },
   {
     "path": "harmony/entry/src/main/cpp/probe.cpp",
-    "bytes": 3364,
     "sha256": "3220b5a8ced40a9a32702243b9a981f4f0ef687678fb1aff9ad2daee5219c6b3"
   },
   {
     "path": "harmony/entry/src/main/cpp/remote_audio.cpp",
-    "bytes": 15097,
     "sha256": "75c47fafdc4e92b7362ccf472a9dbb22e76b11058e4f04c12db49b4fb4caf611"
   },
   {
     "path": "harmony/entry/src/main/cpp/remote_audio.h",
-    "bytes": 5510,
     "sha256": "d6ab7703484c0dd47ab3145f7af9521bb51cd173f536deeaa52847d326ea3e3e"
   },
   {
     "path": "harmony/entry/src/main/cpp/remote_audio_stub.cpp",
-    "bytes": 900,
     "sha256": "de065b85bb595eb6e2ac7e1fa5718868205a99c9414677934a3ec59084c3c91e"
   },
   {
     "path": "harmony/entry/src/main/cpp/route_selector.h",
-    "bytes": 5130,
     "sha256": "f0aaf89d42d065e39032a3a00131d1d55800cbd9e91853da1e7a74903f36c8d2"
   },
   {
     "path": "harmony/entry/src/main/cpp/rtc_event_channel.cpp",
-    "bytes": 5405,
     "sha256": "a8a67c8599010a4da28ed946541e59ad6d48b26276630953cb7a491de77ba601"
   },
   {
     "path": "harmony/entry/src/main/cpp/rtc_event_channel.h",
-    "bytes": 337,
     "sha256": "836d0d2c8041c1bc98d3c13ad88c7fc9efef12a204ed11cfbe1e62083efbed92"
   },
   {
     "path": "harmony/entry/src/main/cpp/rtc_media_ingress.h",
-    "bytes": 2825,
     "sha256": "16234cbe7bc6f8e07a9cf33fc68803ece411caf3ad402763cb546f1d007785dd"
   },
   {
     "path": "harmony/entry/src/main/cpp/rtc_record_ingress.h",
-    "bytes": 3363,
     "sha256": "185ae80988fd02427551caabf6b68aa90a324d47cd5902b3e8c4600b1a637653"
   },
   {
     "path": "harmony/entry/src/main/cpp/rtc_reorder_policy.h",
-    "bytes": 682,
     "sha256": "3590d9868a3b7a06f7d8790682e3daa7654b46d1160f8565433ca32b57348bfa"
   },
   {
     "path": "harmony/entry/src/main/cpp/rtc_signaling.h",
-    "bytes": 3441,
     "sha256": "f35b5bd58c9c9521664238e3c313c945f7b44db6cc2d31b49733896640cd8c5c"
   },
   {
     "path": "harmony/entry/src/main/cpp/split_policy.h",
-    "bytes": 3230,
     "sha256": "6ee6cade2ae6240f133bbf82e9daf34ed354d007add169320d5b7600323a90ad"
   },
   {
     "path": "harmony/entry/src/main/cpp/split_proof.h",
-    "bytes": 494,
     "sha256": "55d2edf7d04e837fb261536e25915a8927055c134007bed6c19c628bcfe06594"
   },
   {
     "path": "harmony/entry/src/main/cpp/store_json.h",
-    "bytes": 521,
     "sha256": "03909f55fd56dc05d7a11ab0fac4ad03d69284d543dbc2abaa0e0d167cbb42d5"
   },
   {
     "path": "harmony/entry/src/main/cpp/store_link.cpp",
-    "bytes": 9794,
     "sha256": "2312f19f5118298ead1183ca7037fc5bd0d1106a677bd61e277e76e306b27c9f"
   },
   {
     "path": "harmony/entry/src/main/cpp/store_paths.cpp",
-    "bytes": 10168,
     "sha256": "4432ad65d529e121830808b7c7fd210cdbc859a324d094c7988ecfae4166248e"
   },
   {
     "path": "harmony/entry/src/main/cpp/store_policy.h",
-    "bytes": 877,
     "sha256": "71ee78037de083f6ea9c48eae8757f6806d7bf77ac6d2f16ed5f106f9ef14d51"
   },
   {
     "path": "harmony/entry/src/main/cpp/timing.h",
-    "bytes": 6469,
     "sha256": "879849f816fa506063a9b94395aa4297a2c8045257e3b5e523f5f7e6f0854011"
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/index.d.ts",
-    "bytes": 3415,
     "sha256": "25a44ecadadef8764cb83e9701d818da26c5791d3b9104718c33f29bdcb61a8a"
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/oh-package.json5",
-    "bytes": 79,
     "sha256": "4c46ccf172dcefd3871756405c0351db0c4ff9aa3b940454e18724e02e889535"
   },
   {
     "path": "harmony/entry/src/main/cpp/wan_rate_controller.h",
-    "bytes": 6060,
     "sha256": "976cc38e1337db2a52c6eedcc1278206057c000204eb486d70780f58099b015d"
   },
   {
     "path": "harmony/entry/src/main/ets/entryability/EntryAbility.ets",
-    "bytes": 5417,
     "sha256": "d5da1e26cc4ba0966e5d39a0034dd3bd48173e9e4216ec77b74670175479d87a"
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 153028,
-    "sha256": "c966fce8d18a50b1acb9366bd0babab1ffd533d5ab7e889f169c27183c6c8e01"
+    "sha256": "1a1bce3154a0df78fab0e416fe5849f310965d552a1f69b75b0f5c345c834c4c"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
-    "bytes": 3966,
     "sha256": "4270db011dd85dae4ac6b5f6768305d8565eb0302c20f3d218e5729ac9b802b3"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DynamicWANRoute.ets",
-    "bytes": 12129,
     "sha256": "1b51ab56e3e6083a7275c6dcf781dffc542f860a515b31d24f1cd47ded68b606"
   },
   {
     "path": "harmony/entry/src/main/ets/service/InternetReconnect.ets",
-    "bytes": 7989,
     "sha256": "306d2016333ded1236a5ab2ac73dab57e30b2c74f764dbe7c46626102e33c071"
   },
   {
     "path": "harmony/entry/src/main/ets/service/LocalAvailability.ets",
-    "bytes": 7394,
-    "sha256": "e026bd5f1593c7f367fc9384457c4035c86ff05207dd894b94f9aab0a9c38260"
+    "sha256": "a3db15a0b63e5899d5ed66f446a008dc2577eb6f959d78908eea181d3c92aefc"
   },
   {
     "path": "harmony/entry/src/main/ets/service/RTCArkWebTransport.ets",
-    "bytes": 6028,
     "sha256": "b3b9bfc2db7e965a1d636c9df34871955ab0af0e191473bce390ea6811438be4"
   },
   {
     "path": "harmony/entry/src/main/ets/store/HarmonyAccessory.ets",
-    "bytes": 1463,
     "sha256": "3c382225936e4a4e276499662f384b477f13cf11a2487c4dcaf0bc63a9e25614"
   },
   {
     "path": "harmony/entry/src/main/ets/store/NearbyPad.ets",
-    "bytes": 2175,
     "sha256": "f8289005d0a36a6d6f915c8b8077ed2d48280cd17b73f7394be54780884964e7"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StoreDiscovery.ets",
-    "bytes": 10646,
     "sha256": "7c0e79a573dd9297a364b34d2b3e68ab2fe98ca4739de2c2a8c336428328e884"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
-    "bytes": 2469,
-    "sha256": "9ab5e8ce6d86fdb7006a4d79ca07bff279f619e417756615387c3ca74e4bb194"
+    "sha256": "fdaee6c6132b9d1f83fbd3ae4c01e3452d61821163194be500ca0bfc110ad5a2"
   },
   {
     "path": "harmony/entry/src/main/module.json5",
-    "bytes": 1292,
     "sha256": "d32e646847eb6458110daa6d8ae336b80e4d06f4d395933c84b898b229c6eb52"
   },
   {
     "path": "harmony/entry/src/main/resources/base/element/color.json",
-    "bytes": 98,
     "sha256": "3ebc0b7b7f582ff204ea3426ecc37407a675719c97fbbc7db9c8912f749c48d2"
   },
   {
     "path": "harmony/entry/src/main/resources/base/element/string.json",
-    "bytes": 207,
-    "sha256": "0ae8b9e620812cf5ff192f9e71e392a2800967f56a1192030c6759a843294ae5"
+    "sha256": "b4826332b279598e0c789b9269b6647e16f62e8a9d72d0ac2bacf7eb8dcb2a6d"
   },
   {
     "path": "harmony/entry/src/main/resources/base/media/app_icon.svg",
-    "bytes": 505,
     "sha256": "73d267351f591eb836c591506ecd283f2c588c7715cbbb71fdc0cb6f937970b5"
   },
   {
     "path": "harmony/entry/src/main/resources/base/media/bridge_connection.svg",
-    "bytes": 332,
     "sha256": "f367edaad547f7871e9ebffea32af5003c457d8dbe34dcf4c9a7669cb2561d65"
   },
   {
     "path": "harmony/entry/src/main/resources/base/media/remote_cursor.svg",
-    "bytes": 214,
     "sha256": "9c37c36fe5af84b42709ff0c7e0e207669ff4c4d3d40a6023b8bef2364b8fd7f"
   },
   {
     "path": "harmony/entry/src/main/resources/base/profile/easy_go.json",
-    "bytes": 14,
     "sha256": "394e0b466e44df9fde137e01a26bcef6a0e4919a691c7767826790dcbc469e94"
   },
   {
     "path": "harmony/entry/src/main/resources/base/profile/main_pages.json",
-    "bytes": 36,
     "sha256": "22d2d6d5175b5c198156b3b4b38ccbe3063d43e46ffe7a4a04ace768dc85479f"
   },
   {
     "path": "harmony/entry/src/main/resources/rawfile/OPUS-LICENSE.txt",
-    "bytes": 1945,
     "sha256": "01e1167d54a096d123cf6dfbbeb19587278845c6481d2d66d545669846079551"
   },
   {
     "path": "harmony/entry/src/main/resources/rawfile/pairing.json",
-    "bytes": 82,
     "sha256": "55a10c453dcd9c184cc11f31f5f0be3937a710674d040a23a47f1f648594b4b4"
   },
   {
     "path": "harmony/entry/src/main/resources/rawfile/rtc-media.html",
-    "bytes": 20090,
     "sha256": "f376df71a9cc32925f7491ca54547b1107efd763a6e30c6b060a1ae8dc78833d"
   },
   {
     "path": "harmony/hvigor/hvigor-config.json5",
-    "bytes": 134,
     "sha256": "8c5aed20036244893cd52fad5a216a190942d2a524e01cdc6edd22113ca6a12d"
   },
   {
     "path": "harmony/hvigorfile.ts",
-    "bytes": 103,
     "sha256": "2378c5e0c5246005ada73a67e8c9834fa08adb9ffd6fb6c219051456753bed5a"
   },
   {
     "path": "harmony/oh-package.json5",
-    "bytes": 125,
     "sha256": "fd769b4d64192f07d0ae12ee427159834765a88721bf2a5eeba0e04de01ab316"
   },
   {
     "path": "mac/Info.plist",
-    "bytes": 1096,
-    "sha256": "c608384adcf4da873bce6b3cf8cc2a41a3414d86d061900e1c0e5ffd130b275a"
+    "sha256": "5a151200f63777d07c985fce5d2eed3e58aa208780fcd85deb83b1ab0eb06454"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
-    "bytes": 309139,
     "sha256": "4eba9dae0b3217acf4f16a1163824f7a0d72ce3c65c3a6947e1d8911fd0a2ca8"
   },
   {
     "path": "mac/Sources/AcceptedBoundedCaptureLifecycle.swift",
-    "bytes": 7882,
     "sha256": "0fb41b17492a651af09a6f28f82d13ffd21eda2f9931cd60eba6d56ee3b0825b"
   },
   {
     "path": "mac/Sources/AcceptedCapture.swift",
-    "bytes": 24889,
     "sha256": "99a4f875f8e18f535ca761e6b4bfa7ce6028f26202e2191afbc63536eca5122d"
   },
   {
     "path": "mac/Sources/AcceptedCaptureLifecycleDiagnostics.swift",
-    "bytes": 2487,
     "sha256": "6e4a48eab0c081be763144b4c5ae8b2110c2a9ef2ccd87837f69f958b068b21e"
   },
   {
     "path": "mac/Sources/AcceptedCursor.swift",
-    "bytes": 4870,
     "sha256": "ce1307673956facc6e7cad6ca1d72a6e6fce9bfd79e33dbcf5d3a7c6287f3596"
   },
   {
     "path": "mac/Sources/AcceptedDesktopOverview.swift",
-    "bytes": 1807,
     "sha256": "c4dc60350d82a43431112fad2566f913bf5bd0a478cfdde4b26906b8e2896e92"
   },
   {
     "path": "mac/Sources/AcceptedExtensionDisplayLayout.swift",
-    "bytes": 2224,
     "sha256": "e090b8ab04f40d2c6e23e25dad19d7da4c7e5abad8590acf8c5a148cd278276d"
   },
   {
     "path": "mac/Sources/AcceptedTiming.swift",
-    "bytes": 4629,
     "sha256": "cabceb06ff342cf9cd2ecbc24e64fef031c2212ac4609ecc7f26076e6a9befcd"
   },
   {
     "path": "mac/Sources/AcceptedVideoSender.swift",
-    "bytes": 13549,
     "sha256": "28042f9758291f614721ba72d4256abda196de5e873fa3efab64506df7678b5d"
   },
   {
     "path": "mac/Sources/AcceptedWANByteAdmissionBudget.swift",
-    "bytes": 6094,
     "sha256": "1f39783e4525b85531c84d9d5ea4f84d085844730854d6fd11fb30d8d751f832"
   },
   {
     "path": "mac/Sources/CGVirtualDisplayPrivate.h",
-    "bytes": 3199,
     "sha256": "605b21d12dbb830d15fc38e13e5b1cf15de180e65bb957821e3cda0357e2348a"
   },
   {
     "path": "mac/Sources/Gesture.swift",
-    "bytes": 1867,
     "sha256": "bf97c139f0d3855e8b020056254e86f51e703aa4478ebbe3cbbf4f690a0736e0"
   },
   {
     "path": "mac/Sources/Input.swift",
-    "bytes": 12859,
     "sha256": "3bde8520a3c260d3bcb79dad549a8526145159520dcdd81f18a8891b1e7c33ee"
   },
   {
     "path": "mac/Sources/OriginalLocalIngress.swift",
-    "bytes": 2974,
     "sha256": "617aea1c4b1b1a575485217a913c6534631a3a97aebed58c491fb9556b1fb1e1"
   },
   {
     "path": "mac/Sources/OriginalStandbyCoordinator.swift",
-    "bytes": 10840,
     "sha256": "fd1787037939c21ed482c9f0e48906745644aea53f44f631b67080e0aad0622a"
   },
   {
     "path": "mac/Sources/StoreCapture.swift",
-    "bytes": 3253,
     "sha256": "a7b6f9ece7a9750ff92e3200958b79c0aedec5b8a13704d33743825a73d2c779"
   },
   {
     "path": "mac/Sources/StoreDashboard.swift",
-    "bytes": 11527,
-    "sha256": "54037d2bd0815859b2946ffa4e1a97c12f3c9cfcf7a879b6c115e798b43b783b"
+    "sha256": "ad228ad1fe533538727723f6ad3ec83d77fd2adcdf07b6c2c9679f309edd1460"
   },
   {
     "path": "mac/Sources/StoreDiscovery.swift",
-    "bytes": 8140,
     "sha256": "9e4cad52aca156678975da4bcc235eedec4d889108d32fa6a65404af430a6ec5"
   },
   {
     "path": "mac/Sources/StoreEncoderSettings.swift",
-    "bytes": 1178,
     "sha256": "a43a4d4c1050a232e9541e38e2693d469dc955f7d48833437ef0b42be2bd0325"
   },
   {
     "path": "mac/Sources/StoreFrameWindow.swift",
-    "bytes": 1515,
     "sha256": "d43f402cfd6d59a931a7ec94f14996cf71fe1a991514625915cdbced7be0de15"
   },
   {
     "path": "mac/Sources/StoreIdentity.swift",
-    "bytes": 4387,
     "sha256": "0dd52af6eefd4f84a22581bf36e3c15f510b1aad59405f4b957730b62d04205a"
   },
   {
     "path": "mac/Sources/StoreNearbyPads.swift",
-    "bytes": 9223,
     "sha256": "2bdfe8efe1a7b496e371422d5d2e45ca35ea0f3950cfae53bf4459943a9c87d4"
   },
   {
     "path": "mac/Sources/StoreNetworkPaths.swift",
-    "bytes": 2680,
     "sha256": "c22883f5541cbd8c2b21089495971082e5981f340cb4d0825a6793486362193b"
   },
   {
     "path": "mac/Sources/StoreOriginalConnections.swift",
-    "bytes": 9546,
-    "sha256": "b6f5c63528821c96a71a526eff32e56065cc012aed87972f16d569af040c2e9c"
+    "sha256": "953ce8f9bb619912ddeebe8ba5ce461a1b98d63e36b841c8c670326214d32d8b"
   },
   {
     "path": "mac/Sources/StoreOriginalUSBDebug.swift",
-    "bytes": 12282,
     "sha256": "319383b8ad5429133a8b7646fa4370275ee148bf829d4fc84b085feca70d2eca"
   },
   {
     "path": "mac/Sources/StorePermissions.swift",
-    "bytes": 4930,
     "sha256": "26827665979d36e02ac66fef3f23aa7111cdbd82ca00adcf8e962b96b3fcfdba"
   },
   {
     "path": "mac/Sources/StoreUSB.swift",
-    "bytes": 1870,
     "sha256": "bf65839681f0c15bd99c203ebd047b5ebf4d653e59fa4c0ef0ec561a0a8d645a"
   },
   {
     "path": "mac/Sources/StoreWire.swift",
-    "bytes": 2773,
     "sha256": "89c4b91f9307aabba12dbb7addf3595f79ce0e6fc5b891f43508208b99f24661"
   },
   {
     "path": "mac/Sources/VisualTheme.swift",
-    "bytes": 6322,
     "sha256": "8cdb27a79c9a02ebbdab989ac16e92dd97964c27a855d35b8d10a46177784624"
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 22757,
-    "sha256": "9a7cd668ff7b88a8737b6dee04ebe4de4121bc09d8adde0f74668df3301f5937"
+    "sha256": "95e504456190fc957613318ecc0c47c70f9201d970a7c41e152596fb8d76e5a8"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
-    "bytes": 1694,
     "sha256": "a31134008491541112536631453d12618368a8e8aff30ef823bcebe7d149047d"
   },
   {
     "path": "mac/USB/StoreUSB.h",
-    "bytes": 388,
     "sha256": "bd860378a97a33bff0c627a0d5613b91ac279e270111e5200098f1092689da90"
   },
   {
     "path": "mac/USB/StoreUSB.mm",
-    "bytes": 16637,
     "sha256": "e9a37790271fa1275a663cfdbf75769226fc0c12cd7b78200907abd2eeaec5ac"
   },
   {
     "path": "mac/USB/port/arch/cc.h",
-    "bytes": 304,
     "sha256": "556e27174561a0df52abe641e8f2903372ff9f6102f27a30b4a439a7667766a4"
   },
   {
     "path": "mac/USB/port/lwipopts.h",
-    "bytes": 1010,
     "sha256": "23a0c7e23f82a37872b867b5369f4aff34392bb283b91b9333c9fbf226298e48"
   },
   {
     "path": "mac/build.sh",
-    "bytes": 2008,
-    "sha256": "0eab1212ea473f20fc9f2102a06e787aba022cdcd6d9fdb152c5a3dc2114ac43"
+    "sha256": "93236ffff9b21cc6e7e2a35bf00619413b72e7744993c935c3b47275e0fa27c5"
   },
   {
     "path": "shared/DisplayProfile.hpp",
-    "bytes": 1180,
     "sha256": "05daf4eb3eed666f646b9d6adcd801b151e5f9e05664939530b62de43adbf4c8"
   },
   {
     "path": "shared/TransportPolicy.hpp",
-    "bytes": 2905,
     "sha256": "2c3a76ac5eba806ebb287f7088aa21b0b533058215a494f65809793369dfaeb0"
   },
   {
     "path": "tests/host_stubs/hilog/log.h",
-    "bytes": 117,
     "sha256": "14cfd5eaddb1b5858d815089d3d6de59aa397c00df33522f2f2410dce9ea3e23"
   },
   {
     "path": "tests/host_stubs/multimedia/player_framework/native_avcapability.h",
-    "bytes": 818,
     "sha256": "b402be9708562170c0d15703a5483806a46c9e1fb671f71782b651a3a89208e8"
   },
   {
     "path": "tests/host_stubs/napi/native_api.h",
-    "bytes": 1888,
     "sha256": "46a7a6f8444eef66a5dd7968a7be9e92b0aaf73b7bf2a58f295e161aad2feb02"
   },
   {
     "path": "tests/json_identity_test.cpp",
-    "bytes": 429,
     "sha256": "5393a3ba8dc28d7cc8ee4ef7adb99614825eb919ff19fc5b3414a79f5b18c650"
   },
   {
     "path": "tests/native_exports_test.cpp",
-    "bytes": 1376,
     "sha256": "27e01715362ff1fca52a436b591218165d16184b2e25d8e43ee51a05abd49953"
   },
   {
     "path": "tests/policy_test.cpp",
-    "bytes": 3604,
     "sha256": "d525fcb03eb5a36c74460a52825e6a542f6a711aec68e84f147f59e3efc2bdb7"
   },
   {
     "path": "tests/portable_profile_test.cpp",
-    "bytes": 3116,
     "sha256": "90672a4edc61b9b455bea41bd506c71c9b247d401ec9b867f12418f687d65e31"
   },
   {
     "path": "tests/rndis_test.cpp",
-    "bytes": 1545,
     "sha256": "c347055ded720dfcf9b788e3aa3adf5a135c749233389ebce4e1d5121c1d4176"
   },
   {
     "path": "tests/route_selection_test.cpp",
-    "bytes": 1208,
     "sha256": "7d310783d7f29bd5267bbc47ca9aa6e041b80d0787582587e2287cc2ec94e1d9"
   },
   {
     "path": "tests/usb_test.cpp",
-    "bytes": 1997,
     "sha256": "888108c766e3ac51612d33727aaa0b90a29d0120ed36693fde1e0345d1cdea66"
   },
   {
     "path": "third_party/lwip/COPYING",
-    "bytes": 1450,
     "sha256": "d51980b934e4411a8e0d80ce61afa28978bf0d49c50d0ee93f705679cb8a6042"
   },
   {
     "path": "third_party/lwip/UPSTREAM.json",
-    "bytes": 334,
     "sha256": "aa9dc0f0ee9c636d7a680117f2a30b1106ee7fd1a3416d878ec81658f6a5deae"
   },
   {
     "path": "third_party/lwip/src/core/altcp.c",
-    "bytes": 17578,
     "sha256": "8ec8e486d3d63af44da2a23c2f6ca402bd12dff20ac663ed5d76047fe048fd0b"
   },
   {
     "path": "third_party/lwip/src/core/altcp_alloc.c",
-    "bytes": 3104,
     "sha256": "40883643d0a06dab4bb1c9f959f8193152d1f741089db48491646cf69d3877f9"
   },
   {
     "path": "third_party/lwip/src/core/altcp_tcp.c",
-    "bytes": 14862,
     "sha256": "564946787e394d70cf6e3b7d955c786cd9596e67d1d63ada3e56a21441405e9d"
   },
   {
     "path": "third_party/lwip/src/core/def.c",
-    "bytes": 8284,
     "sha256": "3abf710515bc3e16b8844141d3361b79f01912d4537dbce6d20c8594f605338f"
   },
   {
     "path": "third_party/lwip/src/core/dns.c",
-    "bytes": 55730,
     "sha256": "c7d6b3f0e0348acc4312eeebcfcbd8b2673893f55bb380570c7ca047d61b043e"
   },
   {
     "path": "third_party/lwip/src/core/inet_chksum.c",
-    "bytes": 20007,
     "sha256": "46c0a094463ae27b6a0daedcb4c07e14ee62cbf365cd58dd36470539e2bc0ef9"
   },
   {
     "path": "third_party/lwip/src/core/init.c",
-    "bytes": 17171,
     "sha256": "e461ca0fcb506eb3cc668dfdf7adbdbb0a3b76368883748553ec85445196cd44"
   },
   {
     "path": "third_party/lwip/src/core/ip.c",
-    "bytes": 4876,
     "sha256": "aadd79d9ba3b13decdac92d43e7fdfe17415e5527f09a8276114b77eb037ce48"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/acd.c",
-    "bytes": 19309,
     "sha256": "1c4a6224020797aea3638d2088908fabffb7ca2fcc6ebd84ec8c2d615973f94f"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/autoip.c",
-    "bytes": 12802,
     "sha256": "32c0051c7ef0035f749999b73c3a10cd831cc45fc7e122e773e97036888ea38d"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/dhcp.c",
-    "bytes": 78623,
     "sha256": "8638409156843a4741eb3a9aac47e874506399b251d5fe0b17cbb5b7993843bb"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/etharp.c",
-    "bytes": 48793,
     "sha256": "cbd8b5e6e859fc267678b029a8371466317d590a8013893ade1fec78dd9f4b4a"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/icmp.c",
-    "bytes": 15012,
     "sha256": "2489779474ae6ec157c6634275b3f570fc12bcbb18b33b9ed457b83593df9bb5"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/igmp.c",
-    "bytes": 28536,
     "sha256": "cee7af2217787b9d1e2de691e0809d88bd02f8942f706937b3ddf1c8a9211a81"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/ip4.c",
-    "bytes": 43197,
     "sha256": "8ceed579626e49883afd37fbff81d47a5ad9023fa51458eeaa2e0de5097c90d1"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/ip4_addr.c",
-    "bytes": 9012,
     "sha256": "ce153b850d018c9bd8ecb66da7afa124734a52485c32926ce15dc54950690ab6"
   },
   {
     "path": "third_party/lwip/src/core/ipv4/ip4_frag.c",
-    "bytes": 31196,
     "sha256": "b1b76e03aae7c4003b090ec3b91a48f9f1ed3d70053a032c8b564c83a7a66ba2"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/dhcp6.c",
-    "bytes": 28927,
     "sha256": "bb5b86865281e7e9fd9eb8ed3defceaffd5b2edae43ab987976ace54bc538fe8"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/ethip6.c",
-    "bytes": 4383,
     "sha256": "ea73b39759b87ab77e4cfc523129eca172c78f6e59bfe0eb5767a9a911fbbe05"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/icmp6.c",
-    "bytes": 14766,
     "sha256": "4e89bcda0f77eaebe7c8b033f5d62954ce860ffe653348666bebb04de428b0bd"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/inet6.c",
-    "bytes": 2094,
     "sha256": "3e16b2cdc011389e661f704a00e66da94580ecebe7fb63294e2853149c7708e1"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/ip6.c",
-    "bytes": 56104,
     "sha256": "b46f5bcc0d086552502bd0db36198a9a804f22efcb97683bc968e20099025dec"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/ip6_addr.c",
-    "bytes": 10605,
     "sha256": "8ace022aadcc391223bd3652689f9e9ab5f0a3c15960654bb8f9022963b0a845"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/ip6_frag.c",
-    "bytes": 31907,
     "sha256": "c770139ab8d31da076fbf9b74a260511b647c377241bf1344547d02f6e0cc99d"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/mld6.c",
-    "bytes": 19264,
     "sha256": "18b5a4621c4b87a4d968369b147685f168050586c2fbdeb2d9ef98d4180f5cc3"
   },
   {
     "path": "third_party/lwip/src/core/ipv6/nd6.c",
-    "bytes": 87969,
     "sha256": "c415888732a6b68e9276a6f50276bf1de524b0aa2403121b18c15b1bec3fe0b4"
   },
   {
     "path": "third_party/lwip/src/core/mem.c",
-    "bytes": 35756,
     "sha256": "5dca0b77132ab681b4761f5a838dc83b522f434ed3c69dd3aa6763df85fd592c"
   },
   {
     "path": "third_party/lwip/src/core/memp.c",
-    "bytes": 12191,
     "sha256": "9c21b3273224919e65a98eacdc7b74ca88c69d5e7b3d54717655bde824ee2dc6"
   },
   {
     "path": "third_party/lwip/src/core/netif.c",
-    "bytes": 55517,
     "sha256": "a24f628d9ffe1aad43d66a2e3a58ef1092ce998fb3910a79f7f9b60dd55ce3d0"
   },
   {
     "path": "third_party/lwip/src/core/pbuf.c",
-    "bytes": 53274,
     "sha256": "e6bd58c3f5efbabad79d3abf0daae5c91f44a63a6ac6bddaf720305cb4c3af6d"
   },
   {
     "path": "third_party/lwip/src/core/raw.c",
-    "bytes": 21570,
     "sha256": "6ad002c136ec65b5efcdec896cb3980de9410e16576829510970c266f1af0d87"
   },
   {
     "path": "third_party/lwip/src/core/stats.c",
-    "bytes": 6278,
     "sha256": "ad9b8aede3f38f2fffad212881f1ca90135dc5e8ee3f929b538ef17443d6e657"
   },
   {
     "path": "third_party/lwip/src/core/sys.c",
-    "bytes": 5949,
     "sha256": "a3a60f22adac27bd7a1595836906a8e5d910986275414dd709cbb70fe3522976"
   },
   {
     "path": "third_party/lwip/src/core/tcp.c",
-    "bytes": 89454,
     "sha256": "5a94c5cd4f5edd8d83cc522effd9af581634f95e11cd393c55d12cf48718e41a"
   },
   {
     "path": "third_party/lwip/src/core/tcp_in.c",
-    "bytes": 86062,
     "sha256": "b4d1f0bf55dd782aa75f94069284bf99019aa8c42ee040c4e9e966ae8172b443"
   },
   {
     "path": "third_party/lwip/src/core/tcp_out.c",
-    "bytes": 81578,
     "sha256": "690d0b9e75e3aa5e5588e2990a1ce10cc2cbfd94a72951891f32d6588b03d1a7"
   },
   {
     "path": "third_party/lwip/src/core/timeouts.c",
-    "bytes": 13304,
     "sha256": "a5e36f81cab4fcd17d870d286643bfa0787e40cf6a714e79c9a6b97f519a597b"
   },
   {
     "path": "third_party/lwip/src/core/udp.c",
-    "bytes": 45605,
     "sha256": "dd715899d10cb0e1568b4b2ca034b39f15bff6de209cb3f2b10d0f86bd45646c"
   },
   {
     "path": "third_party/lwip/src/include/compat/posix/arpa/inet.h",
-    "bytes": 1589,
     "sha256": "e92abfec8db381dc33039725a4af8e4525788d85e7db01b8a4b320ecb447c288"
   },
   {
     "path": "third_party/lwip/src/include/compat/posix/net/if.h",
-    "bytes": 1712,
     "sha256": "6cd39d76c4ec6c23a4cd01ae1b3385731e74dbbc5e15e07e3d3df846e49f53d8"
   },
   {
     "path": "third_party/lwip/src/include/compat/posix/netdb.h",
-    "bytes": 1585,
     "sha256": "b37dde949b00fd552be550760b62c577c1ba929e349385fdbd4ba010d60d20eb"
   },
   {
     "path": "third_party/lwip/src/include/compat/posix/sys/socket.h",
-    "bytes": 1589,
     "sha256": "e92abfec8db381dc33039725a4af8e4525788d85e7db01b8a4b320ecb447c288"
   },
   {
     "path": "third_party/lwip/src/include/compat/stdc/errno.h",
-    "bytes": 1590,
     "sha256": "28b90f3f1e14bde8217090f448724b104deea29fc40ab4ed381c677502b36cca"
   },
   {
     "path": "third_party/lwip/src/include/lwip/acd.h",
-    "bytes": 4053,
     "sha256": "a55b912462acded2d9b0b5fda0b4db17123ca4dc05b770255c79559d619cad49"
   },
   {
     "path": "third_party/lwip/src/include/lwip/altcp.h",
-    "bytes": 7588,
     "sha256": "0887f8bb0c15ee2fd8eafb9de321dc37c972744dfec36204d62302bd313cf8e6"
   },
   {
     "path": "third_party/lwip/src/include/lwip/altcp_tcp.h",
-    "bytes": 2723,
     "sha256": "ef238110f879ea8218aca79d595ffa72fedbf4ba314f586d523d3bd96165ad3d"
   },
   {
     "path": "third_party/lwip/src/include/lwip/altcp_tls.h",
-    "bytes": 7403,
     "sha256": "5d2d8aebdb3d0b8002bc05bad47ea59fc6572fc378d84247cbebb2143456ac62"
   },
   {
     "path": "third_party/lwip/src/include/lwip/api.h",
-    "bytes": 18641,
     "sha256": "444d1d14de8b0fc037fe79e3babbc08473b68f560093884549ab22b4e0155044"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/FILES",
-    "bytes": 141,
     "sha256": "44f2aae35c494db094654524395cdda5131fea3eb746ca1f0543b73f16c5b59e"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/altcp_proxyconnect.h",
-    "bytes": 2843,
     "sha256": "952a0862cdb42b559708de54020fbaeead92c1223a4fa40c525132a1b8b67447"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/altcp_tls_mbedtls_opts.h",
-    "bytes": 4281,
     "sha256": "91037dd0b14bc901726d88c6610747cbe69e5b28625b352ba758ec11babbe43b"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/fs.h",
-    "bytes": 5140,
     "sha256": "edc06b66d4f08561ca786091275445669e3464f924563d36e87f81ed2fc605fe"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/http_client.h",
-    "bytes": 6102,
     "sha256": "e407f07ef8bbaf895fe2a398abba62279a6519bed7dd85a43ebe97a058935fc3"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/httpd.h",
-    "bytes": 10925,
     "sha256": "8ce6a0ff54dcefab304851a482518966c9f450df3fc55c3527d5eced0bffb012"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/httpd_opts.h",
-    "bytes": 16972,
     "sha256": "4af4f25757002c8ee1cd14f4a8d97ad8a00feef3ead3e86a0c5b709b6da40c84"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/lwiperf.h",
-    "bytes": 4238,
     "sha256": "7a1665245094dfea157479c40b5a216875fcf68459077c12426cb3b5b164f81b"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/mdns.h",
-    "bytes": 5631,
     "sha256": "ac1f23f7211c807d85403e06ae550337bd3c0cd47fcaddac4761c08522ad8a42"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/mdns_domain.h",
-    "bytes": 3384,
     "sha256": "1fe8e3e9707fc0ffb4a19703475593379f67a93971b654c625ab343cb80b1e30"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/mdns_opts.h",
-    "bytes": 4102,
     "sha256": "93936f5878294e0fc4212065a4aa31219fa8f6f26e05c25241dd69270de7d305"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/mdns_out.h",
-    "bytes": 5650,
     "sha256": "8f8d21978d4b0f203b5db0e0347b525249b772288a310166fd9aa44db54cfe10"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/mdns_priv.h",
-    "bytes": 7696,
     "sha256": "a84564bb6004713bc3e25fd0bfc4e2ddf10df34b48bae2dfd61a4a9e131675c4"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/mqtt.h",
-    "bytes": 7617,
     "sha256": "6d562b39d3fa21af5104c9851a9dc80a15c7d459f6032cf3a31ea8229afd92f8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/mqtt_opts.h",
-    "bytes": 3045,
     "sha256": "0edca5faad96ad17ea6eb4fd54f8c1afd996b006dbc0b80aee92cbe0e8829db5"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/mqtt_priv.h",
-    "bytes": 3337,
     "sha256": "1fa194809a5d265012f9763f1677330e883b16650b0a07837c4d39e88291717d"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/netbiosns.h",
-    "bytes": 1907,
     "sha256": "31977f1265e4711f6e47769e0ae124be2b53aabfb83322186e16e9b3a53070f0"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/netbiosns_opts.h",
-    "bytes": 2512,
     "sha256": "462523a8ae8e5b7416d28d12868c4f479206d72453e3a6dd359b65bcfb129dec"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/smtp.h",
-    "bytes": 4665,
     "sha256": "5e5c3d5819b0b7ec7532a137d9d382ab97ffa3225542c4780cf7769cc49e42b6"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/smtp_opts.h",
-    "bytes": 1866,
     "sha256": "1cfe42968b28cd026aad693cde3390bbd8e36a07d6d8a32b7ea61b838e8eda94"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp.h",
-    "bytes": 5413,
     "sha256": "53f03de1f8152e78e94b9e156888c45c1144f32313ebd845d7bdb0aef17effd8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp_core.h",
-    "bytes": 15182,
     "sha256": "e6caf7a9c3200e2280de061e21ef46144430302f51465ee87a4562d9e4e771e6"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp_mib2.h",
-    "bytes": 3009,
     "sha256": "fdb6a91ec6b210bbd6f4dcc6e23e1c641ca5dd866e626ce51a3ccc3ff451349f"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp_opts.h",
-    "bytes": 9910,
     "sha256": "d251e809614acabf45753a249748a6c2ec489c06047ad9d288da985bad1a6fdd"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp_scalar.h",
-    "bytes": 4629,
     "sha256": "ad2ed188f5f8c051ddc8de7fbc83ba07f0de270657034c689935ab39f1ba135f"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp_snmpv2_framework.h",
-    "bytes": 781,
     "sha256": "a2bdb4c6f9b9149feca2f8db58969c4749db559e46c80b355c0d7a9194f86b22"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp_snmpv2_usm.h",
-    "bytes": 459,
     "sha256": "928d28d87406894693a5ef48ead632a5c173d1914c3b681706079326044f9bd2"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp_table.h",
-    "bytes": 5644,
     "sha256": "cf1d6d7e260d966910c021b6ce627056c4db971459c463c9ace5d9f2792282bf"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmp_threadsync.h",
-    "bytes": 3913,
     "sha256": "2ffec17f30ca770bf422b3ae1458a7b837c50145173e5138b06a9a39129119fc"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/snmpv3.h",
-    "bytes": 4016,
     "sha256": "401436fce49633574fc4f0eb6a497ee61ada25d5737fe2bc6e45a8250c33cc19"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/sntp.h",
-    "bytes": 2982,
     "sha256": "c568abe5af32f6d91d5ea7f5fe50973f922eb826223550ea71a94cfce6c3db7d"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/sntp_opts.h",
-    "bytes": 8558,
     "sha256": "1f427c509c97c8c7e7fb01b0665898e9388844348bf0692c3050aedc0b801433"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/tftp_client.h",
-    "bytes": 2126,
     "sha256": "a183972c5a07d93c07f6ec2ed4e01dfa523739a6c9890c98b459667b6b04d504"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/tftp_common.h",
-    "bytes": 3947,
     "sha256": "f57761b501118d6823e61f33c2203106b0fb6ddfe4259d5971c1da02b74dc799"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/tftp_opts.h",
-    "bytes": 3025,
     "sha256": "fbba24d4337e141d0ec9637cc4cc350219c952376aba3b19ff9e6a037da370a9"
   },
   {
     "path": "third_party/lwip/src/include/lwip/apps/tftp_server.h",
-    "bytes": 1768,
     "sha256": "e63220c1a687609b95dd03ba09145c8584d8588c0bf954579ff642ba4b313898"
   },
   {
     "path": "third_party/lwip/src/include/lwip/arch.h",
-    "bytes": 14685,
     "sha256": "b86e1fc2b83b0f11742ad31cd4567643ba6af0fc6a0c90b98c54ec2d1c9c1d98"
   },
   {
     "path": "third_party/lwip/src/include/lwip/autoip.h",
-    "bytes": 3141,
     "sha256": "0eb054f0fc94340a4868763220f33d3972ec0fc1115347a287cf9eea5ab7b151"
   },
   {
     "path": "third_party/lwip/src/include/lwip/debug.h",
-    "bytes": 5309,
     "sha256": "0e556dcfd69849a5e3d1e7de93829545b28d3e4367fdb6bf919cd0e1a10eb938"
   },
   {
     "path": "third_party/lwip/src/include/lwip/def.h",
-    "bytes": 6069,
     "sha256": "07cd432de806a1f8a50c1d6b1a4d7a46bfa3381d6660e084f60c7a262dbdafd4"
   },
   {
     "path": "third_party/lwip/src/include/lwip/dhcp.h",
-    "bytes": 6198,
     "sha256": "76b9b6d4bc7e2cc15ff059a13a7021e95e0e3f2ab6f2ae12f97347794c9901f3"
   },
   {
     "path": "third_party/lwip/src/include/lwip/dhcp6.h",
-    "bytes": 3857,
     "sha256": "c167f1a899e0e5b02d34620683bac8dce62801afcc7466a72ec954fa3808753c"
   },
   {
     "path": "third_party/lwip/src/include/lwip/dns.h",
-    "bytes": 5004,
     "sha256": "573977308b19b9f47690e7f5c3e1e879eb14b7e2e79093bb556409a078932083"
   },
   {
     "path": "third_party/lwip/src/include/lwip/err.h",
-    "bytes": 3454,
     "sha256": "c35e7cfe52ecc4e84a423c78f6cbf930e94713abcc5d03ad89bfce429472ff16"
   },
   {
     "path": "third_party/lwip/src/include/lwip/errno.h",
-    "bytes": 9713,
     "sha256": "da2cbcf57126b44a2fff00eb5c80f0d12ea4e4ecedb5bb2ed26931bf5cbcebd0"
   },
   {
     "path": "third_party/lwip/src/include/lwip/etharp.h",
-    "bytes": 4325,
     "sha256": "75f78a87bfbc99fa7958bd8cb50fad5c19d3b0d0d4290cd039f4994ca93b1212"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ethip6.h",
-    "bytes": 2326,
     "sha256": "ea2e21da73252211440b23108b4a6657d4c897fee244a504527c2836b81fa8e3"
   },
   {
     "path": "third_party/lwip/src/include/lwip/icmp.h",
-    "bytes": 3903,
     "sha256": "ce0f09739d7e82f7701366da29a3a2936744627898ab70193acc1df2cfe6feca"
   },
   {
     "path": "third_party/lwip/src/include/lwip/icmp6.h",
-    "bytes": 2668,
     "sha256": "585e8dfc16a5add1bcad6eae60dd13d60a09dfc26d40b3e7ceb32190b0970716"
   },
   {
     "path": "third_party/lwip/src/include/lwip/if_api.h",
-    "bytes": 2564,
     "sha256": "78aaa6edb9204e495f5feb2406d055429b3f893b6c863c5b222e9d6841011717"
   },
   {
     "path": "third_party/lwip/src/include/lwip/igmp.h",
-    "bytes": 4469,
     "sha256": "b3e975c941a75f9bbbd4fbf7248c409069e5b09bbed5ae8e2931d51418ea23f8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/inet.h",
-    "bytes": 7944,
     "sha256": "25999a511395659a2a7a4fe02c39ff233fd391d67ff74b60b52a791d8340e626"
   },
   {
     "path": "third_party/lwip/src/include/lwip/inet_chksum.h",
-    "bytes": 4022,
     "sha256": "568d5b97ff38cef32852a3edd4f4ad28fbe50592d92e72e40b5fd5e7f7c60930"
   },
   {
     "path": "third_party/lwip/src/include/lwip/init.h",
-    "bytes": 3742,
     "sha256": "eec744e0df5477991a54c60808ffc72a1ac26e345b26f460f53ea472c71ef805"
   },
   {
     "path": "third_party/lwip/src/include/lwip/init.h.cmake.in",
-    "bytes": 3808,
     "sha256": "054a4865ed9d7773e1255b4239fb05f76fbf35db109a092c80cc02aebd8df7f4"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip.h",
-    "bytes": 14951,
     "sha256": "2bd77f9ea857637b2943eeaac468f4d0451129d416e8d2c4cf964f7c6e1ca6d6"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip4.h",
-    "bytes": 4107,
     "sha256": "2eabd8f98f24d29eac54f4f8b46ba3199e8d78947adba8614914506f4d2df418"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip4_addr.h",
-    "bytes": 9938,
     "sha256": "be2f4cac00567de19dc7688edd5cf5ac971e31648613e0f030542aaffbfa78ef"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip4_frag.h",
-    "bytes": 3190,
     "sha256": "9abd0c56d1e5d1a076458d10ec1455670a2f9f5ef0f4b25516ef3225536644a2"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip6.h",
-    "bytes": 3526,
     "sha256": "fca378457957de286555704405cab9eabca3d74f85e863717dbd0ab6ca3f807d"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip6_addr.h",
-    "bytes": 20146,
     "sha256": "6da2c3efe21a33d95f20a7fed8a5b59a7870de996a1aa5ec7dfdb75daba1927a"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip6_frag.h",
-    "bytes": 5781,
     "sha256": "0dcea4a7600b856877e7fb4943b20690aa9e2b69414b4b2273c7e9e0a25f74a3"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip6_zone.h",
-    "bytes": 14235,
     "sha256": "6c10757286ace70898ffaf5957d0e9b96e9b20eb621dc5267b2fb3f2d3739582"
   },
   {
     "path": "third_party/lwip/src/include/lwip/ip_addr.h",
-    "bytes": 21863,
     "sha256": "6ea66fae68e5972e6e292a791719f2e2226f25b3dac1e8a86d13d132082e426c"
   },
   {
     "path": "third_party/lwip/src/include/lwip/mem.h",
-    "bytes": 2523,
     "sha256": "832bcbe6480947265500a298bb6b27ec5cb4308ac70b9fa5ac3dbac3612ff424"
   },
   {
     "path": "third_party/lwip/src/include/lwip/memp.h",
-    "bytes": 5321,
     "sha256": "b38e28c11735115189a7939a3d2f4544cb78df5787b19609cee5daa4e4c3e044"
   },
   {
     "path": "third_party/lwip/src/include/lwip/mld6.h",
-    "bytes": 3645,
     "sha256": "c7037171e0a565cd19f038a1cc583bdbc2d1209ec9cb07bbaee87e8058328e1c"
   },
   {
     "path": "third_party/lwip/src/include/lwip/nd6.h",
-    "bytes": 3260,
     "sha256": "a861eb61999a3ddfb1004dc80f99b3bbe623e3e5791a68e2bee238cbe122fe7a"
   },
   {
     "path": "third_party/lwip/src/include/lwip/netbuf.h",
-    "bytes": 4662,
     "sha256": "aea791762b4a1031f62789bbd05115198424088c20cabcffb001fae76c027ffa"
   },
   {
     "path": "third_party/lwip/src/include/lwip/netdb.h",
-    "bytes": 5464,
     "sha256": "1df1d70b2a7dd1b340da3b261586eefcfcccecb459a853285fa11dab1dfd2a9d"
   },
   {
     "path": "third_party/lwip/src/include/lwip/netif.h",
-    "bytes": 27645,
     "sha256": "fe36067c5adeeccae5c5408c98ae2080bdd296517fdafd0529c0699772bcad23"
   },
   {
     "path": "third_party/lwip/src/include/lwip/netifapi.h",
-    "bytes": 5763,
     "sha256": "8a1480df68a69277e1700acd5ab0f01f34698e70dd303cee79c4e708ad335109"
   },
   {
     "path": "third_party/lwip/src/include/lwip/opt.h",
-    "bytes": 118613,
     "sha256": "3c18bc6b788bd6c5bdd6b2813f7fdddfac8884d3b9ace9af206b84c5cfc304b8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/pbuf.h",
-    "bytes": 14819,
     "sha256": "1f3112b8e76ad1bbd32f7727eb735e71a57e67d72b56e8252574e2b8df05ced8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/altcp_priv.h",
-    "bytes": 6955,
     "sha256": "6a4c147efebbb6aa358861e00e240b07e098714b91b486f8b326f3e003197aa7"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/api_msg.h",
-    "bytes": 9222,
     "sha256": "9fadb1f2ace864f21042b12cdc2fa92b34800ab35c51e34b0ad9b313d43d5b93"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/mem_priv.h",
-    "bytes": 3363,
     "sha256": "3a519997f84a67f35d901dd8f46cb5697cc185d648cc96372e8818878ffd1899"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/memp_priv.h",
-    "bytes": 5500,
     "sha256": "7487d08cc95fd221901c1d9f0b0a8b4d1e5936c0e07c00dd29e51de34464dcb8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/memp_std.h",
-    "bytes": 6925,
     "sha256": "c8aff2d2323c228353b654d925228bb4a165f4f644c4edea571e5b09a13fa94e"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/nd6_priv.h",
-    "bytes": 4409,
     "sha256": "5c5755310ecaca7cccf9cbf614d9643e8015ae54c89ce6232d263b3876645d9d"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/raw_priv.h",
-    "bytes": 2564,
     "sha256": "6708f3a65434fda97df55285200200e663e738c5e6d8801e7c3d2c7176234825"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/sockets_priv.h",
-    "bytes": 5914,
     "sha256": "67f8d8fbbad756440e99205198bec1b2cdb9bc4e8cd583898db1e47681ecede8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/tcp_priv.h",
-    "bytes": 23029,
     "sha256": "dfa76f4a861e2fec96dc7310603232a992c03ed830823f07d614ca6a854de418"
   },
   {
     "path": "third_party/lwip/src/include/lwip/priv/tcpip_priv.h",
-    "bytes": 6138,
     "sha256": "fe897f524d614dacf8d3cd52d4156bb99951e5dc361e562225cb4e21ec6893f2"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/acd.h",
-    "bytes": 4082,
     "sha256": "163823214d14c0f8bc745fbd7859dfa2a98b6e289b8df57da0c102108c1333b8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/autoip.h",
-    "bytes": 2270,
     "sha256": "d9c8f7c983f587b0f2220f26ed62d077031898c4c3c81c607a009127716cbaf6"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/dhcp.h",
-    "bytes": 6561,
     "sha256": "4601e60d159d4b53a7a41114ce850ca1c2552d5cc4561cdfa2c92049c453e087"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/dhcp6.h",
-    "bytes": 5499,
     "sha256": "9e73a416f803125fa3849b0b5c2767a66c4fc7df39abd3ac36df401f673a21f8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/dns.h",
-    "bytes": 5507,
     "sha256": "d599862e07d662ffe55d75360afad80043376c35f10dd570060f18d37b095be4"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/etharp.h",
-    "bytes": 3992,
     "sha256": "40b5b4d8c632d89a29e441dbb4798587c7d29b0f129d140738f457a091ea66c7"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/ethernet.h",
-    "bytes": 4077,
     "sha256": "f7738af54d5dbf600aab02a9809b83572edffcfac687a01d04f0a1ce9ee636b8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/iana.h",
-    "bytes": 2991,
     "sha256": "32a63eda2e1a9bc5bde36be2fbf26c27bae9541aa86f9da272f9e41badde2194"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/icmp.h",
-    "bytes": 3670,
     "sha256": "02e193d6e5b1d77f16ba64b901ad63cf00357fce905f6a5eb972730d91446164"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/icmp6.h",
-    "bytes": 5154,
     "sha256": "115b21b102c426107dc4561f013db2d2540c93c68aad135ca191f91b367c3b78"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/ieee.h",
-    "bytes": 3097,
     "sha256": "0f9c74a2e4822af5a10a06538d7a0adb3a3d2912858985173b328d6a25f76e5c"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/igmp.h",
-    "bytes": 3093,
     "sha256": "122e5759d7129c79a718188e2730e97926fa3207f1e39f0db7c971fb192464d5"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/ip.h",
-    "bytes": 2133,
     "sha256": "b610c5bb14ec82c6506616a68650d8433d4656c46d87b21b692c704f218852b6"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/ip4.h",
-    "bytes": 4601,
     "sha256": "cc06f3758b0a62b4081234b78e2d56374b7fe630c56357cee3004582aee1e8c7"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/ip6.h",
-    "bytes": 7395,
     "sha256": "74f7de2571eae0669935929ab922466c6634ccbc7c48874e3618f6ea71a19d1f"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/mld6.h",
-    "bytes": 2478,
     "sha256": "adf2f34759e238cc8965235c274d9281c9b082258ef90c4be0b5a0249fc92970"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/nd6.h",
-    "bytes": 8350,
     "sha256": "185bf89b22dbec7b6184fb8f00be8b8a3b6feadd0455a08c3602c59e0bb6cf1a"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/tcp.h",
-    "bytes": 3739,
     "sha256": "7d143dd53c5f5f2138f0d5f5464651b2e2b02aa46411757a1825f862be1677c8"
   },
   {
     "path": "third_party/lwip/src/include/lwip/prot/udp.h",
-    "bytes": 2331,
     "sha256": "edeae0cbac3a2f0d0c54b4abaa9d31876ea135b0d7689edb2ef9df58be0bce46"
   },
   {
     "path": "third_party/lwip/src/include/lwip/raw.h",
-    "bytes": 5526,
     "sha256": "bc954056ba01001801d48cf244721091a5d2e6e563e5d96a92696a59029a6c7e"
   },
   {
     "path": "third_party/lwip/src/include/lwip/sio.h",
-    "bytes": 4366,
     "sha256": "5ec9f8d63040826ffddbe177ecdaedf77131085264e53588387689c2d9c36d44"
   },
   {
     "path": "third_party/lwip/src/include/lwip/snmp.h",
-    "bytes": 7793,
     "sha256": "5374b02ccab56ebd711ec7242dc029b974ce2b4f805850705b9efef07304b993"
   },
   {
     "path": "third_party/lwip/src/include/lwip/sockets.h",
-    "bytes": 26593,
     "sha256": "e18b00eb7a17df40ce840abba8b4d22bc1275bd0528f487e96625426902e1a7e"
   },
   {
     "path": "third_party/lwip/src/include/lwip/stats.h",
-    "bytes": 15424,
     "sha256": "68ebe2e52eb105d42e21c0da66c583db79b0e875e097ef0897c09eac4ed6257a"
   },
   {
     "path": "third_party/lwip/src/include/lwip/sys.h",
-    "bytes": 21349,
     "sha256": "28e659eaeb9f3f96273cbe3e5595ce6168c7fbb0d252a55e397080abb45cfff4"
   },
   {
     "path": "third_party/lwip/src/include/lwip/tcp.h",
-    "bytes": 19488,
     "sha256": "192117d1da4f796470049978e037d42048d99b78c08564197e2dbd89637dc69b"
   },
   {
     "path": "third_party/lwip/src/include/lwip/tcpbase.h",
-    "bytes": 2744,
     "sha256": "d2be437bf439a11e109a0af34fd5c9885311831b051c82da153f1ae7257cd554"
   },
   {
     "path": "third_party/lwip/src/include/lwip/tcpip.h",
-    "bytes": 4369,
     "sha256": "ee4f36b68e1a34c4f16dd75e10b02271d0cca5924002156e68e4b5badca930c2"
   },
   {
     "path": "third_party/lwip/src/include/lwip/timeouts.h",
-    "bytes": 4242,
     "sha256": "7bcd208f7250e10539cdb62c599d48444bc6787b5f4bea46bf571a3483aab0eb"
   },
   {
     "path": "third_party/lwip/src/include/lwip/udp.h",
-    "bytes": 8056,
     "sha256": "e506bed37fc7e8e0ed0ea6cd5e951e754d9a6323cc2324b27085e7113a09877a"
   },
   {
     "path": "third_party/lwip/src/include/netif/bridgeif.h",
-    "bytes": 5286,
     "sha256": "117fd9fc361fffb0a9eb35b2f4114c90039e09c90366fa2399428184e7211ea1"
   },
   {
     "path": "third_party/lwip/src/include/netif/bridgeif_opts.h",
-    "bytes": 3546,
     "sha256": "ed95dc1ff51c74b57267ac619351df8bebf534f4cbb24bc5c416ccd924523491"
   },
   {
     "path": "third_party/lwip/src/include/netif/etharp.h",
-    "bytes": 140,
     "sha256": "598f51cc6d1009880bd27d80d5c41ac0a64685b60bd5faff4677515317a8b015"
   },
   {
     "path": "third_party/lwip/src/include/netif/ethernet.h",
-    "bytes": 2966,
     "sha256": "6c45b4855110f01cfb8a449ce195caaffa58652db918689d914e79246cbcae69"
   },
   {
     "path": "third_party/lwip/src/include/netif/ieee802154.h",
-    "bytes": 5450,
     "sha256": "e90c1cc2b269a265c2f2320d8e1f062cb2fd1a0da072fb915b52e960e2056b5d"
   },
   {
     "path": "third_party/lwip/src/include/netif/lowpan6.h",
-    "bytes": 3010,
     "sha256": "ed5b3401c22e18fd6e23e246b949568c62d8c28d00464e7a4e1f97ff97147f62"
   },
   {
     "path": "third_party/lwip/src/include/netif/lowpan6_ble.h",
-    "bytes": 3177,
     "sha256": "7bf47b2ce1c11482545f4c363797538d9e85f652ee9fa2a4ca977ee6d9f8d706"
   },
   {
     "path": "third_party/lwip/src/include/netif/lowpan6_common.h",
-    "bytes": 3194,
     "sha256": "e3d550248cbbc87e330f59c41ec6b612320242e6a4329820caf931accca6f80d"
   },
   {
     "path": "third_party/lwip/src/include/netif/lowpan6_opts.h",
-    "bytes": 4388,
     "sha256": "a73baf54d7262fd310c434b8a83086de39fe37a1df5793db40aeb2785177217d"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/ccp.h",
-    "bytes": 5126,
     "sha256": "9629b99d93e3c7260c88675cc7351441178d5f336e5ba5b971d9d10243a20372"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/chap-md5.h",
-    "bytes": 1508,
     "sha256": "8bdeecfa0224223dabab2b8e6a5c04651eed5e6c80b979cc7b47f0e44ec2f99f"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/chap-new.h",
-    "bytes": 6386,
     "sha256": "f40a75b954e8479fd2696d187107b3a71ee9e6d2756fc73e979049da7b28d200"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/chap_ms.h",
-    "bytes": 1782,
     "sha256": "cb2eb95fe76e739049b3a2f3dcd041f1e9f348477d2388724959cf2885de728a"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/eap.h",
-    "bytes": 5741,
     "sha256": "1f705db654149fa5b2ed84153c028f47828604e7014d34b0e23d810a3e87d7e4"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/ecp.h",
-    "bytes": 2060,
     "sha256": "64f48a5301b09437df9d9270d59c1140cf32166b274e582f510aeff405d2222b"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/eui64.h",
-    "bytes": 3154,
     "sha256": "a7715aa16680379dfc62703112da1ca345e3bd219c1079ed2c0956f570c92070"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/fsm.h",
-    "bytes": 6567,
     "sha256": "3ee20821e270bee0ec4c807a03dc7fc0c395110122142310426d229a6735277a"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/ipcp.h",
-    "bytes": 5216,
     "sha256": "9100fe618f34fc2b9c31f462a36bdab00bdee3ab9bc0b1caba0a6f544b7eaa0e"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/ipv6cp.h",
-    "bytes": 7840,
     "sha256": "90a2b6e529467b24fb8b5c41cea5d20af5568ff535a6d40e6febd0a0918fee3d"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/lcp.h",
-    "bytes": 6989,
     "sha256": "bea16cac731fb7f0199269e30bbce0c896b2b680c966cef77b0ef6a27112d14f"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/magic.h",
-    "bytes": 4988,
     "sha256": "15eb12fbbbf842e01a7960d721a4bd846604b230fec6d09c06655c4ae2ace688"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/mppe.h",
-    "bytes": 6439,
     "sha256": "0dec116fbded31193275e5abc99d767278fe4dab35a25e2d77d71c9d9d035a0b"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/polarssl/arc4.h",
-    "bytes": 2857,
     "sha256": "0404bdb5bfa7b1ec28ccd1d62f2bce38b980c49659abca75f10779cbdd6ebd9a"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/polarssl/des.h",
-    "bytes": 3126,
     "sha256": "deb872305c3e0e097ac508706b6d158d8409c5075f0520620577e442b1f9db56"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/polarssl/md4.h",
-    "bytes": 3229,
     "sha256": "5c1fc263e83327de7bcc897287efde528f0f4bb786dafe31ae2ec5b454d0aac4"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/polarssl/md5.h",
-    "bytes": 3227,
     "sha256": "c8eca46bcdcb4745d5dcfdb6d73bf4efe9f74bd567abee46bf0217297133995b"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/polarssl/sha1.h",
-    "bytes": 3259,
     "sha256": "2800e8b2bdb15cfaaf3c2afeef947cec10b2ba78b7fced3fc5371b7b8c2311a8"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/ppp.h",
-    "bytes": 25648,
     "sha256": "cbc828e5c742e0d40918e9dcb04a4a81afe23b42ac5629c32791a0e3a7a39d10"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/ppp_impl.h",
-    "bytes": 26717,
     "sha256": "d3dc3d94fe5f2e0963dca561fa1e43f06758b21f014e81cea6df948562e5f332"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/ppp_opts.h",
-    "bytes": 16103,
     "sha256": "6b7faa99686360bf96e5bc223ccd14a81c2b14d30e5fc07ced9744d59d49c0ee"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/pppapi.h",
-    "bytes": 4584,
     "sha256": "63e8e37916f98c91fc8dd20460728fb571525e2310410c323810929f408746c8"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/pppcrypt.h",
-    "bytes": 4781,
     "sha256": "30b8d0e40bd366992a27800cb5139f5e116d7f346ae003cf945aac842d0a19db"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/pppdebug.h",
-    "bytes": 3317,
     "sha256": "8e1a9f01928b9c44ae283a2ae673fb80274c87edd471f8ec250bab8143722764"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/pppoe.h",
-    "bytes": 7611,
     "sha256": "1490d5367ef31488ca963dfbd99a6154f9a9f07aa5a96f0c7a16b6f69f2a33ce"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/pppol2tp.h",
-    "bytes": 9073,
     "sha256": "e589e31b31bb3c8948e52f3a271ea72db8f56e5c24fb1a6ea1ca7e1c98c7c885"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/pppos.h",
-    "bytes": 4671,
     "sha256": "181e3af7c0e58a1f3b35b9efc525e1bb45ee193b28d31140e5dc8d48330bc4ef"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/upap.h",
-    "bytes": 4270,
     "sha256": "52957fc1be26b98088b0cab3435772af73de1277b3b94f5099cbd529ae4a151b"
   },
   {
     "path": "third_party/lwip/src/include/netif/ppp/vj.h",
-    "bytes": 6528,
     "sha256": "078dfc63d5551b74274f5f6efb12149c99d69134db1d901573e0348eea5a6bd7"
   },
   {
     "path": "third_party/lwip/src/include/netif/slipif.h",
-    "bytes": 3178,
     "sha256": "0cb2dcb6ac3798599c776a48abc60dcbcc89de9b01ddec6d517bd694f6bc559d"
   },
   {
     "path": "third_party/lwip/src/include/netif/zepif.h",
-    "bytes": 2940,
     "sha256": "2f77f06432565dc13598c3717936d54dd7ebfd8cf66f52920d351dbe7544f4a7"
   },
   {
     "path": "third_party/lwip/src/netif/ethernet.c",
-    "bytes": 12259,
     "sha256": "3cecace1ce4b8d9dfe348de7de9ce118cb8ffd4592707f9324eb0efe749ca636"
   },
   {
     "path": "tools/build-harmony.sh",
-    "bytes": 532,
     "sha256": "126a2ade79a64cb00677d844f43b4d4f2bce7321de55a5c87b8a8587850fe97d"
   },
   {
     "path": "tools/check-source.py",
-    "bytes": 1744,
     "sha256": "0b7e552985dde7e64b0dbd489f77f268b6016b4942134a0df324252e7b0a9d5a"
   },
   {
     "path": "tools/prepare-original-tablet-test.py",
-    "bytes": 2214,
     "sha256": "03b2cdb53be78d7b56d47ddbf0706bac06a10e64d9a557eb8d5aa3da62b1a250"
   },
   {
     "path": "tools/test-pairing.cjs",
-    "bytes": 1529,
     "sha256": "53bbd01842297599d55f5d89150588aa0d26a0a3acbc0605d163479e4a13e547"
   },
   {
     "path": "usb/AccessoryProtocol.hpp",
-    "bytes": 1688,
     "sha256": "55f51795a8e107328843a74207d22433b848fe51b853d0af4fa9e0ba3c26eef0"
   },
   {
     "path": "usb/RNDIS.hpp",
-    "bytes": 2785,
     "sha256": "4a947d32bc2772ec0385dc10cd7e20067b857174bc4c3f24e4ee20082796c86d"
   },
   {
     "path": "usb/StreamMux.hpp",
-    "bytes": 2226,
     "sha256": "3aa1665c8e1bc25209729445cfe97ee25417e46f30e6d0787c0a5a76ab323a51"
   },
   {
     "path": "windows/Inspect-Capabilities.ps1",
-    "bytes": 721,
     "sha256": "369eb36296687c2f66b772ec8f6a65867c21c91e8b44d7efc739973d0415f1ee"
   },
   {
     "path": "windows/README.md",
-    "bytes": 688,
     "sha256": "42b8195c6705006d0273f54535acaeb24b7bc466f801803a5e5b994578b162e5"
   }
 ]

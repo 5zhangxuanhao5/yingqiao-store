@@ -51,7 +51,7 @@ export class LocalAvailability {
   try {
    const discovery = mdns.createDiscoveryService(this.context, '_yingqiaostandby._tcp');this.discovery = discovery;
    discovery.on('serviceFound', (info: mdns.LocalServiceInfo) => {
-    if (!this.alive || !info.serviceName.startsWith('映桥测试版-Mac')) { return; }
+    if (!this.alive || !info.serviceName.startsWith('映桥-Mac')) { return; }
     this.discoveryStatus = 'found';const epoch = this.epoch;
     mdns.resolveLocalService(this.context, info).then((resolved: mdns.LocalServiceInfo) => {
      if (!this.alive || epoch !== this.epoch || resolved.port !== 49562 || !resolved.host) { return; }

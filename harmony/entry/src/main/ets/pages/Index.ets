@@ -214,7 +214,7 @@ struct Index {
   this.storeDiscovery?.stop();this.storeDevices=[];this.storeDiscoverMessage='正在寻找附近的 Mac…';
   this.storeDiscovery=new StoreDiscovery(this.context(),(devices:StoreDiscoveredMac[])=>{
    this.storeDevices=devices;this.storeReadyNearby=devices.length>0;const invitation=devices.find((d:StoreDiscoveredMac)=>d.startRequested===true);if(invitation&&this.storeIntroDone&&!this.active&&!this.storeLinkPending){invitation.startRequested=false;this.pendingNearbyStart=invitation.id;}this.tryNearbyStart();this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
-   this.storeDiscoverMessage=devices.length>0?'选择电脑即可连接':'还未发现电脑，请确认 Mac 上的映桥测试版已打开。';
+   this.storeDiscoverMessage=devices.length>0?'选择电脑即可连接':'还未发现电脑，请确认 Mac 上的映桥已打开。';
    const known=devices.find((d:StoreDiscoveredMac)=>d.certificate===this.pairing?.cert);
    if(known&&this.pairing){if(!this.active&&known.host!=='127.0.0.1'&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.availability?.setHost(known.host);this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
    if(!this.storeSelectedID&&devices.length===1){this.storeSelectedID=devices[0].id;}
@@ -1868,7 +1868,7 @@ struct Index {
    Text('欢迎使用映桥').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
    Text('平板和 Mac 都要安装，才能开始扩展屏').fontSize(18).fontColor('#23796C').width('100%')
    Text('先在 Mac 下载并打开电脑端，再回来连接。下载入口会直接打开本次测试版，不需要找源码。').fontSize(15).lineHeight(24).fontColor('#607A74').width('100%')
-   Text('① 在 Mac 打开下载链接，下载 Mac 测试版 ZIP。\n② 解压，把“映桥测试版”拖进“应用程序”并打开。\n③ 按电脑端说明完成权限设置。\n④ 回到平板，点下方“Mac 已安装，开始使用”。').fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
+   Text('① 在 Mac 打开下载链接，下载 Mac 测试版 ZIP。\n② 解压，把“映桥”拖进“应用程序”并打开。\n③ 按电脑端说明完成权限设置。\n④ 回到平板，点下方“Mac 已安装，开始使用”。').fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
    Button('复制 Mac 下载链接').onClick(()=>this.storeCopyLink()).width('100%').height(44).backgroundColor('#EAF3EE').fontColor('#23796C')
    Button(this.storeShowInstallGuide?'收起详细安装步骤':'第一次安装？查看详细步骤').onClick(()=>this.storeShowInstallGuide=!this.storeShowInstallGuide).fontSize(13).fontColor('#23796C').backgroundColor(Color.Transparent)
    if(this.storeShowInstallGuide){Text(STORE_INSTALL_STEPS).fontSize(14).lineHeight(25).fontColor('#607A74').width('100%');Text(STORE_DOWNLOAD_URL).fontSize(12).fontColor('#23796C').copyOption(CopyOptions.LocalDevice).width('100%')}
@@ -1880,7 +1880,7 @@ struct Index {
   Column({space:20}) {
    Row({space:18}) {
     Column({space:4}) {
-     Text('映桥测试版').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#172D2C')
+     Text('映桥').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#172D2C')
      Text('让 Mac 与平板自然相连').fontSize(10).letterSpacing(1.5).fontColor('#789089')
     }.alignItems(HorizontalAlign.Start)
     Blank()

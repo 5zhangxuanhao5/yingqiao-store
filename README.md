@@ -1,14 +1,14 @@
-# 映桥测试版
+# 映桥
 
 把华为平板变成 Mac 的另一块屏幕，支持键盘、触控板和触摸操作。
 
 ## 下载与安装
 
-### [下载 Mac 0.3.1 测试版（ZIP）↓](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/store-v0.3.1-test.1/Yingqiao-Mac-Test-0.3.1.zip)
+### [下载 Mac 0.3.2 测试版（ZIP）↓](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/store-v0.3.2-test.1/Yingqiao-Mac-0.3.2.zip)
 
-[查看版本说明与所有附件](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/store-v0.3.1-test.1)
+[查看版本说明与所有附件](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/store-v0.3.2-test.1)
 
-**普通用户只需下载 `Yingqiao-Mac-Test-0.3.1.zip`。** 下载后双击解压，把“映桥测试版”拖进 Mac 的“应用程序”。源码和依赖是开发资料，不是安装包。
+**普通用户只需下载 `Yingqiao-Mac-0.3.2.zip`。** 下载后双击解压，把“映桥”拖进 Mac 的“应用程序”。源码和依赖是开发资料，不是安装包。
 
 - 第一次安装：阅读 [Mac 逐步安装说明](docs/MAC_INSTALL.md)。
 - 不知道该下载哪个文件：阅读 [下载文件对照](docs/downloads.md)。
@@ -18,13 +18,13 @@
 
 ## 开始使用
 
-1. 在 Mac 安装并打开“映桥测试版”，在平板打开同名应用，先让两台设备连接同一局域网。
+1. 在 Mac 安装并打开“映桥”，在平板打开同名应用，先让两台设备连接同一局域网。
 2. 首次使用先阅读权限用途说明，再由 macOS 请求录屏和辅助功能授权；设备发现不需要先取得这两项权限。
 3. 在平板的“附近的 Mac”选择电脑，或者在 Mac 的“附近的 Pad”选择平板。首次连接需要在 Mac 上点“允许连接”，不用扫码、填 IP 或输入匹配码。
 4. 点击“开启扩展屏”。没有可连接设备时按钮不可用；发现多台时选择这次使用的设备。
 5. 点击“结束会话”后停止采集、编码和传屏，保留设备发现。
 
-当前版本独立于个人版安装，保留原版界面、画面和输入核心，提供局域网扩展屏，不提供异地远控。0.3.0 的首次使用与附近设备调整见 [版本说明](docs/FIRST_RUN_NEARBY_030.md)；0.3.1 的实际交付状态与已知问题以对应 Releases 说明为准。
+当前版本独立于个人版安装，保留原版界面、画面和输入核心，提供局域网扩展屏，不提供异地远控。0.3.0 的首次使用与附近设备调整见 [版本说明](docs/FIRST_RUN_NEARBY_030.md)；0.3.2 更名与发布准备状态见 [版本说明](docs/NAME_RELEASE_032.md)。
 
 ## 已实现与待验证
 

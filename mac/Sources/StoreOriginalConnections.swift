@@ -20,7 +20,7 @@ extension StoreHost {
     if loopback{connection.cancel()}else{self?.accept(connection,standby:true)}
     #endif
    }};standby.start(queue:.main)
-   let service=NetService(domain:"local.",type:"_yingqiaostandby._tcp",name:"映桥测试版-Mac",port:49562)
+   let service=NetService(domain:"local.",type:"_yingqiaostandby._tcp",name:"映桥-Mac",port:49562)
    service.schedule(in:.main,forMode:.common);service.publish();standbyService=service
    #if ORIGINAL_USB_TEST
    let localTCP=NWProtocolTCP.Options();localTCP.noDelay=true

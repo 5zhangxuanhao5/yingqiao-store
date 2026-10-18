@@ -6,7 +6,7 @@ import CoreImage
 
 @MainActor final class StoreHost:NSObject,NSApplicationDelegate {
  var window:NSWindow!,enable:NSButton!,dashboard:StoreDashboard!
- var statusMessage="打开平板上的映桥测试版，自动寻找设备。"{didSet{updateDashboard()}}
+ var statusMessage="打开平板上的映桥，自动寻找设备。"{didSet{updateDashboard()}}
  var overview:DesktopOverview?
  var hostCursor:HostCursorMonitor?,cursorRequested=false
  var lastSessionError:String?
@@ -28,7 +28,7 @@ import CoreImage
  let input=RemoteInput()
  func applicationDidFinishLaunching(_ n:Notification){
   window=NSWindow(contentRect:NSRect(x:0,y:0,width:880,height:660),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
-  window.title="映桥测试版";window.center();window.isReleasedWhenClosed=false;window.contentMinSize=NSSize(width:760,height:620);window.backgroundColor=BridgeTheme.fog;window.titlebarAppearsTransparent=true;window.appearance=NSAppearance(named:.aqua)
+  window.title="映桥";window.center();window.isReleasedWhenClosed=false;window.contentMinSize=NSSize(width:760,height:620);window.backgroundColor=BridgeTheme.fog;window.titlebarAppearsTransparent=true;window.appearance=NSAppearance(named:.aqua)
   dashboard=StoreDashboard(target:self,stop:#selector(userEndSession),screen:#selector(screenPermission),access:#selector(accessPermission),network:#selector(prepare),relayConfig:#selector(prepare),start:#selector(startExtension),power:#selector(prepare),powerSettings:#selector(prepare),remoteAccess:#selector(prepare));window.contentView=dashboard;enable=dashboard.document.startButton
   availability.onChanged={[weak self] in self?.syncRequestTimer();self?.updateDashboard()};availability.onClosePath={[weak self] id in guard let self,let key=self.standbyConnections.first(where:{$0.value.id==id})?.key else{return};self.standbyConnections.removeValue(forKey:key)?.peer.close()};nearbyPads.onChanged={[weak self] in self?.announceToNearbyPads();self?.updateDashboard()};window.orderFront(nil);updateDashboard();DispatchQueue.main.async{[weak self] in self?.explainInitialPermissions()}
  }

@@ -11,7 +11,7 @@ final class StoreDashboard:NSView {
 }
 final class StoreDashboardDocument:NSView {
  override var isFlipped:Bool{true}
- let brand=BridgeBrandMark(frame:.zero),name=BridgeTheme.label("映桥测试版",size:28,weight:.semibold),tagline=BridgeTheme.label("让 Mac 与平板自然相连",size:13,color:BridgeTheme.muted),pill=BridgeStatusPill(frame:.zero)
+ let brand=BridgeBrandMark(frame:.zero),name=BridgeTheme.label("映桥",size:28,weight:.semibold),tagline=BridgeTheme.label("让 Mac 与平板自然相连",size:13,color:BridgeTheme.muted),pill=BridgeStatusPill(frame:.zero)
  let hero=BridgeCard(frame:.zero),devices=BridgeDeviceView(frame:.zero),heading=BridgeTheme.label("扩展屏",size:25,weight:.semibold),explanation=BridgeTheme.label("把平板变成 Mac 的另一块屏幕。",size:14,color:BridgeTheme.muted,wrap:true),footnote=BridgeTheme.label("结束后停止传屏，保留附近设备发现。",size:12,color:BridgeTheme.muted,wrap:true)
  let permissions=BridgeCard(frame:.zero),permissionIcon=BridgeTheme.symbol("checkmark.shield"),permissionTitle=BridgeTheme.label("操作权限",size:16,weight:.semibold),screenTitle=BridgeTheme.label("屏幕共享",size:13,weight:.medium),inputTitle=BridgeTheme.label("键盘与触控板",size:13,weight:.medium),screenState=BridgeTheme.label("尚未申请",size:11,color:BridgeTheme.muted),inputState=BridgeTheme.label("尚未申请",size:11,color:BridgeTheme.muted)
  let nearby=BridgeCard(frame:.zero),nearbyIcon=BridgeTheme.symbol("ipad.landscape"),nearbyTitle=BridgeTheme.label("附近的 Pad",size:16,weight:.semibold),nearbyState=BridgeTheme.label("正在寻找平板…",size:13,weight:.medium),nearbyHint=BridgeTheme.label("两端打开映桥后，自动寻找附近设备。",size:12,color:BridgeTheme.muted,wrap:true),nearbySelector=NSPopUpButton(frame:.zero,pullsDown:false)
