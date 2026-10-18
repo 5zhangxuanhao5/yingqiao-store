@@ -1,5 +1,5 @@
 {
-  "version": "store-v0.1.13-test.1",
+  "version": "store-v0.1.14-test.1",
   "date": "2026-10-18",
   "status": "development-preview-not-appgallery-ready",
   "publicSource": true,
@@ -31,15 +31,15 @@
     "USB control consent/failure sequence",
     "USB mux fragmentation/parser/fairness"
   ],
-  "macSelfTest": "LAN address policy only, no GUI/listener/identity/capture",
+  "macSelfTest": "LAN address and encoder/window policy checks only; no GUI/listener/capture",
   "releaseGateDocument": "docs/APPGALLERY_READINESS.md",
   "discovery": "mDNS and datagram discovery plus bounded refresh of previously approved address; initial multicast-suppressed-network discovery still incomplete",
   "quality": "0.1.11 original media core, HiDPI output retained; user reported clear relative improvement on LAN.",
   "coreProvenance": "docs/ACCEPTED_CORE_PROVENANCE.json",
-  "consumerUSBImplementation": "Experimental user-space RNDIS/lwIP TLS bridge; ordinary USB Initialize and device receipt verified, DHCP response and streaming remain unverified.",
-  "networkHandoverImplementation": "Authenticated background path probes and runtime single-path reselection integrated; real cable/wireless handover still unverified.",
+  "consumerUSBImplementation": "0.1.13 real user-space RNDIS USB/TLS streaming verified on current Edge; no HDC connection. Other models unverified.",
+  "networkHandoverImplementation": "0.1.13 cable removal automatically recovered LAN and preserved windows; user reports noticeable transition pause. 0.1.14 adopts retained display without mode reset and polls lifecycle loss at 100ms during active sessions. Reinsert USB mode restoration still unverified.",
   "components": {
-    "mac": "0.1.13 (14)",
-    "harmony": "0.1.12 (13)"
+    "mac": "0.1.14 (15)",
+    "harmony": "0.1.14 (15)"
   }
 }

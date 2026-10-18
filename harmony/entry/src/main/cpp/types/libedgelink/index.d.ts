@@ -75,3 +75,6 @@ export const storePathsStatus: (activeHost:string,elapsedSinceSwitchMs:number,in
 export const storePathsStop: ()=>void;
 
 export const storeUSBInterfaces: ()=>string;
+
+// Lifecycle-only snapshot; does not consume/reset statistics samples.
+export const storeSessionFlags: ()=>number;

@@ -55,3 +55,7 @@ Huawei app registered as 映桥; reviewer draft saved, not submitted. Match tabl
 ## store-v0.1.0-dev.1
 
 Independent public-source prototype. First-run companion installation guide, explicit local pairing, capability-based geometry selection, local-only media policy, Mac13 dual-architecture build, bounded display retention implementation. USB accessory research adapters/fixtures added but not integrated or hardware-proven; no new real-device stream certification, no Windows extension service, no formal AppGallery release. Personal edition remains unchanged in its original private history.
+
+## store-v0.1.14-test.1
+
+0.1.13真实USB传屏成功，拔线自动恢复局域网且窗口保留；用户确认恢复后正常，停顿主要在切换时。移植个人版保留显示器的直接接续逻辑，避免重复设置模式及600ms等待。新增仅会话期间运行的100ms轻量断线状态读取，不重置帧率统计；明确结束时取消。增加本机断开到首帧渲染确认的耗时记录。USB状态发送失败时保留重试。修复Windows检出换行导致源码清单验证失败的问题。新版本实际接续耗时仍待安装测试，不承诺零停顿。

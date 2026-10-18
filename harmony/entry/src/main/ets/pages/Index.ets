@@ -111,6 +111,7 @@ interface Statistics extends WANRouteMetrics {
  cursorSyncApplied: number; cursorSyncStaleSession: number; cursorSyncStaleSequence: number; cursorSyncStaleInput: number; cursorSyncInvalid: number;
  hostCursorOwner: boolean; hostCursorVisible: boolean;
 }
+interface StoreSessionSignal {running:boolean;localHandoverSupported:boolean;renderSubmittedFrames:number;stopReason:string;}
 interface StorePathStatus { paths:StorePathSample[];preferredHost:string; }
 interface StorePathSample {host:string;ready:boolean;route:string;rttMs:number;probeMbps:number;}
 interface StoreLinkStatus { phase:string;code:string;error:string;pairing:string; }
@@ -136,6 +137,7 @@ struct Index {
  private storeLinkHost:string='';
  private storeUSBLastReport:string='';
  private storePathTimer:number=-1;
+ private storeHandoverTimer:number=-1;
  private storePathRefreshAt:number=0;
  private storeActiveHost:string='';
  private storeSwitchedAt:number=0;
@@ -156,17 +158,29 @@ struct Index {
   this.storePathTimer=setInterval(()=>{
    if(!this.remoteSessionForeground)return;
    if(Date.now()-this.storePathRefreshAt>=8000){this.storePathRefreshAt=Date.now();this.storeDiscovery?.refreshPaths();}
-   if(this.active){this.storeConfigurePaths();const status=native.storeUSBInterfaces();if(status!==this.storeUSBLastReport){this.storeUSBLastReport=status;native.input('CLIENTUSB '+new util.Base64Helper().encodeToString(new util.TextEncoder().encodeInto(status)));}}
+   if(this.active){this.storeConfigurePaths();const status=native.storeUSBInterfaces();if(status!==this.storeUSBLastReport){if(native.input('CLIENTUSB '+new util.Base64Helper().encodeToString(new util.TextEncoder().encodeInto(status))))this.storeUSBLastReport=status;}}
 
   },2000);
  }
- private checkStoreHandover(s:Statistics):boolean {
+ private storeStartFastHandover():void {
+  if(this.storeHandoverTimer>=0)return;
+  this.storeHandoverTimer=setInterval(()=>{
+   if(!this.active||this.mode!=='extend'||!this.remoteSessionForeground)return;
+   const flags=native.storeSessionFlags();
+   if(flags<0||(flags&1)!==0||(flags&8)!==0)return;
+   this.checkStoreHandover({running:false,localHandoverSupported:(flags&2)!==0,renderSubmittedFrames:0,stopReason:''});
+  },100);
+ }
+ private storeStopFastHandover():void {
+  if(this.storeHandoverTimer>=0){clearInterval(this.storeHandoverTimer);this.storeHandoverTimer=-1;}
+ }
+ private checkStoreHandover(s:StoreSessionSignal):boolean {
   if(!this.active||this.mode!=='extend'||!this.remoteSessionForeground||!this.localHandoverCapable&& !s.localHandoverSupported||s.stopReason==='mac_end')return false;
   this.localHandoverCapable=true;const now=Date.now(),state=this.storePathState(s.running);
   const current=state.paths.find((p:StorePathSample)=>p.host===this.storeActiveHost);
   this.localRouteLabel=current?.route==='usb-net'?'USB 网络单路传屏 · 无线备用':'局域网单路传屏 · 自动选择更优线路';
   let target=state.preferredHost;
-  if(s.running){this.storeRecoveryUntil=0;if(s.renderSubmittedFrames<20||now-this.storeSwitchedAt<5000||!this.remoteInputWindowActive)return false;}
+  if(s.running){if(s.renderSubmittedFrames>0)this.storeRecoveryUntil=0;if(s.renderSubmittedFrames<20||now-this.storeSwitchedAt<5000||!this.remoteInputWindowActive)return false;}
   else {if(this.storeRecoveryUntil===0)this.storeRecoveryUntil=now+8500;if(now>=this.storeRecoveryUntil)return false;
    if(!target)target=this.pairing?.host || '';if(now<this.storeNextRecovery)return true;
   }
@@ -884,7 +898,7 @@ struct Index {
   }
   this.cancelRemoteStart();
   // stop() invalidates and unregisters the old callback before any session reset.
-  this.stop(localHandoverRoute ? 'local_handover' : 'restart', false);this.saveSettings();this.mode = mode;this.storeActiveHost=this.host;this.storeSwitchedAt=Date.now();this.storeConfigurePaths();
+  this.stop(localHandoverRoute ? 'local_handover' : 'restart', false);this.saveSettings();this.mode = mode;this.storeUSBLastReport='';this.storeActiveHost=this.host;this.storeSwitchedAt=Date.now();this.storeConfigurePaths();
   this.clearDesktopTopology();
   this.relativeCursorBlocked = false;this.relativeAnchorReady = false;this.relativeRawEvents = 0;this.relativeMissingRawEvents = 0;this.relativeMissingRawRun = 0;this.relativeRawSamples = [];this.relativeLastRawTimestamp = -1;this.lastAbsoluteMouseX = -1;this.lastAbsoluteMouseY = -1;
   this.relativeDragTrace = [];this.relativeDragTouchMoves = 0;this.relativeDragMouseMoves = 0;
@@ -919,9 +933,10 @@ struct Index {
   native.input(`OPTION ctrlToCmd ${this.ctrlToCmd ? 1 : 0}`);
   this.message = mode === 'extend' ? '正在建立扩展桌面…' : '正在连接 Mac…';
   const generation = this.sessionGeneration;
-  this.timer = setInterval(() => this.refresh(generation), 1000);this.focusRemote();
+  this.timer = setInterval(() => this.refresh(generation), 1000);this.storeStartFastHandover();this.focusRemote();
  }
  private stop(reason: string = 'user_end', restore: boolean = true): void {
+  this.storeStopFastHandover();
   if(reason!=='restart'&&reason!=='local_handover'){native.storePathsStop();this.storeRecoveryUntil=0;this.storeActiveHost='';}
   if (reason !== 'restart' && reason !== 'udp_fallback') { this.dynamicWANRoute.cancel(reason); }
   if (reason !== 'restart' && reason !== 'udp_fallback') { this.internetReconnect?.cancel(reason); }this.internetRecovering = false;
@@ -1295,7 +1310,8 @@ struct Index {
  private refresh(generation: number = this.sessionGeneration): void {
   if (generation !== this.sessionGeneration) { return; }
   const s = this.saveStatus();if (!s) { return; }
-  if (this.checkStoreHandover(s)) { return; }
+  const signal:StoreSessionSignal={running:s.running,localHandoverSupported:s.localHandoverSupported===true,renderSubmittedFrames:s.renderSubmittedFrames,stopReason:s.stopReason};
+  if (this.checkStoreHandover(signal)) { return; }
   if (this.checkMediaFallback(s, generation)) { return; }
   if (this.checkDynamicWANRoute(s, generation)) { return; }
   this.remoteMicEnabled = s.microphoneAllowed === true;
@@ -1310,7 +1326,7 @@ struct Index {
    this.unbindCursorChannel();
    native.input('OBSERVE -1');this.axisInputActive = false;
    if (this.timer >= 0) { clearInterval(this.timer);this.timer = -1; }
-   this.active = false;this.menuVisible = false;this.setFullScreen(false);this.restoreDiagnosticProfile();this.updateAvailabilityState();this.saveStatus();
+   this.storeStopFastHandover();this.active = false;this.menuVisible = false;this.setFullScreen(false);this.restoreDiagnosticProfile();this.updateAvailabilityState();this.saveStatus();
   }
  }
  private bindCursorChannel(): void {
