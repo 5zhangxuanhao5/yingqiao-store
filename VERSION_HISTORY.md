@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.10-test.1
+
+0.1.9 produced real 3120x2080 HEVC frames, but the user still reported stutter. Observed Pad decode P95 about 12ms, input queue below 1ms, render-submission ACK P95 about 159ms. The fixed three-frame window constrained throughput. Restore baseline-plus-bounded-jitter window sizing from the personal-edition approach, with a 4-12 frame cap and tests for initial capacity, invalid/duplicate/cumulative ACK and high-delay bounds. Keep HEVC optional-property fallback. Smoothness is not yet accepted; this is still LAN, not consumer USB.
+
 ## store-v0.1.9-test.1
 
 0.1.8 failed on the real Mac: HEVC returned -12900 for MaxFrameDelayCount=0, which had incorrectly been treated as a mandatory property. Preserve real-time/reorder settings; optional unsupported frame-delay hints no longer reject the session. A regression calls the same production settings helper with -12900 for the optional property and checks mandatory failures are still rejected. Preserve actual session failure text instead of overwriting it with normal stop text. Pad numeric diagnostic fields now use supported string log formatting. Real native-size streaming acceptance remains pending.

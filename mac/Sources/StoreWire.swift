@@ -31,7 +31,7 @@ final class StoreFrameSender {
  let queue=DispatchQueue(label:"cn.edgelink.store.video",qos:.userInteractive)
  private let lock=NSLock();private var pending=0,alive=true;private var frameWindow=StoreFrameWindow();private var sentFrames:UInt64=0,sentBytes:UInt64=0
  var connection:NWConnection?
- init(){sid=UInt32(randomBytes(4).uintBE(0,4));key=SymmetricKey(data:randomBytes(16));serverPrefix=randomBytes(4);clientPrefix=randomBytes(4);viewerToken=hex(randomBytes(32))}
+ init(fps:Int=60){frameWindow.targetFPS=fps;sid=UInt32(randomBytes(4).uintBE(0,4));key=SymmetricKey(data:randomBytes(16));serverPrefix=randomBytes(4);clientPrefix=randomBytes(4);viewerToken=hex(randomBytes(32))}
  var canEncode:Bool{lock.lock();defer{lock.unlock()};return alive && connection != nil && pending<2 && frameWindow.canEncode}
  func handshake(width:Int,height:Int,fps:Int,topology:DesktopInputTopology,codec:String)->String {var s=Data();s.appendBE(sid);return "OK \(hex(s)) \(key.withUnsafeBytes{hex(Data($0))}) \(hex(serverPrefix)) \(hex(clientPrefix)) \(viewerToken) \(width) \(height) \(fps)"+topology.wireFields()+" local-handover-v1 codec-\(codec)-v1"}
  func attach(_ value:NWConnection){lock.lock();connection=value;lock.unlock()}
@@ -41,6 +41,6 @@ final class StoreFrameSender {
   }catch{self.stop()}
  }}
  func acknowledge(_ id:UInt64){lock.lock();frameWindow.acknowledge(id,now:ProcessInfo.processInfo.systemUptime);lock.unlock()}
- func health()->[String:Any]{lock.lock();defer{lock.unlock()};return ["framesSent":sentFrames,"bytesSent":sentBytes,"renderSubmissionAck":frameWindow.lastAck,"outstanding":frameWindow.outstanding.count,"ackP95ms":frameWindow.p95,"pendingSocketWrites":pending]}
+ func health()->[String:Any]{lock.lock();defer{lock.unlock()};return ["framesSent":sentFrames,"bytesSent":sentBytes,"renderSubmissionAck":frameWindow.lastAck,"outstanding":frameWindow.outstanding.count,"frameWindow":frameWindow.limit,"ackMinMs":frameWindow.samples.min() ?? -1,"ackP95ms":frameWindow.p95,"pendingSocketWrites":pending]}
  func stop(){lock.lock();alive=false;let c=connection;connection=nil;lock.unlock();c?.cancel()}
 }
