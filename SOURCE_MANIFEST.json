@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 4419,
-    "sha256": "8aa3b3711f05fd9a22f8039d3eaccd5aefea654266045f27e8ab4a2827f535ae"
+    "bytes": 4503,
+    "sha256": "0e5331edb244b44f5ba1e50a1b86d011d5da05b807288405301fa496ba711767"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -86,8 +86,8 @@
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
-    "bytes": 4743,
-    "sha256": "c41d576596acb15f822a48835a418eba9c9c49951f58a638c947d20670e57515"
+    "bytes": 4935,
+    "sha256": "12454097d86d98c939851ae69cdfe61ccb5722ca86b3c8cf6253581c98515216"
   },
   {
     "path": "docs/BUILD.md",
@@ -156,8 +156,8 @@
   },
   {
     "path": "docs/REGRESSION_034.md",
-    "bytes": 2630,
-    "sha256": "09b2ede1d1de6ef6b9927132997d9545563cd909967d8bf311d8649e07013b48"
+    "bytes": 3017,
+    "sha256": "cd9afc5ae98ad89f904c8e74f505b8426b4016d8f0eb22573dc06b2352eb2f1a"
   },
   {
     "path": "docs/TRACKPAD_TEST_021.md",
