@@ -1,11 +1,11 @@
 {
-  "sourceVersion": "store-v0.1.0-dev.1",
+  "sourceVersion": "store-v0.1.1-dev.1",
   "macUniversalArchitectures": [
     "x86_64",
     "arm64"
   ],
-  "macBinarySHA256": "f8793c4458f92228143be26f496fe1a9b42f62f7cfaf0d3fe2adeac2b1cdcc92",
-  "harmonyUnsignedHAPSHA256": "8ba9a07c8e18d7fc6911db913c3533e9d2d0133889347d9d8dbce9743342020b",
+  "macBinarySHA256": "2d85d63bd0f9daabc6d3e8a66f83ea33202d13e2a01233bd475acded114204c9",
+  "harmonyUnsignedHAPSHA256": "582c9f200ba7adf0b7ed773e64e26c447b2c975ea86b5b28e0c11affe7dc98d7",
   "installedOnUserDevices": false,
   "newEditionSessionTested": false,
   "consumerUSBHandoverTested": false,
@@ -13,15 +13,7 @@
   "originalPersonalMacExecutableUnchanged": true,
   "newPreviewRuntimeIdentityDirectoryExists": false,
   "tests": [
-    "9 simulated panel ratios",
-    "codec/fps fallback policy",
-    "authenticated route switching policy",
-    "display lease policy",
-    "local pairing shape validation",
-    "headless Mac LAN address self-test",
-    "USB control consent/failure sequence",
-    "USB mux fragment/parser/control-video fairness",
-    "actual native export and callback with synthetic NAPI/decoder capability fixture"
+    "This version: official SDK Harmony release compilation, Mac universal compilation and headless LAN policy check. Prior dev.1 offline fixtures retained; new cloud run pending."
   ],
   "buildSDK": "official DevEco SDK; no schema modification",
   "usbSDKCandidateCompiled": true,
@@ -32,5 +24,6 @@
   "usbProtocolFixturePassed": true,
   "usbPhysicalControlRequestsSent": 0,
   "consumerUSBAdapterIntegrated": false,
-  "officialSDKTabletTimestampWarningsRemaining": false
+  "officialSDKTabletTimestampWarningsRemaining": false,
+  "packageNameVersionInspected": true
 }

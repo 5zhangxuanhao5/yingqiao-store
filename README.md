@@ -20,7 +20,7 @@
 - [屏幕规格与待测矩阵](docs/compatibility-catalog.json)
 - [USB与接续发布门槛](docs/USB_AND_HANDOVER.md)
 - [上架准备与未完成项](docs/APPGALLERY_READINESS.md)
-- [隐私说明草案](docs/PRIVACY_DRAFT.md)
+- [隐私说明与公开联系方式](docs/PRIVACY.md)
 - [Windows路线](windows/README.md)
 - [恢复构建](docs/BUILD.md)
 

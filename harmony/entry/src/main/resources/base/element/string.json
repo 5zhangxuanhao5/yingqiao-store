@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "app_name",
-      "value": "映桥预览"
+      "value": "映桥"
     },
     {
       "name": "module_desc",
-      "value": "局域网扩展屏开发预览"
+      "value": "已配对电脑与平板之间的局域网扩展显示"
     }
   ]
 }

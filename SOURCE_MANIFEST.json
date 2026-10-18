@@ -21,8 +21,8 @@
   },
   {
     "path": "BASELINE.json",
-    "bytes": 376,
-    "sha256": "9d22e5e201942be15c5889ed33363dd13a2bbe818a209394d3dbae44143df681"
+    "bytes": 441,
+    "sha256": "b36f92821fdb26b2afbf1cf6cceaf3aa1b7266bfb42646a207609ec9641dc660"
   },
   {
     "path": "DEPENDENCIES.json",
@@ -32,7 +32,7 @@
   {
     "path": "DEPENDENCY_ARCHIVE.json",
     "bytes": 289,
-    "sha256": "515c9fcb38a8f10119d7695ad6163fc34743a811049dc2f5b4cd8687273d984a"
+    "sha256": "8a75562d3871dd198bfe3fc5fd646e0f2f4077d0b46af512b3e6634d8d0c31ca"
   },
   {
     "path": "LICENSE",
@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 2047,
-    "sha256": "5c040f7ec12c1027f75a9f146185f4dda5c8c02ea66ad233fb0d57216eb2bd35"
+    "bytes": 2056,
+    "sha256": "7fc6a9233623cbad148d186ffdc7e71e121524d355e8c137a6318414c6f79407"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -66,23 +66,23 @@
   },
   {
     "path": "VALIDATION.json",
-    "bytes": 1306,
-    "sha256": "2309ade4ee5162de5c5b729d329b020e03e7fc0262aae2ada9dfbc1cc50c4b50"
+    "bytes": 1124,
+    "sha256": "b37bb6f4c3a75a3d4b7605671ab1647f221d633d27f5c662d9e4fe56beb51d75"
   },
   {
     "path": "VERSION.json",
     "bytes": 1055,
-    "sha256": "8353a37e194564f70f6883f0b6881adbb84f3b078c328d785155b0dffc59105d"
+    "sha256": "e09efdd250b3822e1f77a799ab9974c441c8e4f8556907c4fe8385358b6145ce"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 533,
-    "sha256": "4a970225cc7690da596d6f4994e2f9f7d3f4a660b5ac352b1a152c853cdb07ec"
+    "bytes": 962,
+    "sha256": "9e61bcc09d6ab0f1f06c55bd704fc4beba7df56487269e03cef711cc1b5e43c3"
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
-    "bytes": 3183,
-    "sha256": "861e9e0934492a86a4bb03c10467743b60a19b8128dfebe77131bfa1112b1c98"
+    "bytes": 3429,
+    "sha256": "ebfe721954524783f8ba0e91a2e47be9fe84c9dced43a5a1b5d23356cf25a645"
   },
   {
     "path": "docs/BUILD.md",
@@ -95,9 +95,14 @@
     "sha256": "25e99d091263631f5c380a7e9b2d27305a6147908b038f7922a8fb426305270e"
   },
   {
+    "path": "docs/PRIVACY.md",
+    "bytes": 6849,
+    "sha256": "b41a3a3a8db5d868a0095ddccc1eb2087037636b9c85df1de58b31e5d922c09d"
+  },
+  {
     "path": "docs/PRIVACY_DRAFT.md",
-    "bytes": 1617,
-    "sha256": "6d7f8b129b2ce4fcd6291b7890691a83b5e77265f79b02f69ff2c66a89f25f52"
+    "bytes": 295,
+    "sha256": "a59dc5f1263d69a423130c917568175ed13b6acae551a5fb8ed1eb5ee56330c0"
   },
   {
     "path": "docs/USB_AND_HANDOVER.md",
@@ -117,12 +122,12 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 197,
-    "sha256": "4b379750f1580d7f547b1637721531c1b478ba4f4e2d803d663dd0b1899703b4"
+    "sha256": "61d062d34905afdb749a079bad21a1c2d041cbb57aa7b7ca601e64d0829442fd"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
-    "bytes": 191,
-    "sha256": "00b4ced503b82f56aca05edfcd6e578526ed69dbb0e93ee2f5e02eee544c6965"
+    "bytes": 198,
+    "sha256": "b4826332b279598e0c789b9269b6647e16f62e8a9d72d0ac2bacf7eb8dcb2a6d"
   },
   {
     "path": "harmony/AppScope/resources/base/media/app_icon.svg",
@@ -436,8 +441,8 @@
   },
   {
     "path": "harmony/entry/src/main/resources/base/element/string.json",
-    "bytes": 180,
-    "sha256": "5579f67eff985805a2240b77cc3cc64d3db21990602c3050cf37fb0e4d78167e"
+    "bytes": 198,
+    "sha256": "b4826332b279598e0c789b9269b6647e16f62e8a9d72d0ac2bacf7eb8dcb2a6d"
   },
   {
     "path": "harmony/entry/src/main/resources/base/media/app_icon.svg",
@@ -496,8 +501,8 @@
   },
   {
     "path": "mac/Info.plist",
-    "bytes": 986,
-    "sha256": "80ec84f5a4bd831e56f8275b18ecd28545ac161d26615cd8973a7b691d924263"
+    "bytes": 1029,
+    "sha256": "23e54c673d62449697d6e9a49b713d16043d2349be1cf8398503df149fb0f625"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
