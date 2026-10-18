@@ -1,5 +1,3 @@
-* text=auto eol=lf
-*.icns binary
-*.png binary
-*.jpg binary
-*.woff2 binary
+# Preserve audited upstream bytes; Git newline conversion must not invalidate
+# the SHA-256 recovery manifest on cloud runners.
+third_party/lwip/** -text

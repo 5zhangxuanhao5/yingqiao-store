@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.12-test.2
+
+Preserve imported lwIP line endings explicitly so the Git archive matches the audited SHA-256 bytes. The test.1 candidate exposed Git normalization of upstream CRLF after manifest generation; it is not an accepted recovery archive and was not installed. Application sources/binaries are otherwise unchanged from the 0.1.12 candidate.
+
 ## store-v0.1.12-test.1
 
 Candidate: retain the user-improved 0.1.11 media core, add a consumer-mode USB RNDIS adapter using IOUSBHost and BSD-licensed lwIP, a local-source-port-gated TLS bridge, USB public-identity discovery, and authenticated measured-path selection. Hardware verified RNDIS initialization and device receive counter, but no DHCP/ARP response yet; USB streaming and real handover are not accepted. No HDC provider, private WAN runtime, system driver, microphone permission or privileged helper is added. Original personal applications remain outside the build/install scope.

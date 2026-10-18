@@ -1,8 +1,8 @@
 [
   {
     "path": ".gitattributes",
-    "bytes": 74,
-    "sha256": "8c7ed9d31085f035698b8f18f06583baa3c6e2c99574f589644a215a6dadf7e5"
+    "bytes": 154,
+    "sha256": "6e1723685246560f757a91e31e45d1e8c37bdc3944132dfbfbad053d41409669"
   },
   {
     "path": ".github/workflows/compatibility.yml",
@@ -72,12 +72,12 @@
   {
     "path": "VERSION.json",
     "bytes": 1903,
-    "sha256": "0709883071e27cdb284f88e18dfdb71e955f1c40370efc72b17df05cb159665e"
+    "sha256": "8147e9d8e4c569693a92177bb8d10f643d51edefe639473626e9e955fe88dcd5"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 6702,
-    "sha256": "797c87b80bbd7d9d55a4aeabd8ebe03840420db03fcc1324d6c8f654749ff642"
+    "bytes": 7062,
+    "sha256": "2eea63a2b760c92275b1bccd6e981ca9ccdef0bda5ec6bf3f140acef541b6677"
   },
   {
     "path": "docs/ACCEPTED_CORE_PROVENANCE.json",
