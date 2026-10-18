@@ -15,6 +15,7 @@ export class StoreDiscovery {
  private seen:Map<string,number>=new Map();
  private serviceIDs:Map<string,string>=new Map();
  private probeTimers:number[]=[];
+ private probeInterval:number=-1;
  private finder: mdns.DiscoveryService | null = null;
  private devices: StoreDiscoveredMac[] = [];
  private epoch: number = 0;
@@ -59,7 +60,7 @@ export class StoreDiscovery {
  private async scanUSB(generation:number):Promise<void>{
   if(this.usbPending)return;this.usbPending=true;
   try{const raw=await native.storeUSBDiscover();if(generation!==this.epoch)return;
-   if(!raw){this.devices=this.devices.filter((d:StoreDiscoveredMac)=>d.host!=='127.0.0.1');this.changed(this.devices.slice());return;}
+   if(!raw){const remaining:StoreDiscoveredMac[]=[];for(const d of this.devices){if(d.host!=='127.0.0.1'){remaining.push(d);continue;}const lan=d.paths.find((p:StoreDiscoveredPath)=>localIPv4(p.host));if(lan){d.host=lan.host;d.paths=d.paths.filter((p:StoreDiscoveredPath)=>p.host!=='127.0.0.1');remaining.push(d);}}this.devices=remaining;this.changed(this.devices.slice());return;}
    const value=JSON.parse(raw) as USBIdentity;const info=value.identity;
    if(info.schema!=='store-discovery-v1'||info.certificate!==value.certificate||!/^[0-9a-f]{24}$/.test(info.id)||info.port!==49563)return;
    this.acceptDevice({startRequested:info.startRequested===true,id:info.id,name:info.name.slice(0,80),host:'127.0.0.1',certificate:info.certificate,serviceName:info.id,paths:[{host:'127.0.0.1',route:'usb'}]});
@@ -67,6 +68,7 @@ export class StoreDiscovery {
  }
  probeHost(host:string):void{if(localIPv4(host)){this.rememberedHost=host;this.refreshPaths();}}
  refreshPaths():void {
+  if(this.probeInterval>=0){clearInterval(this.probeInterval);this.probeInterval=-1;}
   for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}
   this.startDatagram(this.epoch);
  }
@@ -95,8 +97,8 @@ export class StoreDiscovery {
    try{for(const net of connection.getAllNetsSync()){const props=connection.getConnectionPropertiesSync(net);for(const link of props.linkAddresses){const address=link.address.address;if(!localIPv4(address)||link.prefixLength<8||link.prefixLength>30)continue;const value=address.split('.').reduce((a:number,b:string)=>(a*256+Number(b))>>>0,0);const mask=(0xffffffff << (32-link.prefixLength))>>>0;const end=(value | ~mask)>>>0;const broadcast=[(end>>>24)&255,(end>>>16)&255,(end>>>8)&255,end&255].join('.');if(!destinations.includes(broadcast))destinations.push(broadcast);hilog.info(0x1234,'StoreDiscovery','network prefix=%{public}d',link.prefixLength);}}}catch(e){hilog.warn(0x1234,'StoreDiscovery','network info unavailable');}
    const send=():void=>{if(generation===this.epoch){for(const destination of destinations.slice(0,5))owned.send({data:`YQDISC1 ${nonce}`,address:{address:destination,port:49565,family:1}}).then(()=>hilog.info(0x1234,'StoreDiscovery','datagram sent')).catch((e:Error)=>hilog.warn(0x1234,'StoreDiscovery','datagram send error=%{public}s',e.message));}};
    send();for(const delay of [1000,3000,6000,10000]){this.probeTimers.push(setTimeout(send,delay));}
-   this.probeTimers.push(setTimeout(()=>{if(this.probe===owned){this.probe=null;owned.close().catch(()=>{});}},15000));
+   this.probeInterval=setInterval(send,8000);
   }catch(e){hilog.warn(0x1234,'StoreDiscovery','datagram unavailable error=%{public}s',(e as Error).message);if(probe)probe.close().catch(()=>{});}
  }
- stop():void {this.epoch++;if(this.usbTimer>=0){clearInterval(this.usbTimer);this.usbTimer=-1;}for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}if(this.finder){try{this.finder.stopSearchingMDNS();this.finder.off('discoveryStart');this.finder.off('serviceFound');this.finder.off('serviceLost');}catch(e){}this.finder=null;}this.devices=[];this.seen.clear();this.serviceIDs.clear();}
+ stop():void {this.epoch++;if(this.probeInterval>=0){clearInterval(this.probeInterval);this.probeInterval=-1;}if(this.usbTimer>=0){clearInterval(this.usbTimer);this.usbTimer=-1;}for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}if(this.finder){try{this.finder.stopSearchingMDNS();this.finder.off('discoveryStart');this.finder.off('serviceFound');this.finder.off('serviceLost');}catch(e){}this.finder=null;}this.devices=[];this.seen.clear();this.serviceIDs.clear();}
 }

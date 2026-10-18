@@ -15,7 +15,7 @@ import CoreImage
  var permissionAlert:NSAlert?,padChoiceAlert:NSAlert?,permissionTimer:Timer?,permissionObservationUntil:TimeInterval=0,continueInputAfterScreen=false,pendingPermissionPadID:String?
  var activePadSession:String?,retainedPadSession:String?
  var discoveryListener:NWListener?, discoveryPeers:[ObjectIdentifier:NWConnection]=[:]
- var discoveryRates:[String:Date]=[:]
+ var discoveryRates:[String:Date]=[:],discoveryAnnouncements:[String:Date]=[:]
  var advertisedService:NetService?,linkPeer:LinePeer?,linkAlert:NSAlert?
  var usbListener:NWListener?;var listener:NWListener?,identity:StoreIdentity?,controller:LinePeer?,viewer:LinePeer?,sender:VideoSender?,capture:StoreCapture?,heartbeat:Timer?
  var peers:[ObjectIdentifier:LinePeer]=[:],lastPing=Date(),generation=0,busy=false
@@ -30,7 +30,7 @@ import CoreImage
   window=NSWindow(contentRect:NSRect(x:0,y:0,width:880,height:660),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
   window.title="映桥测试版";window.center();window.isReleasedWhenClosed=false;window.contentMinSize=NSSize(width:760,height:620);window.backgroundColor=BridgeTheme.fog;window.titlebarAppearsTransparent=true;window.appearance=NSAppearance(named:.aqua)
   dashboard=StoreDashboard(target:self,stop:#selector(userEndSession),screen:#selector(screenPermission),access:#selector(accessPermission),network:#selector(prepare),relayConfig:#selector(prepare),start:#selector(startExtension),power:#selector(prepare),powerSettings:#selector(prepare),remoteAccess:#selector(prepare));window.contentView=dashboard;enable=dashboard.document.startButton
-  availability.onChanged={[weak self] in self?.syncRequestTimer();self?.updateDashboard()};availability.onClosePath={[weak self] id in guard let self,let key=self.standbyConnections.first(where:{$0.value.id==id})?.key else{return};self.standbyConnections.removeValue(forKey:key)?.peer.close()};nearbyPads.onChanged={[weak self] in self?.updateDashboard()};window.orderFront(nil);updateDashboard();DispatchQueue.main.async{[weak self] in self?.explainInitialPermissions()}
+  availability.onChanged={[weak self] in self?.syncRequestTimer();self?.updateDashboard()};availability.onClosePath={[weak self] id in guard let self,let key=self.standbyConnections.first(where:{$0.value.id==id})?.key else{return};self.standbyConnections.removeValue(forKey:key)?.peer.close()};nearbyPads.onChanged={[weak self] in self?.announceToNearbyPads();self?.updateDashboard()};window.orderFront(nil);updateDashboard();DispatchQueue.main.async{[weak self] in self?.explainInitialPermissions()}
  }
  func updateDashboard(){
   guard dashboard != nil else{return};let rows=nearbyPadRows()

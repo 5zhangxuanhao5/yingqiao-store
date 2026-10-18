@@ -1,4 +1,5 @@
 #include "store_policy.h"
+#include "store_json.h"
 #include "split_proof.h"
 #include <napi/native_api.h>
 #include <openssl/ssl.h>
@@ -21,7 +22,7 @@ namespace {
 std::mutex mutex;std::thread worker;std::atomic<bool>cancelled{false};int activeFD=-1;
 std::string phase="idle",code,result,error;
 std::string arg(napi_env env,napi_value v){size_t n=0;napi_get_value_string_utf8(env,v,nullptr,0,&n);if(n>8192)return {};std::string s(n+1,'\0');napi_get_value_string_utf8(env,v,s.data(),s.size(),&n);s.resize(n);return s;}
-std::string quote(const std::string&s){std::string o="\"";for(unsigned char c:s){if(c=='"'||c=='\\')o+='\\';if(c>=32)o+=char(c);}return o+'"';}
+std::string quote(const std::string&s){return edgelinkstore::JSONQuote(s);}
 void state(std::string p,std::string e=""){std::lock_guard<std::mutex>g(mutex);phase=std::move(p);error=std::move(e);}
 void cancel(){cancelled=true;{std::lock_guard<std::mutex>g(mutex);if(activeFD>=0)shutdown(activeFD,SHUT_RDWR);}if(worker.joinable())worker.join();}
 struct Channel{int fd=-1;SSL_CTX*ctx=nullptr;SSL*ssl=nullptr;~Channel(){if(ssl)SSL_free(ssl);if(ctx)SSL_CTX_free(ctx);{std::lock_guard<std::mutex>g(mutex);if(activeFD==fd)activeFD=-1;}if(fd>=0)close(fd);}};

@@ -2,8 +2,8 @@
   "app": {
     "bundleName": "cn.edgelink.store",
     "vendor": "Personal",
-    "versionCode": 21,
-    "versionName": "0.3.0",
+    "versionCode": 22,
+    "versionName": "0.3.1",
     "icon": "$media:app_icon",
     "label": "$string:app_name"
   }

@@ -3,7 +3,7 @@ import { NearbyPad } from '../store/NearbyPad';
 import { StoreDiscovery, StoreDiscoveredMac } from '../store/StoreDiscovery';
 import { HarmonyAccessoryCandidate } from '../store/HarmonyAccessory';
 import { pasteboard, systemDateTime, deviceInfo } from '@kit.BasicServicesKit';
-import { validatePairing, STORE_DOWNLOAD_URL, StorePairing } from '../store/StorePairing';
+import { validatePairing, STORE_DOWNLOAD_URL, STORE_INSTALL_STEPS, StorePairing } from '../store/StorePairing';
 import native, { NativeMouseSample, NativeCursorSample, AvailabilityEvent } from 'libedgelink.so';
 import { webview } from '@kit.ArkWeb';
 import { RTCArkWebTransport, RTCIceServer } from '../service/RTCArkWebTransport';
@@ -216,7 +216,7 @@ struct Index {
    this.storeDevices=devices;this.storeReadyNearby=devices.length>0;const invitation=devices.find((d:StoreDiscoveredMac)=>d.startRequested===true);if(invitation&&this.storeIntroDone&&!this.active&&!this.storeLinkPending){invitation.startRequested=false;this.pendingNearbyStart=invitation.id;}this.tryNearbyStart();this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
    this.storeDiscoverMessage=devices.length>0?'选择电脑即可连接':'还未发现电脑，请确认 Mac 上的映桥测试版已打开。';
    const known=devices.find((d:StoreDiscoveredMac)=>d.certificate===this.pairing?.cert);
-   if(known&&this.pairing){if(!this.active&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.availability?.setHost(known.host);this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
+   if(known&&this.pairing){if(!this.active&&known.host!=='127.0.0.1'&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.availability?.setHost(known.host);this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
    if(!this.storeSelectedID&&devices.length===1){this.storeSelectedID=devices[0].id;}
   },(message:string)=>this.storeDiscoverMessage=message,this.pairing?.host || '');
   this.storeDiscovery.start();
@@ -332,6 +332,7 @@ struct Index {
  @State virtualCursorOnPad: boolean = true;
  @State hostCursorVisible: boolean = false;
  @State homeWidth: number = 1000;
+ @State homeHeight:number=720;
  @State showAdvanced: boolean = false;
  private rtcController: webview.WebviewController = new webview.WebviewController();
  private rtcBridge: RTCArkWebTransport = new RTCArkWebTransport(this.rtcController);
@@ -1794,22 +1795,14 @@ struct Index {
   }.hitTestBehavior(HitTestMode.None).focusable(false)
  }
  @Builder
- private modeCard(mode: string, title: string, description: string, detail: string) {
-  Column({ space: 16 }) {
-   Row() {
-    Text(mode === 'extend' ? '＋' : '↗').fontSize(25).fontWeight(FontWeight.Medium).fontColor('#23796C')
-     .width(46).height(46).textAlign(TextAlign.Center).backgroundColor('#EDF5F1').borderRadius(13)
-    Blank()
-    Text(mode === 'extend' ? '延展工作空间' : '随时接回桌面').fontSize(12).fontColor('#607A74')
-   }.width('100%')
-   Text(title).fontSize(26).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
-   Text(description).fontSize(16).lineHeight(25).fontColor('#607A74').width('100%')
-   Text(detail).fontSize(13).fontColor('#789089').width('100%')
-   Button(this.storeLinkPending ? '连接中…' : '开启扩展屏').enabled(this.storeCanStart()).onClick(() => this.storeStartExtension())
-    .fontSize(16).fontWeight(FontWeight.Medium).fontColor('#FFFFFF').backgroundColor(this.storeCanStart()?'#23796C':'#B6C5BE')
-    .height(48).width('100%').borderRadius(12).margin({ top: 4 }).hitTestBehavior(HitTestMode.Default)
-  }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF')
-   .border({ width: 1, color: '#E0E8E4' }).borderRadius(22).height(370).hitTestBehavior(HitTestMode.Default)
+ private modeCard(mode:string,title:string,description:string,detail:string){
+  Column({space:10}){
+   Row(){Text(title).fontSize(23).fontWeight(FontWeight.Bold).fontColor('#172D2C');Blank();Text('延展工作空间').fontSize(12).fontColor('#789089')}.width('100%')
+   Text(description).fontSize(14).lineHeight(22).fontColor('#607A74').width('100%')
+   Text(detail).fontSize(12).lineHeight(20).fontColor('#789089').width('100%')
+   Blank().layoutWeight(1)
+   Button(this.storeLinkPending?'连接中…':'开启扩展屏').enabled(this.storeCanStart()).onClick(()=>this.storeStartExtension()).fontSize(16).fontWeight(FontWeight.Medium).fontColor('#FFFFFF').backgroundColor(this.storeCanStart()?'#23796C':'#B6C5BE').height(44).width('100%').borderRadius(12)
+  }.alignItems(HorizontalAlign.Start).padding(20).width('100%').height(260).backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22).hitTestBehavior(HitTestMode.Default)
  }
  @Builder
  private qualitySettings() {
@@ -1828,7 +1821,7 @@ struct Index {
  }
  @Builder
  private storeDeviceCard() {
-  Column({ space: 16 }) {
+  Column({ space: 10 }) {
    Row() {
     Text('附近的 Mac').fontSize(20).fontWeight(FontWeight.Bold).fontColor('#172D2C')
     Blank()
@@ -1838,13 +1831,13 @@ struct Index {
    Scroll(){Column({space:10}){ForEach(this.storeDevices,(device:StoreDiscoveredMac)=>{
     Button({type:ButtonType.Normal}) {
      Row({space:14}) {
-      Text('Mac').fontSize(13).fontWeight(FontWeight.Medium).fontColor('#23796C').width(46).height(46).textAlign(TextAlign.Center).backgroundColor('#EDF5F1').borderRadius(12)
+      Text('Mac').fontSize(13).fontWeight(FontWeight.Medium).fontColor('#23796C').width(36).height(36).textAlign(TextAlign.Center).backgroundColor('#EDF5F1').borderRadius(12)
       Column({space:5}) {
-       Text(device.name).fontSize(17).fontWeight(FontWeight.Medium).fontColor('#172D2C').maxLines(1).textOverflow({overflow:TextOverflow.Ellipsis}).width('100%')
+       Text(device.name).fontSize(15).fontWeight(FontWeight.Medium).fontColor('#172D2C').maxLines(1).textOverflow({overflow:TextOverflow.Ellipsis}).width('100%')
        Text(this.rememberedMacs.some((v:StorePairing)=>v.cert===device.certificate)||this.pairing?.cert===device.certificate ? '已记住 · 可连接':'可连接').fontSize(12).fontColor('#789089').width('100%')
       }.alignItems(HorizontalAlign.Start).layoutWeight(1)
       Text(this.storeLinkPending && this.storeSelectedID===device.id ? '连接中…':'连接').fontSize(14).fontColor('#23796C')
-     }.width('100%').padding(14)
+     }.width('100%').padding(10)
     }.width('100%').backgroundColor(this.storeSelectedID===device.id?'#F0F6F2':'#F7F9F8').borderRadius(14).enabled(!this.storeLinkPending).onClick(()=>{this.storeSelectedID=device.id;this.storeConnectSelected();})
    },(device:StoreDiscoveredMac)=>device.id)}}.width('100%').layoutWeight(1)
    if(this.storeLinkPending){
@@ -1854,7 +1847,7 @@ struct Index {
     }.padding(16).width('100%').backgroundColor('#EDF5F1').borderRadius(14)
    }
    Text('两端打开映桥后会自动寻找设备，连接方式由后台选择。').fontSize(13).lineHeight(22).fontColor('#789089').width('100%')
-  }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22).height(370)
+  }.alignItems(HorizontalAlign.Start).padding(20).width('100%').backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22).height(260)
  }
  @Builder
  private storeDevicePicker(){
@@ -1871,20 +1864,20 @@ struct Index {
  }
  @Builder
  private storeWelcome(){
-  Column({space:22}){
-   Text('欢迎使用映桥').fontSize(32).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
-   Text('让平板成为 Mac 的另一块屏幕').fontSize(20).fontColor('#23796C').width('100%')
-   Text('映桥需要在平板和 Mac 上同时安装。请先在 Mac 下载并打开电脑端，再回到这里连接。').fontSize(17).lineHeight(28).fontColor('#607A74').width('100%')
-   Text('1. 复制下方链接，在 Mac 浏览器打开。\n2. 在 Releases 下载 Mac 版，安装到“应用程序”并打开。\n3. 阅读电脑端的权限说明，按系统提示完成设置。\n4. 两端都打开映桥，选择附近设备即可开始。').fontSize(15).lineHeight(27).fontColor('#607A74').width('100%')
-   Text(STORE_DOWNLOAD_URL).fontSize(14).fontColor('#23796C').copyOption(CopyOptions.LocalDevice).width('100%')
-   Button('复制 Mac 下载链接').onClick(()=>this.storeCopyLink()).width('100%').height(46).backgroundColor('#EAF3EE').fontColor('#23796C')
-   Button('Mac 已安装，开始使用').onClick(()=>{this.storeIntroDone=true;this.writeFile('store-intro-v1.json','done');this.storeRefreshDiscovery();}).width('100%').height(48).backgroundColor('#23796C').fontColor('#FFFFFF')
-   Text('以后也可在首页查看下载与安装说明。').fontSize(12).fontColor('#789089')
-  }.padding(32).margin({top:36,bottom:36}).width('90%').constraintSize({maxWidth:720}).backgroundColor('#FFFFFF').borderRadius(24).alignItems(HorizontalAlign.Start)
+  Column({space:16}){
+   Text('欢迎使用映桥').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
+   Text('平板和 Mac 都要安装，才能开始扩展屏').fontSize(18).fontColor('#23796C').width('100%')
+   Text('先在 Mac 下载并打开电脑端，再回来连接。下载入口会直接打开本次测试版，不需要找源码。').fontSize(15).lineHeight(24).fontColor('#607A74').width('100%')
+   Text('① 在 Mac 打开下载链接，下载 Mac 测试版 ZIP。\n② 解压，把“映桥测试版”拖进“应用程序”并打开。\n③ 按电脑端说明完成权限设置。\n④ 回到平板，点下方“Mac 已安装，开始使用”。').fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
+   Button('复制 Mac 下载链接').onClick(()=>this.storeCopyLink()).width('100%').height(44).backgroundColor('#EAF3EE').fontColor('#23796C')
+   Button(this.storeShowInstallGuide?'收起详细安装步骤':'第一次安装？查看详细步骤').onClick(()=>this.storeShowInstallGuide=!this.storeShowInstallGuide).fontSize(13).fontColor('#23796C').backgroundColor(Color.Transparent)
+   if(this.storeShowInstallGuide){Text(STORE_INSTALL_STEPS).fontSize(14).lineHeight(25).fontColor('#607A74').width('100%');Text(STORE_DOWNLOAD_URL).fontSize(12).fontColor('#23796C').copyOption(CopyOptions.LocalDevice).width('100%')}
+   Button('Mac 已安装，开始使用').onClick(()=>{this.storeIntroDone=true;this.writeFile('store-intro-v1.json','done');this.storeRefreshDiscovery();}).width('100%').height(46).backgroundColor('#23796C').fontColor('#FFFFFF')
+  }.padding(28).width('90%').constraintSize({maxWidth:640}).backgroundColor('#FFFFFF').borderRadius(24).alignItems(HorizontalAlign.Start)
  }
  @Builder
  private home() {
-  if(!this.storeIntroDone){this.storeWelcome()}else{Column({space:26}) {
+  Column({space:20}) {
    Row({space:18}) {
     Column({space:4}) {
      Text('映桥测试版').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#172D2C')
@@ -1919,13 +1912,13 @@ struct Index {
     Divider().color('#E5ECE8')
     Button('电脑端下载与安装说明').onClick(()=>this.storeShowInstallGuide=!this.storeShowInstallGuide).fontSize(14).fontColor('#23796C').backgroundColor('#EAF3EE').height(38).borderRadius(10)
     if(this.storeShowInstallGuide){
-     Text('1. 在电脑打开下方链接，查看 Releases 和安装说明。\n2. 打开电脑端映桥，按系统提示允许录屏和键鼠控制。\n3. 两端打开后，在附近设备中选择电脑即可连接。').fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
+     Text(STORE_INSTALL_STEPS).fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
      Text(STORE_DOWNLOAD_URL).copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor('#23796C').width('100%')
      Button('复制电脑端下载链接').onClick(()=>this.storeCopyLink()).fontSize(14).fontColor('#FFFFFF').backgroundColor('#23796C').height(40).borderRadius(10)
     }
     if(this.storeError){Text(this.storeError).fontSize(13).fontColor('#A04444').width('100%')}
    }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22)
-  }.padding(this.homeWidth>=740?32:20).width('100%').constraintSize({maxWidth:1240}).alignItems(HorizontalAlign.Start)}
+  }.padding(this.homeWidth>=740?32:20).width('100%').constraintSize({maxWidth:1240}).alignItems(HorizontalAlign.Start)
  }
  @Builder
  private controls() {
@@ -1981,10 +1974,10 @@ struct Index {
     .onMouse((event: MouseEvent) => this.onJsMouse(event, 2))
    if (!this.active) {
     Scroll() {
-     this.home()
+     if(!this.storeIntroDone){Column(){this.storeWelcome()}.width('100%').constraintSize({minHeight:this.homeHeight}).padding({top:24,bottom:24}).justifyContent(FlexAlign.Center)}else{this.home()}
     }.width('100%').height('100%').align(Alignment.Top).backgroundColor('#F5F7F6').zIndex(100)
      .hitTestBehavior(HitTestMode.Default).onAreaChange((_oldValue: Area, newValue: Area) => {
-      const width = Number(newValue.width);if (Number.isFinite(width) && width > 0 && Math.abs(width - this.homeWidth) > 1) { this.homeWidth = width; }
+      const width=Number(newValue.width),height=Number(newValue.height);if(Number.isFinite(width)&&width>0&&Math.abs(width-this.homeWidth)>1)this.homeWidth=width;if(Number.isFinite(height)&&height>0&&Math.abs(height-this.homeHeight)>1)this.homeHeight=height;
      })
    } else {
     if (!this.fullScreen) {

@@ -73,3 +73,19 @@ extension StoreHost {
   }catch{discoveryListener=nil}
  }
 }
+
+
+extension StoreHost {
+ // Wake the Pad's bounded public discovery exchange after Bonjour finds it.
+ // This carries no pairing material and never starts capture or grants trust.
+ func announceToNearbyPads(){
+  let now=Date();discoveryAnnouncements=discoveryAnnouncements.filter{now.timeIntervalSince($0.value)<30}
+  for pad in nearbyPads.pads where privateLANAddress(pad.host) {
+   guard discoveryAnnouncements[pad.host].map({now.timeIntervalSince($0)>=15}) ?? true else{continue}
+   discoveryAnnouncements[pad.host]=now
+   let connection=NWConnection(host:NWEndpoint.Host(pad.host),port:49565,using:.udp)
+   connection.stateUpdateHandler={state in if case .ready=state{connection.send(content:Data("YQHELLO1".utf8),completion:.contentProcessed{_ in connection.stateUpdateHandler=nil;connection.cancel()})}else if case .failed=state{connection.stateUpdateHandler=nil;connection.cancel()}}
+   connection.start(queue:.main);DispatchQueue.main.asyncAfter(deadline:.now()+2){connection.stateUpdateHandler=nil;connection.cancel()}
+  }
+ }
+}
