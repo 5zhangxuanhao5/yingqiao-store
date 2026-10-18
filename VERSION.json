@@ -1,5 +1,5 @@
 {
-  "version": "store-v0.1.4-test.1",
+  "version": "store-v0.1.5-test.1",
   "date": "2026-10-18",
   "status": "development-preview-not-appgallery-ready",
   "publicSource": true,
@@ -32,5 +32,6 @@
     "USB mux fragmentation/parser/fairness"
   ],
   "macSelfTest": "LAN address policy only, no GUI/listener/identity/capture",
-  "releaseGateDocument": "docs/APPGALLERY_READINESS.md"
+  "releaseGateDocument": "docs/APPGALLERY_READINESS.md",
+  "discovery": "Bonjour plus bounded nonce-matched LAN datagram fallback; real Pad acceptance pending"
 }

@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.5-test.1
+
+Real Pad diagnostic showed mDNS start success with no serviceFound events. Add five foreground LAN broadcast probes over 10 seconds, closing the discovery socket after 15 seconds. Mac replies with public certificate/name/protocol and echoed nonce only, with private-address, input-size, peer-count and rate limits. TLS approval and pinned certificate trust remain unchanged. Consumer USB remains unimplemented, not substituted by HDC.
+
 ## store-v0.1.4-test.1
 
 Observed 0.1.3 readiness callback did not reach ready although Bonjour records were visible on Mac; Pad acceptance was still unverified. Place Mac async setup on the main actor and explicitly schedule Bonjour on the main run loop. Keep the restored dashboard and one-time TLS-code approval flow, with the public project owned by 5zhangxuanhao5. Real device discovery acceptance remains a separate result.

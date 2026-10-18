@@ -8,6 +8,8 @@ final class StoreHost:NSObject,NSApplicationDelegate {
  var window:NSWindow!,enable:NSButton!,dashboard:StoreDashboard!
  var statusMessage="打开平板上的映桥测试版，自动寻找设备。"{didSet{updateDashboard()}}
  var preparing=false,bonjourReady=false
+ var discoveryListener:NWListener?, discoveryPeers:[ObjectIdentifier:NWConnection]=[:]
+ var discoveryRates:[String:Date]=[:]
  var advertisedService:NetService?,linkPeer:LinePeer?,linkAlert:NSAlert?
  var listener:NWListener?,identity:StoreIdentity?,controller:LinePeer?,viewer:LinePeer?,sender:StoreFrameSender?,capture:StoreCapture?,heartbeat:Timer?
  var peers:[ObjectIdentifier:LinePeer]=[:],lastPing=Date(),generation=0,busy=false
@@ -30,7 +32,7 @@ final class StoreHost:NSObject,NSApplicationDelegate {
   guard let host=StoreIdentity.addresses().first else{statusMessage="未找到局域网地址，请让电脑和平板连接同一 Wi-Fi。";return}
   enable.isEnabled=false;statusMessage="正在生成这台电脑专属的加密配对身份…"
   preparing=true;Task{@MainActor in defer{preparing=false;updateDashboard()};do{let id=try await Task.detached{try StoreIdentity.createOrRead()}.value;identity=id;let tcp=NWProtocolTCP.Options();tcp.noDelay=true;tcp.enableKeepalive=true;let params=NWParameters(tls:try id.tlsOptions(),tcp:tcp);params.allowLocalEndpointReuse=true
-   let l=try NWListener(using:params,on:49563);listener=l;advertise(id)
+   let l=try NWListener(using:params,on:49563);listener=l;advertise(id);startDatagramDiscovery(id)
    l.newConnectionHandler={[weak self] c in self?.accept(c)};l.stateUpdateHandler={[weak self] state in if case .failed=state{self?.statusMessage="局域网监听失败，请检查端口占用。";self?.listener=nil;self?.enable.isEnabled=true}};l.start(queue:.main)
    statusMessage="在平板上选择这台 Mac，即可开启扩展屏。";enable.title="检查连接"
   }catch{listener?.cancel();listener=nil;enable.isEnabled=true;statusMessage=error.localizedDescription}}
