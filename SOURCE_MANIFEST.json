@@ -95,6 +95,11 @@
     "sha256": "9c3f89d6cb8366410065c86c68e327b97f889e7a6f6027f9597517057293d081"
   },
   {
+    "path": "docs/CONNECTION_CLEANUP_022.md",
+    "bytes": 653,
+    "sha256": "8e47415017defc0e0e908711345d703ae2e3dec4c391d9b2f40ce447e7d0ad1e"
+  },
+  {
     "path": "docs/DEVICE_TEST.md",
     "bytes": 2396,
     "sha256": "17fdc99f2da48e218889749d409a89e5d16876414e5a27f82c8f269edc8b7f57"
@@ -542,7 +547,7 @@
   {
     "path": "mac/Info.plist",
     "bytes": 1059,
-    "sha256": "20c54a35054e3316cedcbb7e848ee009720fa5e2c01f6b5b31f35e6f5792ab9e"
+    "sha256": "0302e4c41cf5491b706244a8d2cb1a64e3562e20eba4b4d597cdd1855d677add"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -681,8 +686,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 20637,
-    "sha256": "1bb72f137e349d7aedfb7e6789f97e2226f19dbcc9cc50315deaff3b4286e44e"
+    "bytes": 20749,
+    "sha256": "17457d27fa8f22e513bb60ff4243789c2244b5ea5b84dda5aac26fd7417e0039"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
