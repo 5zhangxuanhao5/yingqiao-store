@@ -1,0 +1,65 @@
+[
+  {
+    "source": "work/input-tests/single-app-20261015/src/Capture.swift",
+    "target": "mac/Sources/AcceptedCapture.swift",
+    "sourceSHA256": "02e7063347f2c14045e751304c5ca5457a57037d8f82d2ad920aa967a3d3e46c",
+    "copy": "Original capture lifecycle and encode pipeline; codec argument added for H.264 fallback. Default HEVC settings and budget behavior retained.",
+    "targetSHA256": "99a4f875f8e18f535ca761e6b4bfa7ce6028f26202e2191afbc63536eca5122d"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/BoundedCaptureLifecycle.swift",
+    "target": "mac/Sources/AcceptedBoundedCaptureLifecycle.swift",
+    "sourceSHA256": "0fb41b17492a651af09a6f28f82d13ffd21eda2f9931cd60eba6d56ee3b0825b",
+    "copy": "verbatim",
+    "targetSHA256": "0fb41b17492a651af09a6f28f82d13ffd21eda2f9931cd60eba6d56ee3b0825b"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/CaptureLifecycleDiagnostics.swift",
+    "target": "mac/Sources/AcceptedCaptureLifecycleDiagnostics.swift",
+    "sourceSHA256": "6e4a48eab0c081be763144b4c5ae8b2110c2a9ef2ccd87837f69f958b068b21e",
+    "copy": "verbatim",
+    "targetSHA256": "6e4a48eab0c081be763144b4c5ae8b2110c2a9ef2ccd87837f69f958b068b21e"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/Timing.swift",
+    "target": "mac/Sources/AcceptedTiming.swift",
+    "sourceSHA256": "cabceb06ff342cf9cd2ecbc24e64fef031c2212ac4609ecc7f26076e6a9befcd",
+    "copy": "verbatim",
+    "targetSHA256": "cabceb06ff342cf9cd2ecbc24e64fef031c2212ac4609ecc7f26076e6a9befcd"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/WANByteAdmissionBudget.swift",
+    "target": "mac/Sources/AcceptedWANByteAdmissionBudget.swift",
+    "sourceSHA256": "1f39783e4525b85531c84d9d5ea4f84d085844730854d6fd11fb30d8d751f832",
+    "copy": "verbatim",
+    "targetSHA256": "1f39783e4525b85531c84d9d5ea4f84d085844730854d6fd11fb30d8d751f832"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/Cursor.swift",
+    "target": "mac/Sources/AcceptedCursor.swift",
+    "sourceSHA256": "ce1307673956facc6e7cad6ca1d72a6e6fce9bfd79e33dbcf5d3a7c6287f3596",
+    "copy": "verbatim",
+    "targetSHA256": "ce1307673956facc6e7cad6ca1d72a6e6fce9bfd79e33dbcf5d3a7c6287f3596"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/ExtensionDisplayLayout.swift",
+    "target": "mac/Sources/AcceptedExtensionDisplayLayout.swift",
+    "sourceSHA256": "e090b8ab04f40d2c6e23e25dad19d7da4c7e5abad8590acf8c5a148cd278276d",
+    "copy": "verbatim",
+    "targetSHA256": "e090b8ab04f40d2c6e23e25dad19d7da4c7e5abad8590acf8c5a148cd278276d"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/Protocol.swift",
+    "target": "mac/Sources/AcceptedVideoSender.swift",
+    "sourceSHA256": "151724dc3184d218537bfbde30a1779cae529cf025fb98cd49bc74cab4fb6ce4",
+    "copy": "VideoSender extracted; RTC provider branches and unsupported advertised capabilities removed; LAN packetization/admission/cursor/timing retained",
+    "targetSHA256": "5e216ae32b83d7c7cc41e9e9aedbfbade2d24e76469bf2873c79fc34816d3562"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/DesktopOverview.swift",
+    "target": "mac/Sources/AcceptedDesktopOverview.swift",
+    "sourceSHA256": "c4dc60350d82a43431112fad2566f913bf5bd0a478cfdde4b26906b8e2896e92",
+    "targetSHA256": "c4dc60350d82a43431112fad2566f913bf5bd0a478cfdde4b26906b8e2896e92",
+    "copy": "verbatim"
+  }
+]

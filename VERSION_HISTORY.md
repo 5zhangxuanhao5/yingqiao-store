@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.1.11-test.1
+
+User rejected 0.1.10 clarity and asked why the proven personal version was better. Retire the simplified capture/video sender. Port the accepted NativeCapture, bounded lifecycle, timing, cursor monitor, initial layout, and VideoSender LAN implementation, retaining raw-frame permits, two in-flight hardware encodes, measured window, timed encrypted framing and independent cursor records. Remove RTC provider branches and unsupported advertised capabilities; retain isolated TLS identity and one-click approval. Restore HiDPI=1 at half-size logical display mode and full panel pixel output. Add H.264 codec selection around the original HEVC path for capability fallback. Real M4 encoder setup passed at 3120x2080 for HEVC and AVC; this is not display/performance acceptance. Consumer USB, first discovery on multicast-suppressed campus networks and full hot-plug Sidecar recovery remain open.
+
 ## store-v0.1.10-test.1
 
 0.1.9 produced real 3120x2080 HEVC frames, but the user still reported stutter. Observed Pad decode P95 about 12ms, input queue below 1ms, render-submission ACK P95 about 159ms. The fixed three-frame window constrained throughput. Restore baseline-plus-bounded-jitter window sizing from the personal-edition approach, with a 4-12 frame cap and tests for initial capacity, invalid/duplicate/cumulative ACK and high-delay bounds. Keep HEVC optional-property fallback. Smoothness is not yet accepted; this is still LAN, not consumer USB.

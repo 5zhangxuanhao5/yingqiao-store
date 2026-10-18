@@ -7,12 +7,14 @@ import CoreImage
 final class StoreHost:NSObject,NSApplicationDelegate {
  var window:NSWindow!,enable:NSButton!,dashboard:StoreDashboard!
  var statusMessage="打开平板上的映桥测试版，自动寻找设备。"{didSet{updateDashboard()}}
+ var overview:DesktopOverview?
+ var hostCursor:HostCursorMonitor?,cursorRequested=false
  var lastSessionError:String?
  var preparing=false,bonjourReady=false
  var discoveryListener:NWListener?, discoveryPeers:[ObjectIdentifier:NWConnection]=[:]
  var discoveryRates:[String:Date]=[:]
  var advertisedService:NetService?,linkPeer:LinePeer?,linkAlert:NSAlert?
- var listener:NWListener?,identity:StoreIdentity?,controller:LinePeer?,viewer:LinePeer?,sender:StoreFrameSender?,capture:StoreCapture?,heartbeat:Timer?
+ var listener:NWListener?,identity:StoreIdentity?,controller:LinePeer?,viewer:LinePeer?,sender:VideoSender?,capture:StoreCapture?,heartbeat:Timer?
  var peers:[ObjectIdentifier:LinePeer]=[:],lastPing=Date(),generation=0,busy=false
  var retainedDisplay:CGVirtualDisplay?,retentionTimer:Timer?
  let input=RemoteInput()
@@ -45,19 +47,22 @@ final class StoreHost:NSObject,NSApplicationDelegate {
  func line(_ p:LinePeer,_ line:String){let a=line.split(separator:" ").map(String.init);guard !a.isEmpty else{return}
   if a.count==3,a[0]=="LINK",a[1]=="store-v1"{requestLink(p,code:a[2]);return}
   if p !== controller {
-   if a.count==2,a[0]=="VIEW",let sender,constantEqual(a[1],sender.viewerToken),viewer==nil{viewer=p;sender.attach(p.connection);return}
+   if a.count==2,a[0]=="VIEW",let sender,constantEqual(a[1],sender.viewerToken),viewer==nil{viewer=p;sender.attachViewer(p.connection);return}
    guard a.count>=8,a[0]=="AUTH",let identity,constantEqual(a[1],identity.token),a[2]=="extend",a[6]=="tcp",a.contains("store-v1"),!busy,controller==nil,let w=Int(a[3]),let h=Int(a[4]),let fps=Int(a[5]),w>=640,h>=480,w<=3840,h<=3200,w*h<=8_000_000,w%2==0,h%2==0,[30,60].contains(fps) else{p.send("ERR local_extension_only");p.close();return}
    let codec=a.contains("codec-hevc-v1") && StoreCapture.supports(kCMVideoCodecType_HEVC) ? "hevc":"avc";guard StoreCapture.supports(codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264) else{p.send("ERR hardware_encoder_unavailable");p.close();return}
-   lastSessionError=nil;controller=p;busy=true;generation+=1;let g=generation;let sender=StoreFrameSender(fps:fps);self.sender=sender;let capture=StoreCapture(width:w,height:h,fps:fps,codec:codec,sender:sender);self.capture=capture;capture.onFailure={[weak self] text in DispatchQueue.main.async{self?.failSession(text)}}
-   statusMessage="正在创建独立扩展屏…";Task{@MainActor in do{let retained=retainedDisplay;retainedDisplay=nil;retentionTimer?.invalidate();retentionTimer=nil;let display=try await capture.start(adopting:retained);guard generation==g,controller===p,!p.closed else{_ = await capture.stop();return};try input.configure(displayID:display,extended:true);guard let topology=input.desktopTopology else{throw NSError(domain:"Topology",code:1)};p.send(sender.handshake(width:w,height:h,fps:fps,topology:topology,codec:codec));busy=false;lastPing=Date();statusMessage="扩展屏运行中 · 局域网 · \(w) × \(h) · \(codec.uppercased()) · \(fps)FPS目标";heartbeat=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in guard let self else{return};if Date().timeIntervalSince(self.lastPing)>12{self.endSession()};if var health=self.sender?.health(){health["width"]=w;health["height"]=h;health["codec"]=codec;health["route"]="lan-tcp";if let bytes=try? JSONSerialization.data(withJSONObject:health){try? bytes.write(to:StoreIdentity.directory.appendingPathComponent("stream-health.json"),options:.atomic)};self.capture?.updateRate(ackP95ms:health["ackP95ms"] as? Double ?? -1)}}}catch{p.send("ERR capture_start_failed");failSession(error.localizedDescription)}};return
+   lastSessionError=nil;controller=p;busy=true;generation+=1;let g=generation;let sender:VideoSender;do{sender=try VideoSender(port:49564,tcpMode:true,targetFPS:fps,timedFrames:true)}catch{p.send("ERR sender_setup");failSession(error.localizedDescription);return};sender.setTargetBitrate(kbps:40000);self.sender=sender;let capture=StoreCapture(width:w,height:h,fps:fps,codec:codec,sender:sender);self.capture=capture;capture.onFailure={[weak self] text in DispatchQueue.main.async{self?.failSession(text)}};sender.onRecovery={[weak capture] in capture?.requestKeyframe()};sender.onReady={[weak self,weak capture] in Task{@MainActor in guard let self,let capture,self.capture===capture else{return};do{try await capture.startMedia();self.startCoreCursor()}catch{self.failSession(error.localizedDescription)}}};sender.start()
+   statusMessage="正在创建独立扩展屏…";Task{@MainActor in do{let retained=retainedDisplay;retainedDisplay=nil;retentionTimer?.invalidate();retentionTimer=nil;let display=try await capture.start(adopting:retained);guard generation==g,controller===p,!p.closed else{_ = await capture.stop();return};try input.configure(displayID:display,extended:true);guard let topology=input.desktopTopology else{throw NSError(domain:"Topology",code:1)};p.send(sender.handshake(width:w,height:h,fps:fps,desktop:topology)+" local-handover-v1 codec-\(codec)-v1");busy=false;lastPing=Date();statusMessage="扩展屏运行中 · 局域网 · \(w) × \(h) · \(codec.uppercased()) · \(fps)FPS目标";heartbeat=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in guard let self else{return};if Date().timeIntervalSince(self.lastPing)>12{self.endSession()};if var health=self.sender?.transportStats(){health["width"]=w;health["height"]=h;health["codec"]=codec;health["route"]="lan-tcp";health["hiDPI"]=true;health["capture"]=self.capture?.stats();if let bytes=try? JSONSerialization.data(withJSONObject:health){try? bytes.write(to:StoreIdentity.directory.appendingPathComponent("stream-health.json"),options:.atomic)}}}}catch{p.send("ERR capture_start_failed");failSession(error.localizedDescription)}};return
   }
   lastPing=Date();switch a[0]{
+  case "DESKTOP":if a==["DESKTOP","overview"]{Task{@MainActor in if self.overview==nil{self.overview=DesktopOverview()};self.overview?.request(active:self.capture?.media?.startupReady==true,permission:AXIsProcessTrusted(),heldKeys:self.input.pressed.count,heldButtons:self.input.buttons.count,onChange:{})}}
+  case "TIME":if a.count==2,let t0=UInt64(a[1]){let t1=monotonicNanoseconds(),t2=monotonicNanoseconds();p.send("TIME \(t0) \(t1) \(t2)")}
+  case "CURSOR":if a.count==2{cursorRequested=a[1]=="1";sender?.enableCursor(cursorRequested);Task{@MainActor in if self.cursorRequested{self.startCoreCursor()}else{self.hostCursor?.stop();self.hostCursor=nil}}}
   case "ACK":if a.count==2,let id=UInt64(a[1]){sender?.acknowledge(id)}
   case "STOP":endSession()
   case "HANDOVER":stopSession(keepDisplay:true)
   case "RELEASE":input.reset()
   case "IDR":capture?.requestKeyframe()
-  case "MOVE":if a.count>=3,let x=Double(a[1]),let y=Double(a[2]){input.move(x,y)}
+  case "MOVE":if a.count>=3,let x=Double(a[1]),let y=Double(a[2]){if input.move(x,y,sequence:a.count>3 ? UInt64(a[3]):nil){Task{@MainActor in self.hostCursor?.remoteMoved()}}}
   case "BUTTON":if a.count>=3,let b=Int(a[1]),let d=Int(a[2]){input.button(b,d != 0,clickCount:a.count>3 ? Int(a[3]):nil)}
   case "MACKEY":if a.count==3,let code=UInt16(a[1]),code<=126{input.key("mac\(code)",code,a[2]=="1")}
   case "OPTION":if a.count==3,a[1]=="ctrlToCmd"{input.ctrlToCommand=a[2]=="1"}
@@ -69,12 +74,16 @@ final class StoreHost:NSObject,NSApplicationDelegate {
   default:break
   }
  }
+ @MainActor func startCoreCursor(){guard cursorRequested,hostCursor==nil,let capture,let id=capture.displayID else{return};let monitor=HostCursorMonitor(input:input,captureBounds:{CGDisplayBounds(id)},send:{[weak self] sample in self?.sender?.sendCursor(sample)});hostCursor=monitor;monitor.start()}
  func failSession(_ text:String){lastSessionError=text;if let bytes=try? JSONSerialization.data(withJSONObject:["message":text,"time":Date().timeIntervalSince1970]){try? bytes.write(to:StoreIdentity.directory.appendingPathComponent("last-session-error.json"),options:.atomic)};endSession()}
  @objc func endSession(){if controller==nil && capture==nil{generation+=1;busy=false};retentionTimer?.invalidate();retentionTimer=nil;retainedDisplay=nil;stopSession(keepDisplay:false)}
- func stopSession(keepDisplay:Bool){guard controller != nil || capture != nil else{return};generation+=1;let stopGeneration=generation;heartbeat?.invalidate();heartbeat=nil;input.reset();let old=capture;capture=nil;sender?.stop();sender=nil;let c=controller,v=viewer;controller=nil;viewer=nil;c?.onClose=nil;v?.onClose=nil;c?.close();v?.close();busy=true
+ func stopSession(keepDisplay:Bool){guard controller != nil || capture != nil else{return};generation+=1;let stopGeneration=generation;heartbeat?.invalidate();heartbeat=nil;cursorRequested=false;Task{@MainActor in self.hostCursor?.stop();self.hostCursor=nil};input.reset();let old=capture;capture=nil;sender?.stop();sender=nil;let c=controller,v=viewer;controller=nil;viewer=nil;c?.onClose=nil;v?.onClose=nil;c?.close();v?.close();busy=true
   Task{@MainActor in let kept=await old?.stop(keepingDisplay:keepDisplay);guard generation==stopGeneration else{return};if keepDisplay,let kept{retainedDisplay=kept;retentionTimer=Timer.scheduledTimer(withTimeInterval:10,repeats:false){[weak self] _ in self?.retainedDisplay=nil;self?.retentionTimer=nil}};busy=false;statusMessage=lastSessionError ?? (keepDisplay ? "线路暂时断开，保留工作桌面10秒等待接续。":"会话已结束，画面采集和编码已停止；可从平板再次连接。") }
  }
  func applicationShouldTerminate(_ app:NSApplication)->NSApplication.TerminateReply{guard capture != nil else{return .terminateNow};endSession();Task{@MainActor in try? await Task.sleep(nanoseconds:600_000_000);app.reply(toApplicationShouldTerminate:true)};return .terminateLater}
+}
+if CommandLine.arguments.contains("--encoder-self-test"){
+ Task{do{for codec in [kCMVideoCodecType_HEVC,kCMVideoCodecType_H264]{let sender=try VideoSender(port:0,tcpMode:true);let capture=try NativeCapture(width:3120,height:2080,fps:60,sender:sender,codec:codec);await capture.stop();sender.stop();print("PASS original-core hardware encoder",codec)};exit(0)}catch{print("FAIL original-core hardware encoder",(error as NSError).code);exit(1)}};dispatchMain()
 }
 if CommandLine.arguments.contains("--self-test"){StoreFrameWindow.selfTest();StoreEncoderSettings.selfTest();precondition(privateLANAddress("192.168.1.5"));precondition(privateLANAddress("fd00::1"));precondition(!privateLANAddress("8.8.8.8"));precondition(!privateLANAddress("100.64.0.1"));precondition(!privateLANAddress("127.0.0.1"));print("PASS store LAN address policy; no window, listener, capture, identity, or permission request");exit(0)}
 let app=NSApplication.shared,delegate=StoreHost();app.delegate=delegate;app.setActivationPolicy(.regular);app.run()
