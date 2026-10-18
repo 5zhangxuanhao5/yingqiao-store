@@ -9,3 +9,5 @@
 - Public source visibility has been authorized. A project-owned general reuse license has not been selected; do not change that grant without the owner's instruction. Preserve third-party license notices.
 - Every delivered source/build needs a commit, immutable version tag, notes, SHA-256 manifest and cloud re-download verification. All GitHub network traffic must use a verified PQJC path with no TAG fallback.
 - Never claim AppGallery approval, notarization, Windows support, minimum-OS certification, real streaming performance or perfect multi-device compatibility from compilation/fixtures alone.
+
+2026-10-18 later instruction: owner has explicitly resumed and authorized formal Huawei publication and the project-specific release signing certificate/Profile. This supersedes the earlier submission pause, not the release gates. 0.3.3 is a release-preparation source candidate; package legality passed, but consumer USB, final real-session verification, store screenshots and Mac distribution signing remain incomplete. Keep the personal edition untouched.

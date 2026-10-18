@@ -1,5 +1,9 @@
 # Version history
 
+## store-v0.3.3-rc.1
+
+Release-preparation source candidate. Add explicit first-run privacy consent and withdrawal; prevent discovery and input-device enumeration before consent; allowlist tablet settings/credentials persistence and stop storing input/performance trace files. Build using the unmodified official API26 SDK with the default tablet descriptor. Create the owner-authorized project release certificate/Profile and sign both HAP and outer APP; the first outer-unsigned attempt failed AGC991, the corrected APP passed package legality. Save a 3+ rating and function-only privacy labels in the release draft. Tablet cloud self-check is unsupported. No final review submission, consumer USB acceptance, Mac notarization or new device acceptance is claimed; installed applications and the personal edition were not changed during this preparation.
+
 ## store-v0.1.13-test.1
 
 Mac-only correction: 0.1.12 real-device testing exposed an empty USB address passed to the LAN parser, causing an out-of-range trap during discovery. Reject empty/scope-only/NUL addresses, guard USB address export, and exercise the actual path in the headless self-test. Correct the loopback NWListener creation to use its already specified local endpoint without a second port override. Harmony remains the separately installed 0.1.12 diagnostic client. USB DHCP/streaming and cable handover remain unaccepted.

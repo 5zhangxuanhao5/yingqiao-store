@@ -1,7 +1,6 @@
 import native from 'libedgelink.so';
 import { UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
-import { fileIo } from '@kit.CoreFileKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { pointer } from '@kit.InputKit';
 export default class EntryAbility extends UIAbility {
@@ -46,12 +45,8 @@ export default class EntryAbility extends UIAbility {
   AppStorage.setOrCreate('diagnosticRelativeCursor', want.parameters?.['relativeCursor'] !== 0);
   AppStorage.setOrCreate('diagnosticNoFallback', want.parameters?.['noFallback'] === 1);
  }
- private saveLifecycle(event: string): void {
-  try {
-   const f = fileIo.openSync(`${this.context.filesDir}/ability-status.json`, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.TRUNC);
-   try { fileIo.writeSync(f.fd, JSON.stringify({ event: event, time: Date.now(), native: JSON.parse(native.stats()) })); } finally { fileIo.closeSync(f); }
-  } catch (e) { hilog.error(0xED01, 'EdgeLinkLab', 'Unable to save lifecycle'); }
- }
+ // No persistent input/lifecycle diagnostics in the store release.
+ private saveLifecycle(_event: string): void {}
  // Focus loss (including a local dialog) is not a hidden streaming window.
  onForeground(): void { AppStorage.setOrCreate('remoteSessionForeground', true); }
  onBackground(): void { AppStorage.setOrCreate('remoteSessionForeground', false);native.disconnect('ability_background');this.windowFocused = false;this.publishWindowInputState();this.saveLifecycle('background'); }

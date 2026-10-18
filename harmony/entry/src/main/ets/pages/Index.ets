@@ -1,4 +1,5 @@
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { STORE_PRIVACY_VERSION, STORE_PRIVACY_TEXT } from '../store/StorePrivacy';
 import { NearbyPad } from '../store/NearbyPad';
 import { StoreDiscovery, StoreDiscoveredMac } from '../store/StoreDiscovery';
 import { HarmonyAccessoryCandidate } from '../store/HarmonyAccessory';
@@ -119,6 +120,31 @@ interface StoreLinkStatus { phase:string;code:string;error:string;pairing:string
 @Entry
 @Component
 struct Index {
+ @State storePrivacyAccepted:boolean=false;
+ @State storePrivacyDetails:boolean=false;
+ private storeRuntimeStarted:boolean=false;
+ private startStoreRuntime():void {
+  if(!this.storePrivacyAccepted||this.storeRuntimeStarted)return;
+  this.storeRuntimeStarted=true;this.watchInputDevices();this.storeFirstRun();this.loadInputDevices();
+ }
+ private acceptStorePrivacy():void {
+  this.storePrivacyAccepted=true;AppStorage.setOrCreate('storePrivacyAccepted',true);
+  this.writeFile('store-privacy-consent.json',STORE_PRIVACY_VERSION);this.startStoreRuntime();
+ }
+ private withdrawStorePrivacy():void {
+  this.stop('privacy_withdrawn');this.nearbyPad?.stop();this.nearbyPad=null;
+  this.storeDiscovery?.stop();this.storeDiscovery=null;this.storeCancelLink(false);native.storePathsStop();
+  if(this.storePathTimer>=0){clearInterval(this.storePathTimer);this.storePathTimer=-1;}
+  this.availability?.stop();this.availability=null;
+  if(this.availabilityTimer>=0){clearInterval(this.availabilityTimer);this.availabilityTimer=-1;}
+  if(this.inputDeviceWatchActive){try{inputDevice.off('change',this.inputDeviceListener);}catch(e){}this.inputDeviceWatchActive=false;}
+  this.storeStopFastHandover();this.inputDeviceEpoch++;
+  if(this.networkTimer>=0){clearInterval(this.networkTimer);this.networkTimer=-1;}
+  if(this.networkObserver){this.networkObserver.unregister(()=>{});this.networkObserver=null;}
+  this.storeRuntimeStarted=false;this.storePrivacyDetails=false;
+  this.writeFile('store-privacy-consent.json','withdrawn');this.storePrivacyAccepted=false;
+  AppStorage.setOrCreate('storePrivacyAccepted',false);this.storeDevices=[];this.storeReadyNearby=false;
+ }
  @State storeStage: number = 0;
  @State storeIntroDone:boolean=false;
  @State storeReadyNearby:boolean=false;
@@ -210,7 +236,7 @@ struct Index {
   this.storeRefreshDiscovery();
  }
  private storeRefreshDiscovery():void {
-  if(this.storeLinkPending)return;
+  if(!this.storePrivacyAccepted||this.storeLinkPending)return;
   this.storeDiscovery?.stop();this.storeDevices=[];this.storeDiscoverMessage='正在寻找附近的 Mac…';
   this.storeDiscovery=new StoreDiscovery(this.context(),(devices:StoreDiscoveredMac[])=>{
    this.storeDevices=devices;this.storeReadyNearby=devices.length>0;const invitation=devices.find((d:StoreDiscoveredMac)=>d.startRequested===true);if(invitation&&this.storeIntroDone&&!this.active&&!this.storeLinkPending){invitation.startRequested=false;this.pendingNearbyStart=invitation.id;}this.tryNearbyStart();this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
@@ -624,7 +650,10 @@ struct Index {
   });
  }
  private stopRTC(): void { this.rtcBridge.stop();this.rtcSession='';native.bindRtcEvents(); }
- aboutToAppear(): void { this.watchInputDevices();this.storeFirstRun();this.loadInputDevices(); }
+ aboutToAppear(): void {
+  try{this.storePrivacyAccepted=fileIo.readTextSync(`${this.context().filesDir}/store-privacy-consent.json`)===STORE_PRIVACY_VERSION;}catch(e){}
+  AppStorage.setOrCreate('storePrivacyAccepted',this.storePrivacyAccepted);this.startStoreRuntime();
+ }
 
  aboutToDisappear(): void {
   this.nearbyPad?.stop();this.nearbyPad=null;
@@ -694,7 +723,7 @@ struct Index {
  }
  private context(): common.UIAbilityContext { return this.getUIContext().getHostContext() as common.UIAbilityContext; }
  private prepareLocalAvailability(): void {
-  if (!this.pairing || this.availability) { return; }
+  if (!this.storePrivacyAccepted || !this.pairing || this.availability) { return; }
   this.availability = new LocalAvailability(this.context(), this.host.trim(), this.pairing.token, this.pairing.cert,
    (event: AvailabilityEvent) => this.onAvailabilityEvent(event), () => this.updateAvailabilityState());
   this.availability.start();this.updateAvailabilityState();
@@ -769,6 +798,9 @@ struct Index {
  }
  private isInternetTransport(value: number = this.transport): boolean { return value === 3 || value === 4; }
  private writeFile(name: string, value: string): void {
+  // Persist only settings and trusted-device records, never input/performance traces.
+  const allowed=['store-privacy-consent.json','store-intro-v1.json','store-macs.json','store-pad-id.txt','store-pairing.json','settings.json'];
+  if(!allowed.includes(name))return;
   try {
    const f = fileIo.openSync(`${this.context().filesDir}/${name}`, fileIo.OpenMode.CREATE | fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.TRUNC);
    try { fileIo.writeSync(f.fd, value); } finally { fileIo.closeSync(f); }
@@ -1221,6 +1253,7 @@ struct Index {
  private lastDiscoveryReport: string = '';
  private lastPerformanceLog: number = 0;
  private saveStatus(): Statistics | null {
+  if(!this.storePrivacyAccepted)return null;
   try {
    const discoveryReport = JSON.stringify({ host: this.availability?.host || '', discovery: this.availability?.discoveryStatus || '', status: this.availability?.status() });
    if (discoveryReport !== this.lastDiscoveryReport) { this.lastDiscoveryReport = discoveryReport;this.writeFile('local-discovery.json', discoveryReport); }
@@ -1863,6 +1896,19 @@ struct Index {
   }.width('100%').height('100%').zIndex(200)
  }
  @Builder
+ private storePrivacyPage(){
+  Column({space:18}){
+   Text('连接前，请先了解隐私与权限').fontSize(26).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
+   Text('映桥需要 Mac 与平板共同使用。确认后才开始附近设备发现。').fontSize(16).lineHeight(25).fontColor('#23796C').width('100%')
+   Text('画面与键鼠操作只在你允许的电脑和平板之间加密传输。设备名称、网络地址和连接凭据用于建立连接，保存在设备本地；开发者不接收画面、输入或配对资料。Mac 的录屏和辅助功能权限用于扩展桌面及操作，可在系统设置中撤销。').fontSize(14).lineHeight(24).fontColor('#607A74').width('100%')
+   Button(this.storePrivacyDetails?'收起完整隐私说明':'阅读完整隐私说明').onClick(()=>this.storePrivacyDetails=!this.storePrivacyDetails).fontSize(14).backgroundColor('#EAF3EE').fontColor('#23796C')
+   if(this.storePrivacyDetails){Scroll(){Text(STORE_PRIVACY_TEXT).fontSize(14).lineHeight(23).fontColor('#607A74').width('100%')}.width('100%').height(260)}
+   Text('可在首页“隐私与连接数据”随时查看或撤回同意。不同意时不会启动连接服务。').fontSize(13).lineHeight(22).fontColor('#789089').width('100%')
+   Button('同意并继续').onClick(()=>this.acceptStorePrivacy()).width('100%').height(46).backgroundColor('#23796C').fontColor('#FFFFFF')
+   Button('不同意，退出').onClick(()=>{this.context().terminateSelf();}).width('100%').height(42).backgroundColor('#F1F4F2').fontColor('#607A74')
+  }.padding(28).width('90%').constraintSize({maxWidth:640}).backgroundColor('#FFFFFF').borderRadius(24).alignItems(HorizontalAlign.Start)
+ }
+ @Builder
  private storeWelcome(){
   Column({space:16}){
    Text('欢迎使用映桥').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
@@ -1916,6 +1962,8 @@ struct Index {
      Text(STORE_DOWNLOAD_URL).copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor('#23796C').width('100%')
      Button('复制电脑端下载链接').onClick(()=>this.storeCopyLink()).fontSize(14).fontColor('#FFFFFF').backgroundColor('#23796C').height(40).borderRadius(10)
     }
+    Button('隐私与连接数据').onClick(()=>this.storePrivacyDetails=!this.storePrivacyDetails).fontSize(14).fontColor('#23796C').backgroundColor('#EAF3EE').height(38).borderRadius(10)
+    if(this.storePrivacyDetails){Text(STORE_PRIVACY_TEXT).fontSize(14).lineHeight(23).fontColor('#607A74').width('100%');Button('撤回同意并停止连接').onClick(()=>this.withdrawStorePrivacy()).fontColor('#8B4949').backgroundColor('#F6ECEA')}
     if(this.storeError){Text(this.storeError).fontSize(13).fontColor('#A04444').width('100%')}
    }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22)
   }.padding(this.homeWidth>=740?32:20).width('100%').constraintSize({maxWidth:1240}).alignItems(HorizontalAlign.Start)
@@ -1974,7 +2022,7 @@ struct Index {
     .onMouse((event: MouseEvent) => this.onJsMouse(event, 2))
    if (!this.active) {
     Scroll() {
-     if(!this.storeIntroDone){Column(){this.storeWelcome()}.width('100%').constraintSize({minHeight:this.homeHeight}).padding({top:24,bottom:24}).justifyContent(FlexAlign.Center)}else{this.home()}
+     if(!this.storePrivacyAccepted){Column(){this.storePrivacyPage()}.width('100%').constraintSize({minHeight:this.homeHeight}).padding({top:24,bottom:24}).justifyContent(FlexAlign.Center)}else if(!this.storeIntroDone){Column(){this.storeWelcome()}.width('100%').constraintSize({minHeight:this.homeHeight}).padding({top:24,bottom:24}).justifyContent(FlexAlign.Center)}else{this.home()}
     }.width('100%').height('100%').align(Alignment.Top).backgroundColor('#F5F7F6').zIndex(100)
      .hitTestBehavior(HitTestMode.Default).onAreaChange((_oldValue: Area, newValue: Area) => {
       const width=Number(newValue.width),height=Number(newValue.height);if(Number.isFinite(width)&&width>0&&Math.abs(width-this.homeWidth)>1)this.homeWidth=width;if(Number.isFinite(height)&&height>0&&Math.abs(height-this.homeHeight)>1)this.homeHeight=height;
