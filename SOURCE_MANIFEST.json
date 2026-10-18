@@ -1,0 +1,612 @@
+[
+  {
+    "path": ".gitattributes",
+    "bytes": 74,
+    "sha256": "8c7ed9d31085f035698b8f18f06583baa3c6e2c99574f589644a215a6dadf7e5"
+  },
+  {
+    "path": ".github/workflows/compatibility.yml",
+    "bytes": 3421,
+    "sha256": "eb41fcb2ea830797307ae77183e61e02d8b46a4af72d7323cd2962646c1e2cab"
+  },
+  {
+    "path": ".gitignore",
+    "bytes": 203,
+    "sha256": "680f0e7374c3e8503a9a01fcded591c733c0ee50c722c855ef0a84334a8314c6"
+  },
+  {
+    "path": "AGENTS.md",
+    "bytes": 1889,
+    "sha256": "00c269d38207a06dd07ae652efcca4c8b6f448c2a52caf420d3dc755f8e9a76c"
+  },
+  {
+    "path": "BASELINE.json",
+    "bytes": 376,
+    "sha256": "9d22e5e201942be15c5889ed33363dd13a2bbe818a209394d3dbae44143df681"
+  },
+  {
+    "path": "DEPENDENCIES.json",
+    "bytes": 28974,
+    "sha256": "6eb1fbe5800dd1ab4c3a3876d81bd2030a47f40d2d095b4b1957117fc7eeaf00"
+  },
+  {
+    "path": "DEPENDENCY_ARCHIVE.json",
+    "bytes": 289,
+    "sha256": "f6bc7f1710a72158bffeb0ee74bb01748a175b0cf77919b27ac0a70044b63aec"
+  },
+  {
+    "path": "LICENSE",
+    "bytes": 557,
+    "sha256": "011df007c48b0d0b6bb77b0ffe5265cf234f5fc3e52349e212165b7f75aff61f"
+  },
+  {
+    "path": "LICENSES/DeskPad-MIT.txt",
+    "bytes": 1075,
+    "sha256": "65817005ed84270e73fe24bb0aff422dceeabd12418aa96e81c6749a62dced13"
+  },
+  {
+    "path": "LICENSES/OpenSSL-Apache-2.0.txt",
+    "bytes": 10175,
+    "sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+  },
+  {
+    "path": "LICENSES/Opus-BSD.txt",
+    "bytes": 1945,
+    "sha256": "01e1167d54a096d123cf6dfbbeb19587278845c6481d2d66d545669846079551"
+  },
+  {
+    "path": "README.md",
+    "bytes": 2047,
+    "sha256": "5c040f7ec12c1027f75a9f146185f4dda5c8c02ea66ad233fb0d57216eb2bd35"
+  },
+  {
+    "path": "THIRD_PARTY_NOTICES.md",
+    "bytes": 538,
+    "sha256": "b1822bd0d9ba051d940a1c483552daff9dc7cccd2160a50112f6d11dc74efe61"
+  },
+  {
+    "path": "VALIDATION.json",
+    "bytes": 1162,
+    "sha256": "e6446abcca77748b7dcae714011f4b3372ded031ce685924d7cca0048a94b4da"
+  },
+  {
+    "path": "VERSION.json",
+    "bytes": 1055,
+    "sha256": "8353a37e194564f70f6883f0b6881adbb84f3b078c328d785155b0dffc59105d"
+  },
+  {
+    "path": "VERSION_HISTORY.md",
+    "bytes": 533,
+    "sha256": "4a970225cc7690da596d6f4994e2f9f7d3f4a660b5ac352b1a152c853cdb07ec"
+  },
+  {
+    "path": "docs/APPGALLERY_READINESS.md",
+    "bytes": 2923,
+    "sha256": "b286ffa74bc55eb43b70d53cdc009a8ecdc49ce06823fb9ccf86852f31b9b0b2"
+  },
+  {
+    "path": "docs/BUILD.md",
+    "bytes": 2977,
+    "sha256": "5fb97a5803df6e3e58eb498c694d169898f131ae531c974751a2c411254bdde6"
+  },
+  {
+    "path": "docs/MAC_INSTALL.md",
+    "bytes": 1291,
+    "sha256": "25e99d091263631f5c380a7e9b2d27305a6147908b038f7922a8fb426305270e"
+  },
+  {
+    "path": "docs/PRIVACY_DRAFT.md",
+    "bytes": 1617,
+    "sha256": "6d7f8b129b2ce4fcd6291b7890691a83b5e77265f79b02f69ff2c66a89f25f52"
+  },
+  {
+    "path": "docs/USB_AND_HANDOVER.md",
+    "bytes": 3943,
+    "sha256": "b445107d14b59c4132c40316be15fd60fdb9e7087b05d73d50a11471275dcf16"
+  },
+  {
+    "path": "docs/compatibility-catalog.json",
+    "bytes": 2310,
+    "sha256": "83865aa00f614375a963d13bea94bc3eb456c4489b996518dde777afbd59fc18"
+  },
+  {
+    "path": "docs/tablet-input-compatibility-reference.json",
+    "bytes": 117,
+    "sha256": "4acabdfeddbd24821560cf8c9f48ca46f8ae7305e9071877cc696e9b67f3fd37"
+  },
+  {
+    "path": "harmony/AppScope/app.json5",
+    "bytes": 197,
+    "sha256": "4b379750f1580d7f547b1637721531c1b478ba4f4e2d803d663dd0b1899703b4"
+  },
+  {
+    "path": "harmony/AppScope/resources/base/element/string.json",
+    "bytes": 191,
+    "sha256": "00b4ced503b82f56aca05edfcd6e578526ed69dbb0e93ee2f5e02eee544c6965"
+  },
+  {
+    "path": "harmony/AppScope/resources/base/media/app_icon.svg",
+    "bytes": 505,
+    "sha256": "73d267351f591eb836c591506ecd283f2c588c7715cbbb71fdc0cb6f937970b5"
+  },
+  {
+    "path": "harmony/README.md",
+    "bytes": 300,
+    "sha256": "69887b1033db493c20a72c5add27c9b838be0f4d2ea483a97200264dc7a3f592"
+  },
+  {
+    "path": "harmony/build-profile.json5",
+    "bytes": 538,
+    "sha256": "721c81618fcdd51bc30689a75636c5280a13704a9760e9b038d266fb10efc57c"
+  },
+  {
+    "path": "harmony/entry/build-profile.json5",
+    "bytes": 320,
+    "sha256": "63ce32421bb5acbdf4003f81ef8ab52834c1c99b1d7536f1d4699729770e6ee2"
+  },
+  {
+    "path": "harmony/entry/hvigorfile.ts",
+    "bytes": 103,
+    "sha256": "f547983dcab9c8fff87cc3ddedb22bb98063663c5b8afe18bb32e131311ec289"
+  },
+  {
+    "path": "harmony/entry/oh-package-lock.json5",
+    "bytes": 530,
+    "sha256": "7755d1c344ca244fcecc0385917d9209f0d1ca3a9b2e0cfcc8b3a3a5fe98a2c7"
+  },
+  {
+    "path": "harmony/entry/oh-package.json5",
+    "bytes": 158,
+    "sha256": "899f1d7693ed0c1d47e1f6dc5aa767dca90995c6a61610180cf34c051a481242"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/CMakeLists.txt",
+    "bytes": 1100,
+    "sha256": "a2a76eafb4f92393b466a8983c870d0d29b66d5ad201720ce7e7add77aabb842"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/audio_crypto.cpp",
+    "bytes": 5163,
+    "sha256": "f72f9c0a9334d4ff052086a568c5c147795e390b24b27139a5666f180d28c342"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/audio_crypto.h",
+    "bytes": 1474,
+    "sha256": "19e63bbce6548dbc239092f71cb7bc6f861db383fd55f54439ed3eadbbd024f9"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/audio_read_liveness.h",
+    "bytes": 780,
+    "sha256": "a63cf6c33d9734ab3c9e01c160e2bde69dcedc2e1be8fb1f410c323186625537"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/audio_ring.h",
+    "bytes": 3333,
+    "sha256": "4662676d392864228f8cb37d2a34781ef6db28c43bdc48433d4ec6597981a557"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/axis_observer.cpp",
+    "bytes": 3638,
+    "sha256": "b8c6b6728f1d359b8e063c48a522661081f7986b2b9bfca38b3f8722d563a157"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/axis_observer.h",
+    "bytes": 706,
+    "sha256": "c5232fd682a19cc112963085b998f4f453c8f17166f0f68ccacdffb61d0590de"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/client.cpp",
+    "bytes": 106978,
+    "sha256": "a378a986234f6c786d3ff095555b7367c2e5eae40c577e9375db0c71b827aa26"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/clock_refresh.h",
+    "bytes": 3094,
+    "sha256": "b00484b99174f71cdc07a95e6b73455d67db3e5c93147c6f79f4d69f759bfdbb"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/codec_probe_reference.c",
+    "bytes": 1014,
+    "sha256": "d4ec016b164d395d11bdbd4ad4c0c6c29752b4357c1b912890d56522b1a1a04f"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/control_stream_owner.h",
+    "bytes": 520,
+    "sha256": "96e4cdfcaf1db83597a62233be8c4309f796810b3920702adcf03b79128e30a9"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/cursor_channel.cpp",
+    "bytes": 11749,
+    "sha256": "54416d61587dadaf3da53a4888753569a481c3bfa8ebed0dada95def147550cd"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/cursor_channel.h",
+    "bytes": 705,
+    "sha256": "f185bd0d87d6cc273440d4165f129272e4edfa8238aa8282e7c64d9ebbd4a518"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/cursor_lock.cpp",
+    "bytes": 7835,
+    "sha256": "d58e0acae74bb68197e34aff052d5eda88068b271b77e0bcefbaea404dd8a49e"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/cursor_lock.h",
+    "bytes": 410,
+    "sha256": "eaa751f28308280b95511eb3e206951fede5f387712c8121e7fbc5da31c0f2e2"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/desktop_shortcut.h",
+    "bytes": 1549,
+    "sha256": "76a0c102f5ed25527b15499b72ce18b814976d4169efa508b9774747c3a49ac3"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/desktop_topology.h",
+    "bytes": 2378,
+    "sha256": "6466cd818ecadbbeca508f68abf1f4dc081e482ad83415724a54e86abe9b3201"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/local/availability.cpp",
+    "bytes": 37269,
+    "sha256": "0a6503320b417e5e64111ce0c4f490f763ec960297cfe9975aaddb03aab090a5"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/local/availability.h",
+    "bytes": 632,
+    "sha256": "f7e14a362241fd70d349976a1c9514fca0afbe89fb12d6acfe168d6ed8e3910d"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/mouse_node.cpp",
+    "bytes": 13141,
+    "sha256": "c361392b09d5fc605a1afb70c2f07ac9d7bf584243089f6a8c0a6ca4292e1875"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/mouse_node.h",
+    "bytes": 159,
+    "sha256": "9e14378c77b65be7a97b8963ceec5ee21a89e30606a320dc0b39d850c146a3f7"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/network.cpp",
+    "bytes": 512,
+    "sha256": "a5f4a29f278b69bec8b0a5d5bc192542f0f156bcb51e1a79365d4f6396f280c0"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/network.h",
+    "bytes": 744,
+    "sha256": "90da484b8909ce4d9a14dadbde1148c4669f1e701b9e80502f4fd495bde50d29"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/network_snapshot_freshness.h",
+    "bytes": 1443,
+    "sha256": "b1616975215d90c3136604e3b42bc8b288582af088776341699c08208eebae6c"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/opus_audio_codec.c",
+    "bytes": 2547,
+    "sha256": "858b7e10ac855d71032390cd481252c26c182e599403c5d8d4dcbb96bde8f62b"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/opus_audio_codec.h",
+    "bytes": 905,
+    "sha256": "49e73fa5b3166c5d1e0b097768f34b43d4f85ec21cc15ee39b238c0a2d1dc9fa"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/probe.cpp",
+    "bytes": 3344,
+    "sha256": "c174565660cad6343deb09e460c53e633fdac0a526896c30a96cac09856e2e59"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/remote_audio.cpp",
+    "bytes": 15097,
+    "sha256": "75c47fafdc4e92b7362ccf472a9dbb22e76b11058e4f04c12db49b4fb4caf611"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/remote_audio.h",
+    "bytes": 5510,
+    "sha256": "d6ab7703484c0dd47ab3145f7af9521bb51cd173f536deeaa52847d326ea3e3e"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/remote_audio_stub.cpp",
+    "bytes": 900,
+    "sha256": "de065b85bb595eb6e2ac7e1fa5718868205a99c9414677934a3ec59084c3c91e"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/route_selector.h",
+    "bytes": 5250,
+    "sha256": "eafb5e6979be01429afa7f06378a8ad721012896f63d5217211399e34ef448f1"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/rtc_event_channel.cpp",
+    "bytes": 5405,
+    "sha256": "a8a67c8599010a4da28ed946541e59ad6d48b26276630953cb7a491de77ba601"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/rtc_event_channel.h",
+    "bytes": 337,
+    "sha256": "836d0d2c8041c1bc98d3c13ad88c7fc9efef12a204ed11cfbe1e62083efbed92"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/rtc_media_ingress.h",
+    "bytes": 2825,
+    "sha256": "16234cbe7bc6f8e07a9cf33fc68803ece411caf3ad402763cb546f1d007785dd"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/rtc_record_ingress.h",
+    "bytes": 3363,
+    "sha256": "185ae80988fd02427551caabf6b68aa90a324d47cd5902b3e8c4600b1a637653"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/rtc_reorder_policy.h",
+    "bytes": 682,
+    "sha256": "3590d9868a3b7a06f7d8790682e3daa7654b46d1160f8565433ca32b57348bfa"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/rtc_signaling.h",
+    "bytes": 3441,
+    "sha256": "f35b5bd58c9c9521664238e3c313c945f7b44db6cc2d31b49733896640cd8c5c"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/split_policy.h",
+    "bytes": 3230,
+    "sha256": "6ee6cade2ae6240f133bbf82e9daf34ed354d007add169320d5b7600323a90ad"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/split_proof.h",
+    "bytes": 420,
+    "sha256": "3ab0073d93043fc0ff16233c13cbb08e9d43d372a2e3d022523e738f33d786a9"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/store_policy.h",
+    "bytes": 780,
+    "sha256": "13d3b9d6c46255821a2097b4cf474615149a48a7aef325c945a12af33bdf02ea"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/timing.h",
+    "bytes": 6469,
+    "sha256": "879849f816fa506063a9b94395aa4297a2c8045257e3b5e523f5f7e6f0854011"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/types/libedgelink/index.d.ts",
+    "bytes": 2728,
+    "sha256": "0ff241955754e0649da18aab1b83e32ff1ff486f91e6067a66a6e6c9e0cf64c9"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/types/libedgelink/oh-package.json5",
+    "bytes": 79,
+    "sha256": "4c46ccf172dcefd3871756405c0351db0c4ff9aa3b940454e18724e02e889535"
+  },
+  {
+    "path": "harmony/entry/src/main/cpp/wan_rate_controller.h",
+    "bytes": 6060,
+    "sha256": "976cc38e1337db2a52c6eedcc1278206057c000204eb486d70780f58099b015d"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/entryability/EntryAbility.ets",
+    "bytes": 5213,
+    "sha256": "d169d52f3b6c6ec9177b20cedf3f96c890672ba98fdd87d42eb77b3e4dad0d4c"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/pages/Index.ets",
+    "bytes": 138547,
+    "sha256": "a53c45062ebac0513e2c09680bb84a41760f60672fed9f247c3d48f5aa80d8c5"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
+    "bytes": 3966,
+    "sha256": "4270db011dd85dae4ac6b5f6768305d8565eb0302c20f3d218e5729ac9b802b3"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/service/DynamicWANRoute.ets",
+    "bytes": 12129,
+    "sha256": "1b51ab56e3e6083a7275c6dcf781dffc542f860a515b31d24f1cd47ded68b606"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/service/InternetReconnect.ets",
+    "bytes": 7989,
+    "sha256": "306d2016333ded1236a5ab2ac73dab57e30b2c74f764dbe7c46626102e33c071"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/service/LocalAvailability.ets",
+    "bytes": 7345,
+    "sha256": "3b384901e329fb3e8d5e39ef0796e2e9cb072d5cd6fd9fe37a9797fddc6507fa"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/service/RTCArkWebTransport.ets",
+    "bytes": 6028,
+    "sha256": "b3b9bfc2db7e965a1d636c9df34871955ab0af0e191473bce390ea6811438be4"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/store/HarmonyAccessory.ets",
+    "bytes": 1413,
+    "sha256": "c3513c4672a62a8a903dabd2592f372c06055c51b9b34eb55edca09a0edeb59c"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
+    "bytes": 1417,
+    "sha256": "12e6c0754c3f18ab812307ab70412c061308007943f16b67e2d4484583531f9d"
+  },
+  {
+    "path": "harmony/entry/src/main/module.json5",
+    "bytes": 1292,
+    "sha256": "d32e646847eb6458110daa6d8ae336b80e4d06f4d395933c84b898b229c6eb52"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/base/element/color.json",
+    "bytes": 98,
+    "sha256": "3ebc0b7b7f582ff204ea3426ecc37407a675719c97fbbc7db9c8912f749c48d2"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/base/element/string.json",
+    "bytes": 180,
+    "sha256": "5579f67eff985805a2240b77cc3cc64d3db21990602c3050cf37fb0e4d78167e"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/base/media/app_icon.svg",
+    "bytes": 505,
+    "sha256": "73d267351f591eb836c591506ecd283f2c588c7715cbbb71fdc0cb6f937970b5"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/base/media/bridge_connection.svg",
+    "bytes": 332,
+    "sha256": "f367edaad547f7871e9ebffea32af5003c457d8dbe34dcf4c9a7669cb2561d65"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/base/media/remote_cursor.svg",
+    "bytes": 214,
+    "sha256": "9c37c36fe5af84b42709ff0c7e0e207669ff4c4d3d40a6023b8bef2364b8fd7f"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/base/profile/easy_go.json",
+    "bytes": 14,
+    "sha256": "394e0b466e44df9fde137e01a26bcef6a0e4919a691c7767826790dcbc469e94"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/base/profile/main_pages.json",
+    "bytes": 36,
+    "sha256": "22d2d6d5175b5c198156b3b4b38ccbe3063d43e46ffe7a4a04ace768dc85479f"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/rawfile/OPUS-LICENSE.txt",
+    "bytes": 1945,
+    "sha256": "01e1167d54a096d123cf6dfbbeb19587278845c6481d2d66d545669846079551"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/rawfile/pairing.json",
+    "bytes": 82,
+    "sha256": "55a10c453dcd9c184cc11f31f5f0be3937a710674d040a23a47f1f648594b4b4"
+  },
+  {
+    "path": "harmony/entry/src/main/resources/rawfile/rtc-media.html",
+    "bytes": 20090,
+    "sha256": "f376df71a9cc32925f7491ca54547b1107efd763a6e30c6b060a1ae8dc78833d"
+  },
+  {
+    "path": "harmony/hvigor/hvigor-config.json5",
+    "bytes": 134,
+    "sha256": "8c5aed20036244893cd52fad5a216a190942d2a524e01cdc6edd22113ca6a12d"
+  },
+  {
+    "path": "harmony/hvigorfile.ts",
+    "bytes": 103,
+    "sha256": "2378c5e0c5246005ada73a67e8c9834fa08adb9ffd6fb6c219051456753bed5a"
+  },
+  {
+    "path": "harmony/oh-package.json5",
+    "bytes": 125,
+    "sha256": "fd769b4d64192f07d0ae12ee427159834765a88721bf2a5eeba0e04de01ab316"
+  },
+  {
+    "path": "mac/Info.plist",
+    "bytes": 986,
+    "sha256": "80ec84f5a4bd831e56f8275b18ecd28545ac161d26615cd8973a7b691d924263"
+  },
+  {
+    "path": "mac/Resources/AppIcon.icns",
+    "bytes": 309139,
+    "sha256": "4eba9dae0b3217acf4f16a1163824f7a0d72ce3c65c3a6947e1d8911fd0a2ca8"
+  },
+  {
+    "path": "mac/Sources/CGVirtualDisplayPrivate.h",
+    "bytes": 3169,
+    "sha256": "d970f9ac54833030fe48f0e2deb2345797229e2ad89711af62d4072a6786afbf"
+  },
+  {
+    "path": "mac/Sources/Gesture.swift",
+    "bytes": 74,
+    "sha256": "75494c124eab3cb8e0e548a76f66146ac0732fce511125492f58be8b1c7b390f"
+  },
+  {
+    "path": "mac/Sources/Input.swift",
+    "bytes": 12781,
+    "sha256": "5d9849f337a72a7e241f918c1a80d86b1d01817aad549dc7b1caabab6e120466"
+  },
+  {
+    "path": "mac/Sources/StoreCapture.swift",
+    "bytes": 7992,
+    "sha256": "dcb06ef5103c559c84d16fcaffd35efd289914978fd9ae77de8e21573b7a9ba8"
+  },
+  {
+    "path": "mac/Sources/StoreIdentity.swift",
+    "bytes": 4387,
+    "sha256": "0dd52af6eefd4f84a22581bf36e3c15f510b1aad59405f4b957730b62d04205a"
+  },
+  {
+    "path": "mac/Sources/StoreWire.swift",
+    "bytes": 4625,
+    "sha256": "3add0b70167ba703866e4eeed578f34260194df583b4d4ba8827d55ba64842d7"
+  },
+  {
+    "path": "mac/Sources/main.swift",
+    "bytes": 11080,
+    "sha256": "f6c5d63e5a324b7710a15053fb69d5553a2805cba7d82363a77d431a3e854d76"
+  },
+  {
+    "path": "mac/USB/AccessoryControl.cpp",
+    "bytes": 1694,
+    "sha256": "a31134008491541112536631453d12618368a8e8aff30ef823bcebe7d149047d"
+  },
+  {
+    "path": "mac/build.sh",
+    "bytes": 1063,
+    "sha256": "e39c0f039c0e2701f49fd7a0e1760723bc258ee017c3f98b9af519cb09b68abf"
+  },
+  {
+    "path": "shared/DisplayProfile.hpp",
+    "bytes": 1147,
+    "sha256": "67fe7f34c1c342987f0922d90974ca3bb8d95232605bfe41aac64f4a1089ad2c"
+  },
+  {
+    "path": "shared/TransportPolicy.hpp",
+    "bytes": 1629,
+    "sha256": "859ead4a36f23cdda289d654e6203a9b8e43f08d82265c5042007606b889c91a"
+  },
+  {
+    "path": "tests/policy_test.cpp",
+    "bytes": 2325,
+    "sha256": "850d3aa26831e051775233541eeb9c44878318f4653ed90ba5ccf876ea01a8c4"
+  },
+  {
+    "path": "tests/portable_profile_test.cpp",
+    "bytes": 2876,
+    "sha256": "12379eee852948e2bd759f0b42c06e406e65d02aeedd72a2d4db818c938c6709"
+  },
+  {
+    "path": "tests/usb_test.cpp",
+    "bytes": 1997,
+    "sha256": "888108c766e3ac51612d33727aaa0b90a29d0120ed36693fde1e0345d1cdea66"
+  },
+  {
+    "path": "tools/build-harmony.sh",
+    "bytes": 532,
+    "sha256": "126a2ade79a64cb00677d844f43b4d4f2bce7321de55a5c87b8a8587850fe97d"
+  },
+  {
+    "path": "tools/check-source.py",
+    "bytes": 1744,
+    "sha256": "0b7e552985dde7e64b0dbd489f77f268b6016b4942134a0df324252e7b0a9d5a"
+  },
+  {
+    "path": "tools/test-pairing.cjs",
+    "bytes": 1529,
+    "sha256": "53bbd01842297599d55f5d89150588aa0d26a0a3acbc0605d163479e4a13e547"
+  },
+  {
+    "path": "usb/AccessoryProtocol.hpp",
+    "bytes": 1691,
+    "sha256": "4bf6c02e8aa42d6de7fd945201917b77479ef8d9005ace59c757ce13a14ea691"
+  },
+  {
+    "path": "usb/StreamMux.hpp",
+    "bytes": 2226,
+    "sha256": "3aa1665c8e1bc25209729445cfe97ee25417e46f30e6d0787c0a5a76ab323a51"
+  },
+  {
+    "path": "windows/Inspect-Capabilities.ps1",
+    "bytes": 721,
+    "sha256": "369eb36296687c2f66b772ec8f6a65867c21c91e8b44d7efc739973d0415f1ee"
+  },
+  {
+    "path": "windows/README.md",
+    "bytes": 688,
+    "sha256": "42b8195c6705006d0273f54535acaeb24b7bc466f801803a5e5b994578b162e5"
+  }
+]

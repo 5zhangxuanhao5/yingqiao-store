@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="jade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2D8A7A"/>
+      <stop offset="1" stop-color="#216D62"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#jade)"/>
+  <path d="M280 661V470C407 271 617 271 744 470V661M380 680H644" fill="none" stroke="#FFFFFF" stroke-width="46" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

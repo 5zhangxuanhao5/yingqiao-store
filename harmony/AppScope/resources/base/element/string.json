@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "映桥"
+    },
+    {
+      "name": "module_desc",
+      "value": "Mac 与 MatePad Edge 原生低延迟链路验证"
+    }
+  ]
+}

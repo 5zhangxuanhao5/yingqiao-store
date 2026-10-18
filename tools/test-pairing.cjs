@@ -1,0 +1,14 @@
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+const ts = require(process.env.ETS_TYPESCRIPT_PATH || '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/ets/build-tools/ets-loader/node_modules/typescript');
+const code = fs.readFileSync(path.join(__dirname,'../harmony/entry/src/main/ets/store/StorePairing.ets'),'utf8');
+const result = ts.transpileModule(code,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}});
+const sandbox = {exports:{}};vm.runInNewContext(result.outputText,sandbox);
+const validate=sandbox.exports.validatePairing;
+const valid={schema:'yingqiao-pairing-v1',host:'192.168.1.3',token:'f'.repeat(64),cert:'-----BEGIN CERTIFICATE-----\nsynthetic_fixture_not_a_usable_certificate\n-----END CERTIFICATE-----',port:49563,udpPort:49564,codecs:['avc']};
+if(!validate(JSON.stringify(valid)))throw Error('synthetic shape rejected');
+const invalid=[null,{},'broken', {...valid,host:'8.8.8.8'}, {...valid,host:'192.168.001.3'},{...valid,host:'127.0.0.1'},{...valid,port:48561},{...valid,token:'bad'},{...valid,cert:'no cert'},{...valid,codecs:['remote']},{...valid,codecs:[]},{...valid,host:'192.168.1.3.evil'}];
+for(const v of invalid)if(validate(JSON.stringify(v)))throw Error('untrusted pairing accepted');
+if(validate('x'.repeat(12289)))throw Error('oversize accepted');
+console.log('PASS explicit local pairing shape, public/loopback/malformed endpoint rejection and length limits. Certificate authenticity still requires native TLS.');

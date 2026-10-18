@@ -1,0 +1,16 @@
+{
+  "verifiedDocumentationDate": "2026-10-18",
+  "purpose": "Geometry fixtures and research; never a claim that these devices passed real streaming or USB tests.",
+  "runtimeRule": "Actual display/window pixels, refresh and codec capability override model marketing specifications.",
+  "models": [
+    {"model":"MatePad Edge","width":3120,"height":2080,"source":"https://consumer.huawei.com/cn/tablets/matepad-edge/specs/","validation":"geometry_fixture_only"},
+    {"model":"MatePad Pro 13.2","width":2880,"height":1920,"source":"https://consumer.huawei.com/sg/tablets/matepad-pro-13-2/specs/","validation":"geometry_fixture_only"},
+    {"model":"MatePad Pro 12.2 (2024)","width":2800,"height":1840,"source":"https://consumer.huawei.com/uk/tablets/matepad-pro-12-2-2024/specs/","validation":"geometry_fixture_only"},
+    {"model":"MatePad 11.5 S (2025, China)","width":2800,"height":1840,"source":"https://consumer.huawei.com/cn/tablets/matepad-11-5-s-2025/specs/","validation":"geometry_fixture_only"},
+    {"model":"MatePad 11.5 (2025)","width":2456,"height":1600,"source":"https://consumer.huawei.com/gh/tablets/matepad-11-5-2025/specs/","validation":"geometry_fixture_only"},
+    {"model":"MatePad Mini","width":2560,"height":1600,"source":"https://consumer.huawei.com/cn/tablets/matepad-mini/specs/","validation":"geometry_fixture_only"}
+  ],
+  "importantRegionalDifference": {"model":"MatePad 11.5 S 2026 (global)","shippingOS":"HarmonyOS 4.3","source":"https://consumer.huawei.com/en/tablets/matepad-11-5-s-2026/specs/","consequence":"Same pixels do not imply native HAP compatibility. Requires a separate Android client; not supported by this prototype."},
+  "mac": {"buildTargets":["arm64 macOS 13+","x86_64 macOS 13+"],"conditions":["ScreenCaptureKit available","hardware H264 or HEVC encoder","CGVirtualDisplay runtime available","user screen capture and accessibility permission"],"evidence":"Both architectures compiled. Only arm64 noninteractive address-policy self-test executed. No Intel, old macOS or new display session has been certified."},
+  "harmony": {"prototypeMinimumAPI":24,"targetAPI":26,"rationale":"Retained native input paths contain API24 symbols. Lowering the manifest alone is unsafe.","deviceClass":"tablet","screenPolicy":"orientation/ratio based, not Edge model locked"}
+}

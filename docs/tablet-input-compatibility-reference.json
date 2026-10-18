@@ -1,0 +1,8 @@
+{
+  "common": {},
+  "tablet": {
+    "multiModalInputOptions": {
+      "mouse2TouchEventMode": "disabled"
+    }
+  }
+}

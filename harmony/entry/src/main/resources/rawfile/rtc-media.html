@@ -1,0 +1,240 @@
+<!doctype html><meta charset='utf-8'><script>/* Frozen local-only bridge. No camera, microphone, network account or credential.
+ * Production signaling MUST be carried by the existing authenticated control peer.
+ * Browser transport does not authenticate the application session by itself.
+ */
+(() => {
+  'use strict';
+  const state = { epoch: 0, pcs: [], channels: [], closed: true, parts: new Map(),
+    sent: 0, received: 0, expired: 0, rejected: 0, queueDrops: 0, peakBuffered: 0, recordBudgetMs: 100, echoCompleteRecords: false, videoRecords: 0, keyframeRecords: 0, deltaRecords: 0, lastVideoBytes: 0, largestVideoBytes: 0, lastKeyframeBytes: 0, largestKeyframeBytes: 0 };
+  let port = null, assemblyTimer = null, probeTimer = null, pendingCandidates = [], signalSession = '';
+  const emit = (value) => {
+    if (port) port.postMessage(typeof value === 'string' || value instanceof ArrayBuffer ? value : JSON.stringify(value));
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.rtcProof && !(value instanceof ArrayBuffer))
+      window.webkit.messageHandlers.rtcProof.postMessage(value);
+  };
+  const status = (event, detail = {}) => emit(Object.assign({ event, epoch: state.epoch }, detail));
+  const stop = () => {
+    state.closed = true; state.epoch++; state.parts.clear();
+    if (assemblyTimer) clearInterval(assemblyTimer); assemblyTimer = null;
+    if (probeTimer) clearTimeout(probeTimer); probeTimer = null;
+    pendingCandidates = []; signalSession = '';
+    state.channels.forEach(c => { c.onmessage = c.onopen = c.onerror = null; c.close(); });
+    state.pcs.forEach(p => { p.onicecandidate = p.ondatachannel = null; p.close(); });
+    state.channels = []; state.pcs = [];
+  };
+  function expireAssemblies() {
+    const now = performance.now();
+    for (const [key, item] of state.parts) if (now - item.created > state.recordBudgetMs) {
+      state.parts.delete(key); state.expired++; status('idr-needed', { reason: 'assembly-expired' });
+    }
+  }
+  function beginSession(budgetMs = 100) { stop(); if (![100, 300, 500].includes(budgetMs)) throw Error("record deadline"); state.recordBudgetMs = budgetMs; state.echoCompleteRecords = false; state.sent = state.received = state.expired = state.rejected = state.queueDrops = state.peakBuffered = 0; state.videoRecords = state.keyframeRecords = state.deltaRecords = state.lastVideoBytes = state.largestVideoBytes = state.lastKeyframeBytes = state.largestKeyframeBytes = 0; state.closed = false; assemblyTimer = setInterval(expireAssemblies, 20); }
+  function bytesToBase64(bytes) {
+    let output = ''; for (let n = 0; n < bytes.length; n += 8192)
+      output += String.fromCharCode(...bytes.subarray(n, Math.min(n + 8192, bytes.length)));
+    return btoa(output);
+  }
+  function parseRecord(record) {
+    if (!(record instanceof ArrayBuffer) || record.byteLength < 44 || record.byteLength > 2 * 1024 * 1024) throw Error('record length');
+    const p = new Uint8Array(record), v = new DataView(record);
+    if (p[0] !== 69 || p[1] !== 68 || p[2] !== 76 || p[3] !== 49 || v.getUint16(16) !== 0 || v.getUint16(18) !== 1 ||
+        v.getUint32(20) !== record.byteLength - 28 || p[25] !== 0 || v.getUint16(26) !== 0) throw Error('record fields');
+    return { p, v, id: `${v.getUint32(4)}:${v.getUint32(8)}:${v.getUint32(12)}`, total: v.getUint32(20) };
+  }
+  function receive(packet) {
+    if (state.closed) return;
+    if (!(packet instanceof ArrayBuffer) || packet.byteLength < 29 || packet.byteLength > 1028) { state.rejected++; return; }
+    const p = new Uint8Array(packet), v = new DataView(packet);
+    const index = v.getUint16(16), count = v.getUint16(18), total = v.getUint32(20);
+    if (p[0] !== 69 || p[1] !== 68 || p[2] !== 76 || p[3] !== 49 || !([0,2].includes(p[25])) || v.getUint16(26) !== 0 || total < 16 || total > 2 * 1024 * 1024 ||
+        count !== Math.ceil(total / 1000) || index >= count || p.length !== 28 + Math.min(1000, total - index * 1000)) { state.rejected++; return; }
+    const id = `${v.getUint32(4)}:${v.getUint32(8)}:${v.getUint32(12)}`, now = performance.now();
+    for (const [key, item] of state.parts) if (now - item.created > state.recordBudgetMs) { state.parts.delete(key); state.expired++; status('idr-needed', { reason: 'assembly-expired' }); }
+    let item = state.parts.get(id);
+    if (!item) {
+      if (state.parts.size >= 4 || [...state.parts.values()].reduce((n, p) => n + p.total, 0) + total > 2 * 1024 * 1024) { state.rejected++; status('idr-needed', { reason: 'assembly-cap' }); return; }
+      item = { created: now, header: p.slice(0, 28), body: new Uint8Array(total), seen: new Set(), count, total };
+      state.parts.set(id, item);
+    }
+    if (item.count !== count || item.total !== total || item.header[24] !== p[24] || item.header[25] !== p[25]) { state.parts.delete(id); state.rejected++; return; }
+    if (!item.seen.has(index)) { item.seen.add(index); item.body.set(p.subarray(28), index * 1000); }
+    if (item.seen.size === count) {
+      state.parts.delete(id); state.received++;
+      new DataView(item.header.buffer).setUint16(16, 0); new DataView(item.header.buffer).setUint16(18, 1);
+      const record = new Uint8Array(28 + total); record.set(item.header); record.set(item.body, 28);
+      if (item.header[25] === 0) {
+        state.videoRecords++; state.lastVideoBytes = record.byteLength; state.largestVideoBytes = Math.max(state.largestVideoBytes, record.byteLength);
+        if (item.header[24] & 1) { state.keyframeRecords++; state.lastKeyframeBytes = record.byteLength; state.largestKeyframeBytes = Math.max(state.largestKeyframeBytes, record.byteLength); }
+        else state.deltaRecords++;
+      }
+      if (port) port.postMessage(record.buffer);
+      // Diagnostic-only ACK: browser assembly completion, before native AES.
+      // DTLS protects this message; it is not a native-verifier ACK.
+      if (state.echoCompleteRecords && state.channels[0] && state.channels[0].readyState === 'open') {
+        const ack = new Uint8Array(16); ack.set([69,68,76,65]); ack.set(record.subarray(4,16),4);
+        state.channels[0].send(ack.buffer);
+      }
+      if (window.webkit && window.webkit.messageHandlers)
+        window.webkit.messageHandlers.rtcProof.postMessage({ event: 'record', epoch: state.epoch, base64: bytesToBase64(record) });
+    }
+  }
+  function attach(channel, receiver) {
+    const epoch = state.epoch;
+    if (state.closed) { channel.close(); return; }
+    channel.binaryType = 'arraybuffer'; state.channels.push(channel);
+    channel.onopen = () => { if (!state.closed && epoch === state.epoch) status('channel-open', { receiver, ordered: channel.ordered, maxPacketLifeTime: channel.maxPacketLifeTime, maxRetransmits: channel.maxRetransmits }); };
+    channel.onerror = () => { if (!state.closed && epoch === state.epoch) status('channel-error'); };
+    if (receiver) channel.onmessage = e => { if (!state.closed && epoch === state.epoch) receive(e.data); };
+  }
+  async function loopback(options = {}) {
+    beginSession(); const epoch = state.epoch;
+    if (typeof RTCPeerConnection !== 'function') throw Error('RTCPeerConnection unavailable');
+    // Configuration parse is verified, not TURN reachability. No external endpoint contacted.
+    const syntax = new RTCPeerConnection({ iceServers: [{ urls: ['turns:turn.cloudflare.com:443?transport=tcp', 'turns:turn.cloudflare.com:5349?transport=tcp'], username: 'local-syntax-only', credential: 'not-a-service-key' }], iceTransportPolicy: 'relay' });
+    syntax.close();
+    const config = { iceServers: options.iceServers || [], iceTransportPolicy: options.relayOnly ? 'relay' : 'all' };
+    const a = new RTCPeerConnection(config), b = new RTCPeerConnection(config); state.pcs = [a, b];
+    for (const p of state.pcs) p.onicecandidateerror = e => status('ice-error', { code: e.errorCode, text: e.errorText, url: e.url });
+    const candidatesA = [], candidatesB = [];
+    a.onicecandidate = e => { if (e.candidate && !state.closed && epoch === state.epoch) { if (b.remoteDescription) b.addIceCandidate(e.candidate).catch(err => status('candidate-error', { message: err.message })); else candidatesA.push(e.candidate); } };
+    b.onicecandidate = e => { if (e.candidate && !state.closed && epoch === state.epoch) { if (a.remoteDescription) a.addIceCandidate(e.candidate).catch(err => status('candidate-error', { message: err.message })); else candidatesB.push(e.candidate); } };
+    b.ondatachannel = e => attach(e.channel, true);
+    attach(a.createDataChannel('edl1-encrypted-fragments', { ordered: false, maxPacketLifeTime: 100 }), false);
+    await a.setLocalDescription(await a.createOffer()); if (state.closed || epoch !== state.epoch) return;
+    await b.setRemoteDescription(a.localDescription); for (const c of candidatesA) await b.addIceCandidate(c);
+    await b.setLocalDescription(await b.createAnswer()); await a.setRemoteDescription(b.localDescription); for (const c of candidatesB) await a.addIceCandidate(c);
+    status('negotiated', { rtcpPeerConnection: true, turnTlsSyntaxAccepted: true, dtlsFingerprintPresent: a.localDescription.sdp.includes('a=fingerprint:'), externalServerUsed: !!options.relayOnly });
+  }
+  async function tlsReachabilityProbe(portNumber, plainOpenRelay = false) {
+    if (!(plainOpenRelay ? [80, 443] : [443, 5349]).includes(portNumber)) throw Error('probe port');
+    beginSession(); const epoch = state.epoch, began = performance.now(), errors = [];
+    const serverURL = plainOpenRelay ? `turn:staticauth.openrelay.metered.ca:${portNumber}?transport=tcp` : `turns:turn.cloudflare.com:${portNumber}?transport=tcp`;
+    const p = new RTCPeerConnection({ iceTransportPolicy: 'relay', iceServers: [{
+      urls: serverURL,
+      username: 'edgelink-readonly-incorrect-credential', credential: 'invalid-probe-placeholder'
+    }] }); state.pcs = [p];
+    p.onicecandidateerror = e => {
+      if (!state.closed && epoch === state.epoch) {
+        const value = { code: e.errorCode, text: String(e.errorText || '').substring(0, 512), elapsedMs: performance.now() - began };
+        errors.push(value); status('tls-probe-error', value);
+      }
+    };
+    p.onicecandidate = e => {
+      // Deliberately no candidate address in logs. A relay with bogus auth
+      // would be unexpected and cannot be promoted to a valid connection.
+      if (e.candidate && e.candidate.type === 'relay') status('tls-probe-unexpected-relay');
+    };
+    const c = p.createDataChannel('read-only-ice-probe'); state.channels = [c];
+    probeTimer = setTimeout(() => {
+      if (state.closed || epoch !== state.epoch) return;
+      status('tls-probe-complete', { port: portNumber, elapsedMs: performance.now() - began, errors,
+        rtcPeerConnectionAvailable: true, configuredProtocol: plainOpenRelay ? 'TURN/TCP' : 'TURN/TLS', validCredentialUsed: false,
+        mediaBytesSent: 0, relayAllocationVerified: false }); stop();
+    }, 8000);
+    await p.setLocalDescription(await p.createOffer());
+    if (state.closed || epoch !== state.epoch) return;
+    status('tls-probe-started', { port: portNumber, maximumProbeMs: 8000, validCredentialUsed: false });
+  }
+  // Transport adapter: native caller binds this session to its already paired
+  // TLS peer, validates the complete signaling envelope and never accepts SDP
+  // from a web URL. ICE credentials stay in memory, never emitted as diagnostics.
+  async function createPeer(options) {
+    if (!options || typeof options.session !== 'string' || !/^[a-f0-9]{32,128}$/.test(options.session) ||
+        !['sender', 'receiver'].includes(options.role) || !Array.isArray(options.iceServers) || options.iceServers.length > 8) throw Error('peer options');
+    const servers = options.iceServers.map(s => {
+      const urls = Array.isArray(s.urls) ? s.urls : [s.urls];
+      if (urls.length > 8 || urls.some(u => typeof u !== 'string' || u.length > 512 || !/^(stun|turn|turns):[A-Za-z0-9.:[\]-]+(:[0-9]+)?(\?transport=(udp|tcp))?$/.test(u))) throw Error('ICE URL');
+      if ((s.username && (typeof s.username !== 'string' || s.username.length > 512)) || (s.credential && (typeof s.credential !== 'string' || s.credential.length > 1024))) throw Error('ICE credential size');
+      return { urls, username: s.username, credential: s.credential };
+    });
+    beginSession(options.recordBudgetMs || 100); state.echoCompleteRecords = options.echoCompleteRecords === true; signalSession = options.session; const epoch = state.epoch;
+    const p = new RTCPeerConnection({ iceServers: servers, iceTransportPolicy: options.relayOnly ? 'relay' : 'all' }); state.pcs = [p];
+    p.onicecandidate = e => { if (e.candidate && !state.closed && epoch === state.epoch) status('signal', { session: signalSession, candidate: e.candidate.toJSON() }); };
+    p.onicecandidateerror = e => { if (!state.closed && epoch === state.epoch) status('ice-error', { code: e.errorCode, text: String(e.errorText || '').replace(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/g,'[address]').substring(0,512) }); };
+    p.oniceconnectionstatechange = () => { if (!state.closed && epoch === state.epoch) status('ice-state', { state: p.iceConnectionState }); };
+    p.onconnectionstatechange = () => { if (!state.closed && epoch === state.epoch) status('connection-state', { state: p.connectionState }); };
+    if (options.role === 'sender') {
+      attach(p.createDataChannel('edl1-encrypted-fragments', { ordered: false, maxPacketLifeTime: state.recordBudgetMs }), false);
+      await p.setLocalDescription(await p.createOffer());
+      if (!state.closed && epoch === state.epoch) status('signal', { session: signalSession, description: p.localDescription.toJSON() });
+    } else p.ondatachannel = e => { if (state.closed || epoch !== state.epoch) { e.channel.close(); return; } attach(e.channel, true); };
+  }
+  async function acceptSignal(signal) {
+    if (!signal || state.closed || signal.session !== signalSession || !state.pcs[0]) throw Error('stale signal');
+    const p = state.pcs[0], epoch = state.epoch;
+    if (signal.description) {
+      const d = signal.description;
+      if (!['offer', 'answer'].includes(d.type) || typeof d.sdp !== 'string' || d.sdp.length > 65536 || !d.sdp.includes('a=fingerprint:')) throw Error('SDP bounds/fingerprint');
+      await p.setRemoteDescription(d); if (state.closed || epoch !== state.epoch) return;
+      for (const c of pendingCandidates) await p.addIceCandidate(c); pendingCandidates = [];
+      if (d.type === 'offer') {
+        await p.setLocalDescription(await p.createAnswer());
+        if (!state.closed && epoch === state.epoch) status('signal', { session: signalSession, description: p.localDescription.toJSON() });
+      }
+    } else if (signal.candidate) {
+      const c = signal.candidate;
+      if (typeof c.candidate !== 'string' || c.candidate.length > 2048 || !Number.isInteger(c.sdpMLineIndex) || c.sdpMLineIndex < 0 || c.sdpMLineIndex > 8) throw Error('candidate bounds');
+      if (p.remoteDescription) await p.addIceCandidate(c);
+      else { if (pendingCandidates.length >= 64) throw Error('candidate count'); pendingCandidates.push(c); }
+    } else throw Error('empty signal');
+  }
+  function send(record, reverse = false) {
+    const c = state.channels[0]; if (state.closed || !c || c.readyState !== 'open') return false;
+    const { p, total } = parseRecord(record), count = Math.ceil(total / 1000);
+    if (c.bufferedAmount + total + count * 28 > 256 * 1024) { state.queueDrops++; status('idr-needed', { reason: 'send-budget' }); return false; }
+    // Admission at a complete frame boundary. Do not partially submit a frame.
+    for (let n = 0; n < count; n++) {
+      const index = reverse ? count - 1 - n : n;
+      const packet = new Uint8Array(28 + Math.min(1000, total - index * 1000)); packet.set(p.subarray(0, 28));
+      const view = new DataView(packet.buffer); view.setUint16(16, index); view.setUint16(18, count);
+      packet.set(p.subarray(28 + index * 1000, 28 + Math.min(total, (index + 1) * 1000)), 28); c.send(packet.buffer);
+      state.peakBuffered = Math.max(state.peakBuffered, c.bufferedAmount);
+    }
+    state.sent++; return true;
+  }
+  async function snapshot() {
+    let selected = null, local = null, remote = null, relayCandidates = 0;
+    if (state.pcs[0]) {
+      const report = await state.pcs[0].getStats();
+      report.forEach(s => { if (s.type === 'transport' && s.selectedCandidatePairId) selected = report.get(s.selectedCandidatePairId);
+        if (s.type === 'local-candidate' && s.candidateType === 'relay') relayCandidates++; });
+      if (!selected) report.forEach(s => { if (s.type === 'candidate-pair' && s.nominated && s.state === 'succeeded') selected = s; });
+      if (selected) { local = report.get(selected.localCandidateId); remote = report.get(selected.remoteCandidateId); }
+    }
+    return { sent: state.sent, received: state.received, rejected: state.rejected, expired: state.expired, queueDrops: state.queueDrops, peakBuffered: state.peakBuffered,
+      recordBudgetMs: state.recordBudgetMs, applicationFragmentBodyBytes: 1000, localRelayCandidateCount: relayCandidates,
+      selectedPair: selected ? { state: selected.state, currentRoundTripTime: selected.currentRoundTripTime,
+        bytesSent: selected.bytesSent, bytesReceived: selected.bytesReceived,
+        localType: local && local.candidateType, remoteType: remote && remote.candidateType, protocol: local && local.protocol,
+        relayProtocol: local && local.relayProtocol, url: local && local.url } : null };
+  }
+  function sendRenderAckNative(session, sidText, idText) {
+    const channel = state.channels[0];
+    if (state.closed || session !== signalSession || !channel || channel.readyState !== 'open' ||
+        !/^[0-9]{1,10}$/.test(sidText) || !/^[1-9][0-9]{0,18}$/.test(idText)) return false;
+    const sid=Number(sidText), id=BigInt(idText);
+    if(!Number.isSafeInteger(sid) || sid<0 || sid>4294967295 || id>=9223372036854775808n)return false;
+    const ack=new Uint8Array(16),v=new DataView(ack.buffer);ack.set([69,68,76,82]);v.setUint32(4,sid);v.setUint32(8,Number(id>>32n));v.setUint32(12,Number(id&4294967295n));
+    channel.send(ack.buffer);return true;
+  }
+  window.rtcBridge = { reportSafeSnapshot() {
+    if (state.closed) return;
+    // Only approved scalar counters/lengths. Never ICE credentials, SDP,
+    // candidate addresses, user-agent or error text.
+    status('safe-snapshot', { received: state.received, expired: state.expired, rejected: state.rejected, queueDrops: state.queueDrops,
+      videoRecords: state.videoRecords, keyframeRecords: state.keyframeRecords, deltaRecords: state.deltaRecords,
+      lastVideoBytes: state.lastVideoBytes, largestVideoBytes: state.largestVideoBytes, lastKeyframeBytes: state.lastKeyframeBytes,
+      largestKeyframeBytes: state.largestKeyframeBytes, recordBudgetMs: state.recordBudgetMs });
+  }, sendRenderAckNative, loopback, tlsReachabilityProbe, createPeer, acceptSignal, send, stop, snapshot, reportSnapshot(transport) { status('snapshot', { transport }); }, reportFailure(message) { status('failure', { message: String(message).substring(0,512) }); }, snapshotSync() { return { sent: state.sent, received: state.received, rejected: state.rejected, expired: state.expired, queueDrops: state.queueDrops, peakBuffered: state.peakBuffered }; }, sendBase64(base64) {
+    const raw = atob(base64), bytes = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    return send(bytes.buffer, true);
+  } };
+  window.addEventListener('message', e => {
+    if (e.data !== 'edgelink-rtc-port-v1' || !e.ports || e.ports.length !== 1) return;
+    if (port) port.close(); port = e.ports[0]; port.onmessage = event => {
+      if (event.data instanceof ArrayBuffer) { try { if (!send(event.data, true)) status('send-rejected'); } catch (err) { status('send-error', { message: err.message }); } }
+    }; port.start(); status('port-ready');
+  });
+  status('engine-ready', { secureContext: window.isSecureContext, userAgent: navigator.userAgent, rtcPeerConnectionAvailable: typeof RTCPeerConnection === 'function' });
+})();
+</script>

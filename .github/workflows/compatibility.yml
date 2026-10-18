@@ -1,0 +1,74 @@
+name: Compatibility simulation and compilation
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  portable:
+    name: Portable policies (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - run: python3 tools/check-source.py
+        if: runner.os != 'Windows'
+      - run: python tools/check-source.py
+        if: runner.os == 'Windows'
+      - name: Compile and run Linux fixtures
+        if: runner.os == 'Linux'
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror tests/portable_profile_test.cpp -o portable-test
+          ./portable-test
+          g++ -std=c++17 -Wall -Wextra -Werror tests/usb_test.cpp -o usb-test
+          ./usb-test
+          g++ -std=c++17 -Wall -Wextra -Werror tests/policy_test.cpp -o policy-test
+          ./policy-test
+      - name: Compile and run Windows fixtures (not a Windows display driver)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC installation unavailable' }
+          $vcvars = Join-Path $vs 'VC\Auxiliary\Build\vcvars64.bat'
+          $script = "@call `"$vcvars`" >nul`r`ncl /nologo /std:c++17 /EHsc /W4 tests\portable_profile_test.cpp /Fe:portable-test.exe`r`nif errorlevel 1 exit /b 1`r`nportable-test.exe`r`nif errorlevel 1 exit /b 1`r`ncl /nologo /std:c++17 /EHsc /W4 tests\usb_test.cpp /Fe:usb-test.exe`r`nif errorlevel 1 exit /b 1`r`nusb-test.exe`r`nexit /b %errorlevel%`r`n"
+          Set-Content -Path "$env:RUNNER_TEMP\fixtures.cmd" -Value $script -Encoding ascii
+          & cmd.exe /d /c "$env:RUNNER_TEMP\fixtures.cmd"
+          if ($LASTEXITCODE -ne 0) { throw 'Portable fixture check failed' }
+  mac:
+    name: Mac universal build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - run: python3 tools/check-source.py
+      - name: Compile both architectures and run headless self-test
+        run: bash mac/build.sh
+      - name: Compile IOKit research adapter without accessing USB
+        run: |
+          for arch in arm64 x86_64; do
+            clang++ -target "$arch-apple-macos13.0" -std=c++17 -Wno-deprecated-declarations -c mac/USB/AccessoryControl.cpp -o "$RUNNER_TEMP/accessory-$arch.o"
+          done
+      - name: Run offline fixtures
+        run: |
+          clang++ -std=c++17 -Wall -Wextra -Werror tests/portable_profile_test.cpp -o "$RUNNER_TEMP/portable-test"
+          "$RUNNER_TEMP/portable-test"
+          clang++ -std=c++17 -Wall -Wextra -Werror tests/usb_test.cpp -o "$RUNNER_TEMP/usb-test"
+          "$RUNNER_TEMP/usb-test"
+          clang++ -std=c++17 -Wall -Wextra -Werror tests/policy_test.cpp -o "$RUNNER_TEMP/policy-test"
+          "$RUNNER_TEMP/policy-test"

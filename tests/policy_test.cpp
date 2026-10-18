@@ -1,0 +1,11 @@
+#include "../shared/DisplayProfile.hpp"
+#include "../shared/TransportPolicy.hpp"
+#include "../harmony/entry/src/main/cpp/store_policy.h"
+#include <cassert>
+#include <iostream>
+int main(){using namespace yingqiao;int cases=0;
+ for(auto size:std::vector<std::pair<int,int>>{{3120,2080},{2880,1920},{2800,1840},{2560,1600},{2456,1600},{1920,1200},{1600,2560},{2048,2048},{3840,2160}}){auto p=ChooseDisplayProfile(size.first,size.second,120,"hevc",[](auto,int w,int h,int fps){return w<=2400&&h<=2400&&fps<=60;});assert(p.supported&&p.width%2==0&&p.height%2==0);assert(std::abs(double(p.width)/p.height-double(size.first)/size.second)<.005);++cases;}
+ auto p=ChooseDisplayProfile(2800,1840,60,"hevc",[](auto codec,int,int,int fps){return codec=="avc"&&fps<=30;});assert(p.supported&&p.codec=="avc"&&p.fps==30);assert(!ChooseDisplayProfile(1,1,60,"avc",[](auto,int,int,int){return true;}).supported);
+ std::vector<Path>paths={{"wifi","paired",true,false,true,100,20,100},{"usb","paired",true,true,true,100,3,500}};assert(PreferredPath(paths,"paired","wifi",101,90,false)=="usb");assert(PreferredPath(paths,"paired","wifi",101,90,true)=="wifi");assert(PreferredPath(paths,"paired","wifi",101,100,false)=="wifi");paths[1].consumerSupported=false;assert(PreferredPath(paths,"paired","wifi",101,90,false)=="wifi");paths[1].consumerSupported=true;paths[1].peer="other";assert(PreferredPath(paths,"paired","wifi",101,90,false)=="wifi");paths[1].peer="paired";paths[0].authenticated=false;assert(PreferredPath(paths,"paired","wifi",101,100,true)=="usb");assert(PreferredPath(paths,"paired","usb",120,90,false).empty());DisplayLease l;l.retain("paired",100);assert(!l.adopt("other",101));assert(l.adopt("paired",105));l.retain("paired",110);l.explicitEnd();assert(!l.adopt("paired",111));
+ assert(edgelinkstore::Allowed("192.168.1.10",49563,"extend","store-avc"));for(auto ip:{"127.0.0.1","8.8.8.8","100.64.1.1","example.com","192.168.1.5.evil","::1"})assert(!edgelinkstore::Allowed(ip,49563,"extend","store-avc"));assert(!edgelinkstore::Allowed("10.0.0.5",49563,"remote","store-avc"));assert(!edgelinkstore::Allowed("10.0.0.5",48561,"extend","tcp"));std::cout<<"PASS "<<cases<<" panel ratios, codec/FPS fallback, authenticated route hysteresis/failure, display lease, local-only gate. Policy simulation, not USB integration proof.\n";
+}

@@ -1,0 +1,34 @@
+{
+  "sourceVersion": "store-v0.1.0-dev.1",
+  "macUniversalArchitectures": [
+    "x86_64",
+    "arm64"
+  ],
+  "macBinarySHA256": "f8793c4458f92228143be26f496fe1a9b42f62f7cfaf0d3fe2adeac2b1cdcc92",
+  "harmonyUnsignedHAPSHA256": "f69dfe5c79f359b72bd5f71274f38f0f00e5511790016d772fc48bc8ef9a1772",
+  "installedOnUserDevices": false,
+  "newEditionSessionTested": false,
+  "consumerUSBHandoverTested": false,
+  "realModelCompatibilityCertified": false,
+  "originalPersonalMacExecutableUnchanged": true,
+  "newPreviewRuntimeIdentityDirectoryExists": false,
+  "tests": [
+    "9 simulated panel ratios",
+    "codec/fps fallback policy",
+    "authenticated route switching policy",
+    "display lease policy",
+    "local pairing shape validation",
+    "headless Mac LAN address self-test",
+    "USB control consent/failure sequence",
+    "USB mux fragment/parser/control-video fairness"
+  ],
+  "buildSDK": "official DevEco SDK; no schema modification",
+  "usbSDKCandidateCompiled": true,
+  "macUSBControlObjectsCompiled": [
+    "arm64",
+    "x86_64"
+  ],
+  "usbProtocolFixturePassed": true,
+  "usbPhysicalControlRequestsSent": 0,
+  "consumerUSBAdapterIntegrated": false
+}

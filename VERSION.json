@@ -1,0 +1,34 @@
+{
+  "version": "store-v0.1.0-dev.1",
+  "date": "2026-10-18",
+  "status": "development-preview-not-appgallery-ready",
+  "publicSource": true,
+  "minimumHarmonyAPI": 24,
+  "macBuildArchitectures": [
+    "arm64",
+    "x86_64"
+  ],
+  "macMinimumBuildTarget": "13.0",
+  "installedOnUserDevices": false,
+  "consumerUSBHandoverVerified": false,
+  "multiModelRealDeviceVerified": false,
+  "windowsExtensionImplemented": false,
+  "realNewEditionStreamingVerified": false,
+  "usbPublicSDKContractCompiled": true,
+  "macUSBControlAdapterCompiled": [
+    "arm64",
+    "x86_64"
+  ],
+  "usbAOACompatibilityVerified": false,
+  "policiesVerified": [
+    "9 panel ratios",
+    "hardware codec/FPS fallback policy",
+    "authenticated route selection and hysteresis",
+    "display lease simulation",
+    "local pairing parser rejection cases",
+    "USB control consent/failure sequence",
+    "USB mux fragmentation/parser/fairness"
+  ],
+  "macSelfTest": "LAN address policy only, no GUI/listener/identity/capture",
+  "releaseGateDocument": "docs/APPGALLERY_READINESS.md"
+}

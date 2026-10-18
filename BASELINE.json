@@ -1,0 +1,10 @@
+{
+  "sourceTag": "v2026.10.16-mac227-edge227",
+  "sourceCommit": "c47654f003021e450cae2213b6c3e2395ad40b9e",
+  "purpose": "Separate AppGallery candidate. No deployment, current device settings or personal app modifications.",
+  "identifiers": {
+    "harmony": "cn.edgelink.store",
+    "mac": "cn.edgelink.store.mac"
+  },
+  "status": "development; not approved or published"
+}
