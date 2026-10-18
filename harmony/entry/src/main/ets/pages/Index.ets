@@ -192,7 +192,10 @@ struct Index {
   this.storePathTimer=setInterval(()=>{
    if(!this.remoteSessionForeground)return;
    if(Date.now()-this.storePathRefreshAt>=8000){this.storePathRefreshAt=Date.now();this.storeDiscovery?.refreshPaths();}
-   if(this.active){this.storeConfigurePaths();const status=native.storeUSBInterfaces();if(status!==this.storeUSBLastReport){if(native.input('CLIENTUSB '+new util.Base64Helper().encodeToString(new util.TextEncoder().encodeInto(status))))this.storeUSBLastReport=status;}}
+   this.storeConfigurePaths();
+   const verifiedUSB=this.storePathState(this.active).paths.find((p:StorePathSample)=>p.ready&&p.route==='usb-net');
+   this.availability?.setUSBNetwork(verifiedUSB?.host || '');
+   if(this.active){const status=native.storeUSBInterfaces();if(status!==this.storeUSBLastReport){if(native.input('CLIENTUSB '+new util.Base64Helper().encodeToString(new util.TextEncoder().encodeInto(status))))this.storeUSBLastReport=status;}}
 
   },2000);
  }
@@ -287,7 +290,7 @@ struct Index {
   if(this.pairing && (this.pairing.cert!==pairing.cert || this.pairing.token!==pairing.token)){this.availability?.stop();this.availability=null;if(this.availabilityTimer>=0){clearInterval(this.availabilityTimer);this.availabilityTimer=-1;}}
   this.pairing=pairing;this.host=pairing.host;this.availability?.setHost(pairing.host);this.pairingLoaded=true;this.transport=1;this.storeCodec=pairing.codecs.includes('hevc') ? 'hevc':'avc';
   if(save){this.rememberedMacs=this.rememberedMacs.filter((v:StorePairing)=>v.cert!==pairing.cert);this.rememberedMacs.push(pairing);this.rememberedMacs=this.rememberedMacs.slice(-16);this.writeFile('store-macs.json',JSON.stringify(this.rememberedMacs));this.writeFile('store-pairing.json',JSON.stringify(pairing));}
-  this.storeStage=3;this.prepareLocalAvailability();this.message='已记住这台 Mac，可直接开启扩展屏。';this.storeError='';this.localRouteLabel='原版扩展屏连接流程';
+  this.storeStage=3;this.prepareLocalAvailability();this.storeWatchPaths();this.message='已记住这台 Mac，可直接开启扩展屏。';this.storeError='';this.localRouteLabel='原版扩展屏连接流程';
  }
  private storeSelectProfile(): void {
   const panel=display.getDefaultDisplaySync();const w=panel.width,h=panel.height;
@@ -992,6 +995,10 @@ struct Index {
   this.active = true;this.menuVisible = false;this.showText = false;if(rtc)this.prepareRTCListener();
   this.setFullScreen(reconnectAttempt ? this.reconnectResumeFullScreen : (preservePresentation ? previousFullScreen : mode !== 'bench'));
   if (!reconnectAttempt && !fromDiagnostic && !this.diagnosticProfile && this.isInternetTransport(selectedTransport)) { this.ensureInternetReconnect().arm({ mode: mode, transport: intendedTransport, fullScreen: this.fullScreen }); }
+  const usbEndpoint = this.availability?.status();
+  const usbHost = usbEndpoint?.usbHost || '127.0.0.1';
+  const usbPort = usbEndpoint?.usbPort || 49561;
+  this.storeActiveHost = selectedTransport === 0 ? usbHost : this.host.trim();this.storeSwitchedAt = Date.now();
   const widths: number[] = [this.storeWidth, this.storeWidth, this.storeWidth], heights: number[] = [this.storeHeight, this.storeHeight, this.storeHeight];
   if (split) {
    try {
@@ -1003,7 +1010,7 @@ struct Index {
     this.writeFile('split-diagnostic-status.json', JSON.stringify({ errorCode: 'split_start_failed', time: Date.now() }));return;
    }
   } else {
-   native.connect(selectedTransport === 0 ? '127.0.0.1' : (this.isInternetTransport(selectedTransport) ? this.internetHost : this.host.trim()), selectedTransport === 0 ? 49561 : this.pairing.port, mode,
+   native.connect(selectedTransport === 0 ? usbHost : (this.isInternetTransport(selectedTransport) ? this.internetHost : this.host.trim()), selectedTransport === 0 ? usbPort : this.pairing.port, mode,
     widths[this.resolution], heights[this.resolution], this.fps, rtc ? (selectedTransport===3?'tailnet-rtc':'rtc') : (selectedTransport === 4 ? 'tailnet-udp' : (selectedTransport === 3 ? 'tailnet' : (selectedTransport === 2 ? 'udp' : (this.storeCodec === 'hevc' ? 'store-hevc':'store-avc')))), this.pairing.token, this.pairing.cert, fromDiagnostic && this.diagnosticBitrateKbps >= 1500 && this.diagnosticBitrateKbps <= 240000 ? this.diagnosticBitrateKbps : 0);
   }
   this.updateAvailabilityState();
@@ -1373,18 +1380,23 @@ struct Index {
   const usb = status.paths.some((p: LocalPath) => p.route === 'usb' && p.ready);
   const lan = status.paths.some((p: LocalPath) => p.route === 'lan' && p.ready);
   let route = '';
+  const measuredPaths = this.storePathState(s.running);
+  const usbHost = status.usbHost || '';
+  const measuredUSBPreferred = usbHost === '127.0.0.1' || measuredPaths.preferredHost === usbHost;
   if (!s.running) {
    if (this.localHandoverDeadline === 0) { this.localHandoverDeadline = now + 8500; }
    if (now >= this.localHandoverDeadline) { return false; }
    if (this.sessionTransport === 0) { this.localUSBRetryAfter = now + 15000;route = lan ? 'lan' : ''; }
    else { route = usb && now >= this.localUSBRetryAfter ? 'usb' : (lan ? 'lan' : ''); }
    if (!route || now < this.localHandoverNextAttempt) { this.message = '正在恢复本地连接，扩展桌面保持不变…';return true; }
-  } else if (this.sessionTransport === 1 && usb && now >= this.localUSBRetryAfter && now - this.sessionStartedAt > 2500 && s.renderSubmittedFrames > 20 && !this.menuVisible && !this.dragging && !this.mouseHeld.some((v: boolean) => v)) {
+  } else if (this.sessionTransport === 1 && usb && measuredUSBPreferred && now >= this.localUSBRetryAfter && now - this.sessionStartedAt > 2500 && s.renderSubmittedFrames > 20 && !this.menuVisible && !this.dragging && !this.mouseHeld.some((v: boolean) => v)) {
    route = 'usb';
+  } else if (s.running && this.sessionTransport === 0 && lan && measuredPaths.preferredHost === this.host && now - this.sessionStartedAt > 5000 && !this.menuVisible && !this.mouseHeld.some((v:boolean)=>v)) {
+   route = 'lan';
   }
   if (!route) { return false; }
   this.localHandoverNextAttempt = now + 750;this.localHandoverCount++;
-  this.localHandoverReason = s.running ? 'usb_available' : 'active_path_lost';
+  this.localHandoverReason = s.running ? 'measured_better_path' : 'active_path_lost';
   this.begin('extend', false, '', '', false, false, -1, -1, true, route);
   return true;
  }

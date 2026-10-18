@@ -47,6 +47,7 @@ class Manager {
 public:
  static Manager& Get(){static auto* manager=new Manager;return *manager;}
  bool Configure(const std::string& host,int port,const std::string& token,const std::string& certificate);
+ bool USBNetwork(const std::string& host);
  void State(const std::string& state);
  bool Reply(const std::string& id,bool accepted);
  void Stop();
@@ -83,7 +84,7 @@ private:
  struct Request{std::string id,route;std::weak_ptr<Worker> worker;uint64_t epoch=0,deadline=0;bool replied=false;};
  std::mutex lock_,callbackLock_;
  std::shared_ptr<Worker> usb_,lan_;
- std::string token_,certificate_,session_,host_,state_="idle",preferred_,deviceMetadata_;
+ std::string token_,certificate_,session_,host_,usbNetworkHost_,state_="idle",preferred_,deviceMetadata_;
  int port_=0;uint64_t nextEpoch_=1;
  Path usbPath_,lanPath_;
  std::unique_ptr<Request> request_;
@@ -273,7 +274,7 @@ bool Manager::Configure(const std::string& host,int port,const std::string& toke
   const bool pairChanged=token_!=token||certificate_!=certificate||port_!=port||session_.empty();
   const std::string newSession=pairChanged?RandomID():session_;if(newSession.empty())return false;
   if(pairChanged){
-   oldUSB=std::move(usb_);oldLAN=std::move(lan_);request_.reset();selector_=edgelinkroute::Selector();preferred_.clear();
+   oldUSB=std::move(usb_);oldLAN=std::move(lan_);usbNetworkHost_.clear();request_.reset();selector_=edgelinkroute::Selector();preferred_.clear();
    if(!token_.empty())OPENSSL_cleanse(token_.data(),token_.size());token_=token;certificate_=certificate;session_=newSession;port_=port;
   }else if(host_!=host){oldLAN=std::move(lan_);if(request_&&request_->route=="lan")request_.reset();selector_.failed(edgelinkroute::Kind::LAN,lanPath_.epoch);}
   host_=host;
@@ -287,6 +288,27 @@ bool Manager::Configure(const std::string& host,int port,const std::string& toke
  if(newUSB)newUSB->Launch();if(newLAN)newLAN->Launch();Refresh();
  const uint64_t deadline=NowMs()+200;if(oldUSB)oldUSB->WaitDone(deadline);if(oldLAN)oldLAN->WaitDone(deadline);
  return true;
+}
+
+// A consumer USB-network endpoint is supplied only after the paired PATH
+// probe identifies usb-net. It has its own pinned STANDBY; Wi-Fi stays warm.
+bool Manager::USBNetwork(const std::string& host){
+ if(!host.empty()&&!LocalAddress(host))return false;
+ std::shared_ptr<Worker> old,newWorker;
+ {
+  std::lock_guard<std::mutex> g(lock_);if(session_.empty()||token_.empty())return false;
+  if(host==usbNetworkHost_){if(usb_)usb_->Wake();return true;}
+  usbNetworkHost_=host;old=std::move(usb_);selector_.failed(edgelinkroute::Kind::USB,usbPath_.epoch);usbPath_=Path();
+  if(request_&&request_->route=="usb")request_.reset();
+  const std::string endpoint=host.empty()?(edgelinkstore::DebugUSBAvailable()?"127.0.0.1":""):host;
+  if(!endpoint.empty()){
+   Options options{endpoint,"usb",token_,certificate_,session_,host.empty()?port_:49563,nextEpoch_++};
+   usb_=newWorker=std::make_shared<Worker>(std::move(options));usbPath_.epoch=usb_->Config().epoch;
+  }
+  if(preferred_=="usb")preferred_.clear();PickLocked(NowMs());
+ }
+ if(old)old->Cancel();if(newWorker)newWorker->Launch();
+ if(old)old->WaitDone(NowMs()+200);return true;
 }
 
 bool Manager::IsCurrent(const std::shared_ptr<Worker>& worker){
@@ -413,7 +435,7 @@ bool Manager::CurrentEvent(const Event& event){
 void Manager::Stop(){
  Unbind();std::shared_ptr<Worker> usb,lan;
  {
-  std::lock_guard<std::mutex> g(lock_);usb=std::move(usb_);lan=std::move(lan_);request_.reset();usbPath_=Path();lanPath_=Path();preferred_.clear();host_.clear();hostHint_.clear();session_.clear();port_=0;state_="idle";selector_=edgelinkroute::Selector();
+  std::lock_guard<std::mutex> g(lock_);usb=std::move(usb_);lan=std::move(lan_);request_.reset();usbPath_=Path();lanPath_=Path();preferred_.clear();host_.clear();usbNetworkHost_.clear();hostHint_.clear();session_.clear();port_=0;state_="idle";selector_=edgelinkroute::Selector();
   if(!token_.empty())OPENSSL_cleanse(token_.data(),token_.size());token_.clear();certificate_.clear();
  }
  if(usb)usb->Cancel();if(lan)lan->Cancel();
@@ -432,7 +454,7 @@ void Manager::Refresh(){
 
 std::string Manager::Status(){
  Tick();std::lock_guard<std::mutex> g(lock_);PickLocked(NowMs());
- std::ostringstream json;json<<std::fixed<<std::setprecision(3)<<"{\"hostHint\":\""<<hostHint_<<"\",\"paths\":[";
+ std::ostringstream json;json<<std::fixed<<std::setprecision(3)<<"{\"usbHost\":\""<<(usb_?usb_->Config().host:"")<<"\",\"usbPort\":"<<(usb_?usb_->Config().port:0)<<",\"hostHint\":\""<<hostHint_<<"\",\"paths\":[";
  auto emit=[&](const char* route,const Path& p){json<<"{\"route\":\""<<route<<"\",\"ready\":"<<(p.ready?"true":"false")<<",\"rttMedianMs\":"<<p.median<<",\"rttP95Ms\":"<<p.p95<<",\"goodputMbps\":"<<p.goodput<<'}';};
  emit("usb",usbPath_);json<<',';emit("lan",lanPath_);json<<"],\"preferredRoute\":\""<<preferred_<<"\",\"dualMediaSupported\":false}";return json.str();
 }
@@ -517,6 +539,7 @@ napi_value ConfigureJS(napi_env env,napi_callback_info info){
  const bool ok=valid&&Manager::Get().BindCallback(env,args[4])&&Manager::Get().Configure(host,port,token,certificate);
  if(!token.empty())OPENSSL_cleanse(token.data(),token.size());if(!ok)napi_throw_error(env,"availability_invalid_config","Local availability configuration is invalid");return Undefined(env);
 }
+napi_value USBNetworkJS(napi_env env,napi_callback_info info){napi_value args[1];size_t count=1;napi_get_cb_info(env,info,&count,args,nullptr,nullptr);std::string host;const bool ok=count==1&&StringArgument(env,args[0],64,host)&&Manager::Get().USBNetwork(host);napi_value result;napi_get_boolean(env,ok,&result);return result;}
 napi_value StateJS(napi_env env,napi_callback_info info){napi_value args[1];size_t count=1;napi_get_cb_info(env,info,&count,args,nullptr,nullptr);std::string state;if(count==1&&StringArgument(env,args[0],32,state)&&edgelinkavailability::AvailabilityState(state))Manager::Get().State(state);else napi_throw_error(env,"availability_invalid_state","Availability state is invalid");return Undefined(env);}
 napi_value ReplyJS(napi_env env,napi_callback_info info){napi_value args[2];size_t count=2;napi_get_cb_info(env,info,&count,args,nullptr,nullptr);std::string id;bool accepted=false;const bool ok=count==2&&StringArgument(env,args[0],32,id)&&napi_get_value_bool(env,args[1],&accepted)==napi_ok&&Manager::Get().Reply(id,accepted);napi_value value;napi_get_boolean(env,ok,&value);return value;}
 napi_value StopJS(napi_env env,napi_callback_info){Manager::Get().Stop();return Undefined(env);}
@@ -527,6 +550,7 @@ void Cleanup(void*){Manager::Get().Stop();}
 }
 void RegisterAvailability(napi_env env,napi_value exports){
  napi_property_descriptor methods[]={
+  {"availabilityUSBNetwork",nullptr,USBNetworkJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityConfigure",nullptr,ConfigureJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityState",nullptr,StateJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityReply",nullptr,ReplyJS,nullptr,nullptr,nullptr,napi_default,nullptr},

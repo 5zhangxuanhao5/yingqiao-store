@@ -48,7 +48,7 @@ extension StoreHost {
    };return true
   }
   guard [5,6].contains(a.count),a[0]=="STANDBY",let identity,constantEqual(a[1],identity.token),let route=StandbyCoordinator.Route(rawValue:a[3]),route.local,
-   let state=StandbyCoordinator.Availability(rawValue:a[4]),(p.usb ? route == .usb:route == .lan && LocalIngress.lan(p.connection)) else{p.send("ERR local_standby_only");p.close();return true}
+   let state=StandbyCoordinator.Availability(rawValue:a[4]),((p.usb || StoreNetworkPath.isUSB(p.connection)) ? route == .usb:route == .lan && LocalIngress.lan(p.connection)) else{p.send("ERR local_standby_only");p.close();return true}
   var deviceID:String?,deviceName:String?
   if a.count==6 {
    let fields=a[5].split(separator:":",omittingEmptySubsequences:false).map(String.init)

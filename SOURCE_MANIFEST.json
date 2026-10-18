@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 4503,
-    "sha256": "0e5331edb244b44f5ba1e50a1b86d011d5da05b807288405301fa496ba711767"
+    "bytes": 4654,
+    "sha256": "474117f2f06bd558d6af0f4493b9e61612253338e94ec9ad516aad20e4a29912"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -170,6 +170,11 @@
     "sha256": "6345f2b47828f6d18380b685f81f121289349ad3d03d63a975808eda4696f040"
   },
   {
+    "path": "docs/USB_NETWORK_035.md",
+    "bytes": 2566,
+    "sha256": "6e4a16ae253b3fd93928e62da90efebeb2209bd5ad88a4af44764fa93e53416f"
+  },
+  {
     "path": "docs/compatibility-catalog.json",
     "bytes": 2310,
     "sha256": "83865aa00f614375a963d13bea94bc3eb456c4489b996518dde777afbd59fc18"
@@ -252,7 +257,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 198,
-    "sha256": "99526e8cee5536a08096dadb97fdfc043a279f3c8cc0a6ca22770a9c3c577a57"
+    "sha256": "5a7195c2f9298cac1323b70bed487a224c5f54ad6b36cc6b56b1354ce8b34270"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -381,8 +386,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/local/availability.cpp",
-    "bytes": 38258,
-    "sha256": "991c4ac5238f309abca863519833d3c4846e8e385c7cd06890b19be12ee870a1"
+    "bytes": 40018,
+    "sha256": "7d81cb3d7014da79823428741796ab384e9bf1caad14b4d608bd34c4e35d773f"
   },
   {
     "path": "harmony/entry/src/main/cpp/local/availability.h",
@@ -516,8 +521,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/index.d.ts",
-    "bytes": 3415,
-    "sha256": "25a44ecadadef8764cb83e9701d818da26c5791d3b9104718c33f29bdcb61a8a"
+    "bytes": 3476,
+    "sha256": "5a20326158d15e732cae29ee349abc258606a1d7ac01f15a1f9abe64084ba59f"
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/oh-package.json5",
@@ -536,8 +541,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 159597,
-    "sha256": "4f1a7b37120285fd9a33e110542f9c9bbf44110bc5c632f0a51161caf6550f53"
+    "bytes": 160521,
+    "sha256": "05d71ede94eabe9a694d1075fe28a347ba9b10cc3416d169c5895b2bf67f28e1"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -556,8 +561,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/service/LocalAvailability.ets",
-    "bytes": 7385,
-    "sha256": "a3db15a0b63e5899d5ed66f446a008dc2577eb6f959d78908eea181d3c92aefc"
+    "bytes": 7516,
+    "sha256": "9ce79c7c7d5e1584e90effec622e3bafe22c9ba04a717d54756e21533cb2030e"
   },
   {
     "path": "harmony/entry/src/main/ets/service/RTCArkWebTransport.ets",
@@ -662,7 +667,7 @@
   {
     "path": "mac/Info.plist",
     "bytes": 1078,
-    "sha256": "5a151200f63777d07c985fce5d2eed3e58aa208780fcd85deb83b1ab0eb06454"
+    "sha256": "d3e0f30625d2a27407ebf51d4fd0afe626d7143c9668f2fcbc9a80f2f791fbde"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -781,8 +786,8 @@
   },
   {
     "path": "mac/Sources/StoreOriginalConnections.swift",
-    "bytes": 9537,
-    "sha256": "953ce8f9bb619912ddeebe8ba5ce461a1b98d63e36b841c8c670326214d32d8b"
+    "bytes": 9579,
+    "sha256": "22bb9a60491c85f97450d8de42c2713bfb1e946b99440dfd3d1bcb80346c111e"
   },
   {
     "path": "mac/Sources/StoreOriginalUSBDebug.swift",
@@ -801,8 +806,8 @@
   },
   {
     "path": "mac/Sources/StoreWire.swift",
-    "bytes": 2773,
-    "sha256": "89c4b91f9307aabba12dbb7addf3595f79ce0e6fc5b891f43508208b99f24661"
+    "bytes": 2834,
+    "sha256": "30d97421c07eecd133ad3938a74b30a01091066b2f24748660394fadc4097a89"
   },
   {
     "path": "mac/Sources/VisualTheme.swift",
@@ -811,8 +816,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 22739,
-    "sha256": "95e504456190fc957613318ecc0c47c70f9201d970a7c41e152596fb8d76e5a8"
+    "bytes": 23042,
+    "sha256": "b620a710cc99227aba0f6d242919d2e41b24cc85ccbd02bf7943e8c3238334d4"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",

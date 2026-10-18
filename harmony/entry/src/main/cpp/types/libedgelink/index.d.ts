@@ -82,3 +82,5 @@ export const storeSessionFlags: ()=>number;
 export const storeUSBDiscover: ()=>Promise<string>;
 
 export const availabilityIdentity:(metadata:string)=>void;
+
+export const availabilityUSBNetwork:(host:string)=>boolean;

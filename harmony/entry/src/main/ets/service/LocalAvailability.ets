@@ -13,6 +13,8 @@ export interface LocalPath {
 }
 export interface LocalAvailabilityStatus {
  paths: LocalPath[];
+ usbHost?: string;
+ usbPort?: number;
  hostHint?: string;
  preferredRoute: string;
 }
@@ -82,6 +84,9 @@ export class LocalAvailability {
  state(active: boolean, foreground: boolean, surfaceReady: boolean): void {
   if (!this.alive) { return; }
   native.availabilityState(active ? 'busy' : (!surfaceReady || (!foreground && !this.selfShowSupported) ? 'backgroundUnsupported' : 'idle'));
+ }
+ setUSBNetwork(host:string):void {
+  if(this.alive){native.availabilityUSBNetwork(host);}
  }
  setHost(host: string): void {
   if (!this.alive || !this.numericIPv4(host) || host === this.host) { return; }
