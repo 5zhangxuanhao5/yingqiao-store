@@ -66,18 +66,18 @@
   },
   {
     "path": "VALIDATION.json",
-    "bytes": 1403,
-    "sha256": "ad5826b32aa72887f48b8fafbbb4f815237409777f5e2088c8de18b903d677b4"
+    "bytes": 1649,
+    "sha256": "9e0f2968b55ea1b553f120c35fe65012107c019608d12a67ac441fa6f0a8ae98"
   },
   {
     "path": "VERSION.json",
-    "bytes": 2106,
-    "sha256": "57513442444ee4f54eaa0dd47da2b66f35e02b592c3c9b32e9303b7f1f9ed215"
+    "bytes": 2082,
+    "sha256": "bd852b635d87fa00ad7f7538fe2f59509611f40a48fe8ab7f02a042ce64ca2bc"
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 8196,
-    "sha256": "fb55cec14ef9be9889ab35b25743c533440e9a66c325835fb17144d191b51fc2"
+    "bytes": 8717,
+    "sha256": "e0039c39f2d5d361624e44e06169d4dbb14ed9870c4464afc6990786ff3b0506"
   },
   {
     "path": "docs/ACCEPTED_CORE_PROVENANCE.json",
@@ -121,8 +121,8 @@
   },
   {
     "path": "docs/USB_AND_HANDOVER.md",
-    "bytes": 6538,
-    "sha256": "c90afbf71ee9fc940a30742e2ba189808fad96512966f69b409261d6fb0336b6"
+    "bytes": 6924,
+    "sha256": "4ba7535a7daad58a94a27f3f317b3bf7926d9a98fe8f8ee96f5ea6c51a788035"
   },
   {
     "path": "docs/compatibility-catalog.json",
@@ -137,7 +137,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 199,
-    "sha256": "0cf357b7eda44c2e52acf81ff5986d836977e037881b9389c5a10570849779e9"
+    "sha256": "091ba987fed88810dc18731e669e2a2ca229958d39dc60260780b770a8d31a9e"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -381,8 +381,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/store_paths.cpp",
-    "bytes": 10114,
-    "sha256": "26d3ab5eae64beda2f8a657a4b2f61396e448169a83c3eb23e44f9fa81b139a5"
+    "bytes": 10120,
+    "sha256": "4dd3d071de6bc89c01806f65807bb013b354e56fdf1da6d763d4db1b46c4bff1"
   },
   {
     "path": "harmony/entry/src/main/cpp/store_policy.h",
@@ -691,8 +691,8 @@
   },
   {
     "path": "shared/TransportPolicy.hpp",
-    "bytes": 1629,
-    "sha256": "859ead4a36f23cdda289d654e6203a9b8e43f08d82265c5042007606b889c91a"
+    "bytes": 1680,
+    "sha256": "b3b78fba84d4dbf83af1b21ff45acdd4ef53258be4a76b12974cd065b730f4ff"
   },
   {
     "path": "tests/host_stubs/hilog/log.h",
@@ -716,8 +716,8 @@
   },
   {
     "path": "tests/policy_test.cpp",
-    "bytes": 2325,
-    "sha256": "850d3aa26831e051775233541eeb9c44878318f4653ed90ba5ccf876ea01a8c4"
+    "bytes": 2691,
+    "sha256": "165128b10fc35462ccab85d7af4b81d2e258ed29e9977ca84a6a1d8fc7c94cc9"
   },
   {
     "path": "tests/portable_profile_test.cpp",

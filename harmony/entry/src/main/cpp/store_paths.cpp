@@ -71,7 +71,7 @@ napi_value Configure(napi_env env,napi_callback_info info){size_t n=3;napi_value
 napi_value Status(napi_env env,napi_callback_info info){size_t n=4;napi_value a[4];napi_get_cb_info(env,info,&n,a,nullptr,nullptr);std::string active=n?str(env,a[0]):"";double elapsed=0;bool dragging=false,alive=false;if(n>1)napi_get_value_double(env,a[1],&elapsed);if(n>2)napi_get_value_bool(env,a[2],&dragging);if(n>3)napi_get_value_bool(env,a[3],&alive);if(!std::isfinite(elapsed)||elapsed<0)elapsed=0;
  std::vector<yingqiao::Path> ready;const double time=now();std::ostringstream out;out<<"{\"paths\":[";std::lock_guard<std::mutex>g(lock);bool comma=false;
  for(auto&s:samples){bool valid=s.path.authenticated&&s.successes>=2&&time-s.path.measuredAt<=10;if(valid)ready.push_back(s.path);if(comma)out<<',';comma=true;out<<"{\"host\":\""<<s.path.id<<"\",\"ready\":"<<(valid?"true":"false")<<",\"route\":\""<<(s.path.wired?"usb-net":"lan")<<"\",\"rttMs\":"<<s.path.p95ms<<",\"probeMbps\":"<<s.path.goodputMbps<<'}';}
- std::string preferred=yingqiao::PreferredPath(ready,"pinned",active,time,time-elapsed/1000,dragging);if(alive&&!active.empty()&&std::none_of(ready.begin(),ready.end(),[&](auto&p){return p.id==active;}))preferred=active;
+ std::string preferred=yingqiao::PreferredPath(ready,"pinned",active,time,time-elapsed/1000,dragging,alive);if(alive&&!active.empty()&&std::none_of(ready.begin(),ready.end(),[&](auto&p){return p.id==active;}))preferred=active;
  out<<"],\"preferredHost\":\""<<preferred<<"\"}";auto s=out.str();napi_value value;napi_create_string_utf8(env,s.data(),s.size(),&value);return value;
 }
 napi_value Interfaces(napi_env env,napi_callback_info){

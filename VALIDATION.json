@@ -1,5 +1,5 @@
 {
-  "sourceVersion": "store-v0.1.14-test.1",
+  "sourceVersion": "store-v0.1.15-test.1",
   "status": "built-candidate-awaiting-device-handover-acceptance",
   "macUniversalArchitectures": [
     "arm64",
@@ -27,5 +27,12 @@
     "Actual native module exports/profile fixture passed",
     "Headless Mac production address/encoder/window policies passed"
   ],
-  "previousCI": "0.1.13 Mac ARM/Intel and Linux passed; Windows failed exact-byte manifest due checkout newline conversion. 0.1.14 disables all checkout byte rewriting. New cloud run pending."
+  "previousCI": "0.1.14 Windows and Linux portable fixtures plus Mac ARM runner passed; Intel runner pending when this candidate was prepared. 0.1.15 policy fixture rejects a freshly measured but known-failed active route.",
+  "observedV14Switch": {
+    "direction": "LAN to ordinary USB",
+    "sameDisplay": true,
+    "macStopToRenderACKms": 278.417292,
+    "displayAdoptionMs": 0.046459,
+    "includesPhysicalUnplugDetection": false
+  }
 }

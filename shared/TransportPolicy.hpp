@@ -5,8 +5,8 @@
 namespace yingqiao {
 struct Path {std::string id,peer;bool authenticated=false,wired=false,consumerSupported=false;double measuredAt=0,p95ms=0,goodputMbps=0;};
 // Policy shared by future USB network adapters. A cable's presence never proves a usable or fast media channel.
-inline std::string PreferredPath(const std::vector<Path>&paths,const std::string&pairedPeer,const std::string&active,double now,double lastSwitch,bool dragging){
- std::vector<Path>ready;for(auto&p:paths)if(p.authenticated&&p.consumerSupported&&p.peer==pairedPeer&&p.measuredAt<=now&&now-p.measuredAt<=10&&p.p95ms>0&&p.goodputMbps>0)ready.push_back(p);
+inline std::string PreferredPath(const std::vector<Path>&paths,const std::string&pairedPeer,const std::string&active,double now,double lastSwitch,bool dragging,bool activeAlive=true){
+ std::vector<Path>ready;for(auto&p:paths)if((activeAlive||p.id!=active)&&p.authenticated&&p.consumerSupported&&p.peer==pairedPeer&&p.measuredAt<=now&&now-p.measuredAt<=10&&p.p95ms>0&&p.goodputMbps>0)ready.push_back(p);
  if(ready.empty())return "";
  auto score=[](const Path&p){return p.p95ms+200.0/std::max(1.0,p.goodputMbps);};std::sort(ready.begin(),ready.end(),[&](auto&a,auto&b){return score(a)<score(b);});auto current=std::find_if(ready.begin(),ready.end(),[&](auto&p){return p.id==active;});
  if(current==ready.end())return ready.front().id;
