@@ -1,7 +1,7 @@
 {
   "asset": "yingqiao-store-native-dependencies.tar.gz",
-  "bytes": 4261286,
-  "sha256": "cc9cb8afc91ec3c00e1fc09a14c61e8186f78657a0fa6a5db5a2b6b5a1536714",
+  "bytes": 4254558,
+  "sha256": "8d7374b77d90e0e1fdee568a2fe3e36af363a972b8846aaf8daaccb0d9889548",
   "release": "store-v0.1.0-dev.1",
   "contents": "Generic OpenSSL/Opus libraries and headers only. No account or signing state."
 }

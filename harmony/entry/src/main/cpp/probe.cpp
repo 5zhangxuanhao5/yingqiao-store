@@ -16,7 +16,7 @@ static napi_value Probe(napi_env env,napi_callback_info info) {
    out<<",\"name\":\""<<OH_AVCapability_GetName(cap)<<"\",\"lowLatency\":"<<(OH_AVCapability_IsFeatureSupported(cap,VIDEO_LOW_LATENCY)?"true":"false")<<",\"sizes\":[";
    for(int s=0;s<4;s++) {
     if(s)out<<",";
-    OH_AVRange range={0};auto error=OH_AVCapability_GetVideoFrameRateRangeForSize(cap,sizes[s][0],sizes[s][1],&range);
+    OH_AVRange range={};auto error=OH_AVCapability_GetVideoFrameRateRangeForSize(cap,sizes[s][0],sizes[s][1],&range);
     out<<"{\"width\":"<<sizes[s][0]<<",\"height\":"<<sizes[s][1]<<",\"queryStatus\":"<<error<<",\"maxFps\":"<<range.maxVal<<",\"supports60\":"<<(OH_AVCapability_AreVideoSizeAndFrameRateSupported(cap,sizes[s][0],sizes[s][1],60)?"true":"false")<<",\"supports120\":"<<(OH_AVCapability_AreVideoSizeAndFrameRateSupported(cap,sizes[s][0],sizes[s][1],120)?"true":"false")<<"}";
    }
    out<<"]";
@@ -32,7 +32,7 @@ static napi_value StoreProfile(napi_env env,napi_callback_info info){size_t n=4;
 void RegisterClient(napi_env env,napi_value exports);
 static napi_value Init(napi_env env,napi_value exports) {
  napi_property_descriptor d[]={ {"probe",nullptr,Probe,nullptr,nullptr,nullptr,napi_default,nullptr},{"storeProfile",nullptr,StoreProfile,nullptr,nullptr,nullptr,napi_default,nullptr} };
- napi_define_properties(env,exports,1,d);RegisterClient(env,exports);RegisterAvailability(env,exports);return exports;
+ napi_define_properties(env,exports,sizeof(d)/sizeof(d[0]),d);RegisterClient(env,exports);RegisterAvailability(env,exports);return exports;
 }
 static napi_module module={1,0,nullptr,Init,"edgelink",nullptr,{0}};
 extern "C" __attribute__((constructor)) void Register() {napi_module_register(&module);}

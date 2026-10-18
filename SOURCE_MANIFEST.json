@@ -6,8 +6,8 @@
   },
   {
     "path": ".github/workflows/compatibility.yml",
-    "bytes": 3421,
-    "sha256": "eb41fcb2ea830797307ae77183e61e02d8b46a4af72d7323cd2962646c1e2cab"
+    "bytes": 3773,
+    "sha256": "d0660a6faf67f9530e282512f17d94e3a57e3277649bc1fe1c0f4f13e6a3c863"
   },
   {
     "path": ".gitignore",
@@ -32,7 +32,7 @@
   {
     "path": "DEPENDENCY_ARCHIVE.json",
     "bytes": 289,
-    "sha256": "f6bc7f1710a72158bffeb0ee74bb01748a175b0cf77919b27ac0a70044b63aec"
+    "sha256": "515c9fcb38a8f10119d7695ad6163fc34743a811049dc2f5b4cd8687273d984a"
   },
   {
     "path": "LICENSE",
@@ -66,8 +66,8 @@
   },
   {
     "path": "VALIDATION.json",
-    "bytes": 1162,
-    "sha256": "e6446abcca77748b7dcae714011f4b3372ded031ce685924d7cca0048a94b4da"
+    "bytes": 1306,
+    "sha256": "2309ade4ee5162de5c5b729d329b020e03e7fc0262aae2ada9dfbc1cc50c4b50"
   },
   {
     "path": "VERSION.json",
@@ -81,13 +81,13 @@
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
-    "bytes": 2923,
-    "sha256": "b286ffa74bc55eb43b70d53cdc009a8ecdc49ce06823fb9ccf86852f31b9b0b2"
+    "bytes": 3183,
+    "sha256": "861e9e0934492a86a4bb03c10467743b60a19b8128dfebe77131bfa1112b1c98"
   },
   {
     "path": "docs/BUILD.md",
-    "bytes": 2977,
-    "sha256": "5fb97a5803df6e3e58eb498c694d169898f131ae531c974751a2c411254bdde6"
+    "bytes": 3274,
+    "sha256": "9c3f89d6cb8366410065c86c68e327b97f889e7a6f6027f9597517057293d081"
   },
   {
     "path": "docs/MAC_INSTALL.md",
@@ -291,8 +291,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/probe.cpp",
-    "bytes": 3344,
-    "sha256": "c174565660cad6343deb09e460c53e633fdac0a526896c30a96cac09856e2e59"
+    "bytes": 3364,
+    "sha256": "3220b5a8ced40a9a32702243b9a981f4f0ef687678fb1aff9ad2daee5219c6b3"
   },
   {
     "path": "harmony/entry/src/main/cpp/remote_audio.cpp",
@@ -386,8 +386,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 138547,
-    "sha256": "a53c45062ebac0513e2c09680bb84a41760f60672fed9f247c3d48f5aa80d8c5"
+    "bytes": 138709,
+    "sha256": "e927a7d0eef41c7d2dd1bd23c694e22402c55a93986dfd95d7b4a17333eb4e3b"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -416,8 +416,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/store/HarmonyAccessory.ets",
-    "bytes": 1413,
-    "sha256": "c3513c4672a62a8a903dabd2592f372c06055c51b9b34eb55edca09a0edeb59c"
+    "bytes": 1463,
+    "sha256": "3c382225936e4a4e276499662f384b477f13cf11a2487c4dcaf0bc63a9e25614"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
@@ -558,6 +558,26 @@
     "path": "shared/TransportPolicy.hpp",
     "bytes": 1629,
     "sha256": "859ead4a36f23cdda289d654e6203a9b8e43f08d82265c5042007606b889c91a"
+  },
+  {
+    "path": "tests/host_stubs/hilog/log.h",
+    "bytes": 117,
+    "sha256": "14cfd5eaddb1b5858d815089d3d6de59aa397c00df33522f2f2410dce9ea3e23"
+  },
+  {
+    "path": "tests/host_stubs/multimedia/player_framework/native_avcapability.h",
+    "bytes": 818,
+    "sha256": "b402be9708562170c0d15703a5483806a46c9e1fb671f71782b651a3a89208e8"
+  },
+  {
+    "path": "tests/host_stubs/napi/native_api.h",
+    "bytes": 1888,
+    "sha256": "46a7a6f8444eef66a5dd7968a7be9e92b0aaf73b7bf2a58f295e161aad2feb02"
+  },
+  {
+    "path": "tests/native_exports_test.cpp",
+    "bytes": 1376,
+    "sha256": "27e01715362ff1fca52a436b591218165d16184b2e25d8e43ee51a05abd49953"
   },
   {
     "path": "tests/policy_test.cpp",

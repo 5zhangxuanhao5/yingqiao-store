@@ -26,6 +26,8 @@
 
 GitHub Actions 在 macOS 15 的 Apple Silicon、Intel 标准托管环境分别编译两种 Mac 架构，并仅执行无界面的自检。在 Ubuntu 24.04、Windows Server 2022 编译并执行可移植的屏幕选档、通道策略和 USB 协议模拟。Windows 检查不代表已实现 Windows 扩展屏服务；Mac 部署目标13.0不代表已在macOS13运行。托管环境没有华为平板，不能证明真实 USB 重枚举、视频流畅度、触控板兼容或拔插接续。HarmonyOS 的官方SDK编译在本地隔离工程完成，正式签名与真机云测尚待接入。
 
+Linux和Mac还会将真实的 `probe.cpp` 与测试专用NAPI／硬件能力替身一起编译，调用实际模块初始化并从导出表执行 `storeProfile`。这可发现“函数编译了但未导出”的桥接错误；替身不构成真实解码器测试，也不会进入产品构建。
+
 ## USB离线研究检查命令
 
 `clang++ -std=c++17 -Wall -Wextra -Werror tests/usb_test.cpp -o usb-test`测试控制请求序列、同意门控、流分片及公平调度；不接触硬件。Mac IOKit适配可使用 `clang++ -target arm64-apple-macos13.0 -std=c++17 -Wno-deprecated-declarations -c mac/USB/AccessoryControl.cpp` 编译，也对x86_64做编译检查；对象文件不被GUI链接，不运行设备枚举或模式切换。

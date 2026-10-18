@@ -32,6 +32,8 @@ jobs:
           ./usb-test
           g++ -std=c++17 -Wall -Wextra -Werror tests/policy_test.cpp -o policy-test
           ./policy-test
+          g++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -I tests/host_stubs tests/native_exports_test.cpp -o exports-test
+          ./exports-test
       - name: Compile and run Windows fixtures (not a Windows display driver)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -72,3 +74,5 @@ jobs:
           "$RUNNER_TEMP/usb-test"
           clang++ -std=c++17 -Wall -Wextra -Werror tests/policy_test.cpp -o "$RUNNER_TEMP/policy-test"
           "$RUNNER_TEMP/policy-test"
+          clang++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -I tests/host_stubs tests/native_exports_test.cpp -o "$RUNNER_TEMP/exports-test"
+          "$RUNNER_TEMP/exports-test"

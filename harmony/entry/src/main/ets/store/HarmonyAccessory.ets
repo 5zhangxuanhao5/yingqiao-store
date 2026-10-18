@@ -1,6 +1,7 @@
 import { usbManager } from '@kit.BasicServicesKit';
-// Research adapter only: not imported by the product page, no startup permission
-// requests, and never marks a path ready until the future TLS peer is verified.
+// Research adapter only: the page references its static contract flag to force
+// SDK compilation, but never constructs it or requests accessory access.
+// No path is ready until the future TLS peer is verified.
 export class HarmonyAccessoryCandidate {
  static readonly sdkContractAvailable: boolean = true;
  private handle: usbManager.USBAccessoryHandle | null = null;

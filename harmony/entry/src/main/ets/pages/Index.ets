@@ -1,5 +1,5 @@
 import { HarmonyAccessoryCandidate } from '../store/HarmonyAccessory';
-import { pasteboard } from '@kit.BasicServicesKit';
+import { pasteboard, systemDateTime } from '@kit.BasicServicesKit';
 import { scanBarcode } from '@kit.ScanKit';
 import { validatePairing, STORE_DOWNLOAD_URL, StorePairing } from '../store/StorePairing';
 import native, { NativeMouseSample, NativeCursorSample, AvailabilityEvent } from 'libedgelink.so';
@@ -31,7 +31,6 @@ interface RTCBridgeSafeEvent {
  lastVideoBytes?: number; largestVideoBytes?: number; lastKeyframeBytes?: number; largestKeyframeBytes?: number; recordBudgetMs?: number;
 }
 interface PlatformNetwork { name: string; prefixes: string[]; mtu: number; routeEpoch: number; netId: number; }
-interface WindowModeSnapshot { isPcMode?: boolean; }
 interface InputTrace { kind: string; action: number; source: number; tool: number; fingers: number; deviceId: number; }
 interface InputDeviceDiagnostic { id: number; name: string; sources: string[]; isVirtual?: boolean; isLocal?: boolean; }
 interface ClickTrace { button: number; down: boolean; count: number; intervalMs: number; distanceVp: number; }
@@ -417,6 +416,12 @@ struct Index {
  private watchInputDevices(): void {
   if (this.inputDeviceWatchActive) { return; }
   try { inputDevice.on('change', this.inputDeviceListener);this.inputDeviceWatchActive = true; } catch (e) { /* Discovery still runs at session start. */ }
+ }
+ private storeInputTimestamp(): number {
+  // Public synchronous monotonic time in nanoseconds; do not depend on
+  // SDK-restricted JS event timestamp fields in the store variant.
+  try { return systemDateTime.getUptime(systemDateTime.TimeType.STARTUP, true); }
+  catch (e) { return 0; }
  }
  private button(button: number, down: boolean, timestamp: number = 0, tolerance: number = 5): void {
   if (this.mouseHeld[button] === down) { return; }this.mouseHeld[button] = down;
@@ -880,12 +885,10 @@ struct Index {
    try { w.setWindowDecorVisible(!value); } catch (e) { this.windowWarnings.push(`decor: ${e}`); }
    try { await w.setTitleAndDockHoverShown(!value || this.diagnosticSystemHover, !value); } catch (e) { this.windowWarnings.push(`hover: ${e}`); }
    if (epoch !== this.presentationEpoch) { return; }
-   // Keep only the mode needed for gesture diagnosis, never the full system snapshot.
+   // Do not use the test-directory-only window snapshot API in a store variant.
    try {
     this.freeWindowMode = w.isInFreeWindowMode();
-    const snapshot = JSON.parse(await w.getWindowStateSnapshot()) as WindowModeSnapshot;
-    if (epoch !== this.presentationEpoch) { return; }
-    this.systemWindowMode = typeof snapshot.isPcMode === 'boolean' ? (snapshot.isPcMode ? 'computer' : 'tablet') : 'unknown';
+    this.systemWindowMode = 'unknown';
    } catch (e) { this.systemWindowMode = 'unknown'; }
    this.windowError = '';this.syncCursorLock();this.saveStatus();
   } catch (e) { this.windowError = `${e}`;this.saveStatus(); }
@@ -1370,7 +1373,7 @@ struct Index {
   if (this.convertedTrackpadDeviceId !== deviceId) {
    // Ignore an orphaned continuation after a menu, cancellation, or focus loss. Never turn its Up into a tap.
    if (event.type !== TouchType.Down) { return true; }
-   this.endGestures();this.button(0, false, event.timestamp);this.dragging = false;this.twoFingers = false;
+   this.endGestures();this.button(0, false, this.storeInputTimestamp());this.dragging = false;this.twoFingers = false;
    this.convertedTrackpadDeviceId = deviceId;
   }
   if (fingers.length >= 2) {
@@ -1423,7 +1426,7 @@ struct Index {
    this.touchScreenStartX = this.touchScreenLastX = point.x;this.touchScreenStartY = this.touchScreenLastY = point.y;
    this.touchScreenStartedAt = Date.now();this.touchScreenGestureEvents = 1;this.recordTouchScreenDecision('pending');
    this.touchScreenFeedbackX = point.x;this.touchScreenFeedbackY = point.y;this.touchScreenFeedback = 'pending';
-   this.touchScreenTimestamp = event.timestamp;this.dragging = false;this.twoFingers = false;this.move(point.x, point.y);
+   this.touchScreenTimestamp = this.storeInputTimestamp();this.dragging = false;this.twoFingers = false;this.move(point.x, point.y);
    const epoch = this.touchScreenEpoch, generation = this.sessionGeneration;
    this.touchScreenTimer = setTimeout(() => {
     if (epoch !== this.touchScreenEpoch || generation !== this.sessionGeneration) { return; }
@@ -1446,7 +1449,7 @@ struct Index {
   if ((event.deviceId ?? -1) !== this.touchScreenDeviceId) { return; }
   const point = event.changedTouches.find((item: TouchObject) => item.id === this.touchScreenId);
   if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) {
-   if (event.type === TouchType.Up) { this.cancelTouchScreenGesture(event.timestamp);if (fingers.length === 0) { this.unconvertedTouchDeviceId = -1;this.twoFingers = false; } }
+   if (event.type === TouchType.Up) { this.cancelTouchScreenGesture(this.storeInputTimestamp());if (fingers.length === 0) { this.unconvertedTouchDeviceId = -1;this.twoFingers = false; } }
    return;
   }
   this.touchScreenGestureEvents++;
@@ -1474,8 +1477,8 @@ struct Index {
    const tap = this.touchScreenState === 'pending';
    if (tap) { this.recordTouchScreenDecision('tap'); }
    if (tap || this.touchScreenState === 'drag') { this.move(point.x, point.y); }
-   this.cancelTouchScreenGesture(event.timestamp);
-   if (tap) { this.button(0, true, event.timestamp, 24);this.button(0, false, event.timestamp); }
+   this.cancelTouchScreenGesture(this.storeInputTimestamp());
+   if (tap) { this.button(0, true, this.storeInputTimestamp(), 24);this.button(0, false, this.storeInputTimestamp()); }
    this.dragging = false;if (fingers.length === 0) { this.unconvertedTouchDeviceId = -1;this.twoFingers = false; }
   }
  }
@@ -1497,14 +1500,14 @@ struct Index {
    if (this.diagnosticRelativeCursor) {
     if (event.type === TouchType.Down && !this.mouseHeld[0]) { this.relativeDragTrace = []; }
     if (event.type === TouchType.Move) { this.relativeDragTouchMoves++; }
-    this.recordRelativeDrag(0, event.type, event.deviceId ?? -1, event.source, event.sourceTool, event.timestamp,
+    this.recordRelativeDrag(0, event.type, event.deviceId ?? -1, event.source, event.sourceTool, this.storeInputTimestamp(),
      point.x, point.y, point.windowX, point.windowY, point.displayX, point.displayY);
    }
    if (this.convertedTrackpadDeviceId >= 0 && event.type === TouchType.Move) { return; }
    if (this.convertedTrackpadDeviceId >= 0 && event.type === TouchType.Down) { this.endGestures();this.twoFingers = false; }
    if (this.convertedTrackpadDeviceId < 0 && !this.relativeCursorActive && !this.shouldPreserveCrossDisplayPointer()) { this.move(point.x, point.y); }
-   if (event.type === TouchType.Down) { this.focusRemote();this.button(0, true, event.timestamp); }
-   else if (event.type === TouchType.Up || event.type === TouchType.Cancel) { this.button(0, false, event.timestamp); }
+   if (event.type === TouchType.Down) { this.focusRemote();this.button(0, true, this.storeInputTimestamp()); }
+   else if (event.type === TouchType.Up || event.type === TouchType.Cancel) { this.button(0, false, this.storeInputTimestamp()); }
    return;
   }
   if (event.sourceTool === SourceTool.TOUCHPAD || event.source === SourceType.Mouse) { return; }
@@ -1540,10 +1543,10 @@ struct Index {
   const point = event.changedTouches[0];if (!point) { return; }
   if (event.type === TouchType.Down) { this.startX = point.x;this.startY = point.y;this.dragging = false;this.twoFingers = false;this.move(point.x, point.y); }
   else if (event.type === TouchType.Move && !this.twoFingers) {
-   if (!this.dragging && Math.hypot(point.x - this.startX, point.y - this.startY) > 8) { this.move(this.startX, this.startY);this.button(0, true, event.timestamp, 24);this.dragging = true; }
+   if (!this.dragging && Math.hypot(point.x - this.startX, point.y - this.startY) > 8) { this.move(this.startX, this.startY);this.button(0, true, this.storeInputTimestamp(), 24);this.dragging = true; }
    this.move(point.x, point.y);
   } else if (event.type === TouchType.Up) {
-   if (!this.twoFingers) { this.move(point.x, point.y);if (!this.dragging) { this.button(0, true, event.timestamp, 24); }this.button(0, false, event.timestamp); }
+   if (!this.twoFingers) { this.move(point.x, point.y);if (!this.dragging) { this.button(0, true, this.storeInputTimestamp(), 24); }this.button(0, false, this.storeInputTimestamp()); }
    this.dragging = false;if (event.touches.length === 0) { this.twoFingers = false; }
    if (fingers.length === 0) { this.unconvertedTouchDeviceId = -1; }
   }
@@ -1567,7 +1570,7 @@ struct Index {
  }
  private onJsMouse(event: MouseEvent, route: number): void {
   const sample: MouseInputSample = { action: event.action, button: event.button, source: event.source,
-   sourceTool: event.sourceTool, deviceId: event.deviceId, timestamp: event.timestamp,
+   sourceTool: event.sourceTool, deviceId: event.deviceId, timestamp: this.storeInputTimestamp(),
    x: event.x, y: event.y, windowX: event.windowX, windowY: event.windowY,
    displayX: event.displayX, displayY: event.displayY, rawDeltaX: event.rawDeltaX, rawDeltaY: event.rawDeltaY };
   this.mouse(sample, route);
