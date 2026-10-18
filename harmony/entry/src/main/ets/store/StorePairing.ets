@@ -15,4 +15,4 @@ export function validatePairing(text: string): StorePairing | null {
  } catch (e) { return null; }
 }
 
-export const STORE_INSTALL_STEPS:string='1. 点“复制 Mac 下载链接”，发送到你的 Mac，在电脑浏览器地址栏粘贴并打开。\n\n2. 在网页“Mac 测试版下载”处，点击 Yingqiao-Mac-0.3.2.zip。不要下载 Source code 或 native-dependencies，它们不是安装包。\n\n3. 在 Mac 的“访达 → 下载”找到 ZIP，双击解压。把“映桥”拖进“应用程序”，再双击打开。\n\n4. 阅读电脑端用途说明后点“继续设置”。按 macOS 的权限通知完成“录屏与系统录音”和“辅助功能”授权；这些分别用于显示画面和键鼠操作。认证只在你自己的 Mac 上完成。\n\n5. 保持两端映桥都打开，回到平板点“Mac 已安装，开始使用”，选择附近的 Mac。第一次连接，在 Mac 点“允许连接”，之后无需再次确认。\n\n当前是尚未完成 Apple 公证的测试包；若系统阻止打开，请先停止安装并把提示反馈给我们。';
+export const STORE_INSTALL_STEPS:string='1. 点“复制电脑端下载链接”，发送到你的 Mac，在电脑浏览器地址栏粘贴并打开。\n\n2. 在网页 Assets（附件）里点击 Yingqiao-Mac-0.3.2.zip。不要下载 Source code 或 native-dependencies，它们是开发资料，不是安装包。\n\n3. 在 Mac 的“访达 → 下载”找到 ZIP，双击解压。把“映桥”拖进“应用程序”，再双击打开。\n\n4. 阅读电脑端用途说明后点“继续设置”。按 macOS 的权限通知完成“录屏与系统录音”和“辅助功能”授权，分别用于显示画面和键鼠操作。系统密码或触控 ID 只在你自己的 Mac 上完成，不要发给任何人。\n\n5. 保持两端映桥都打开，回到平板点“Mac 已安装，开始使用”，选择附近的 Mac。首次连接，在 Mac 点“允许连接”；以后可直接开启扩展屏。\n\nMac 客户端仅通过 GitHub 下载，不上架 Mac App Store。当前未经过 Apple 公证，系统可能阻止直接打开。请核对来源和下载校验值，再按下载页链接的 Apple 官方单应用确认说明，由本人判断是否打开；不关闭全局安全保护。若提示软件损坏、将损坏电脑，或校验值不符，请停止并反馈。';

@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 4165,
-    "sha256": "a49c2d31c717c02df3e57669c694acc9611642b3b2f360287c60b881e66ced61"
+    "bytes": 4419,
+    "sha256": "8aa3b3711f05fd9a22f8039d3eaccd5aefea654266045f27e8ab4a2827f535ae"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -86,8 +86,8 @@
   },
   {
     "path": "docs/APPGALLERY_READINESS.md",
-    "bytes": 4530,
-    "sha256": "816c7def32b76b6ad505b259b7c86ee7890589155da9fc75f011ed00e3ff8004"
+    "bytes": 4743,
+    "sha256": "c41d576596acb15f822a48835a418eba9c9c49951f58a638c947d20670e57515"
   },
   {
     "path": "docs/BUILD.md",
@@ -121,13 +121,18 @@
   },
   {
     "path": "docs/FORMAL_PREPARATION_033.md",
-    "bytes": 3069,
-    "sha256": "948c3abea8f628d8fdc1f4087a355adb25bd28da92ed6fcb30811ec4da474500"
+    "bytes": 3244,
+    "sha256": "51b88285af20c235204de2df8ddad9f664dfe153985c4f5849442555ccb1fb44"
   },
   {
     "path": "docs/MAC_INSTALL.md",
     "bytes": 4828,
     "sha256": "a2bc9f52943aa0d90a6481a735d4e285ba16bd4a8cfece8ea0763f934b5a1dde"
+  },
+  {
+    "path": "docs/MARKETING_ASSETS.md",
+    "bytes": 1309,
+    "sha256": "b4659b6d9bfe5a07ea588a88c5b41c3ac92cf667e622c2c4f566fdf0a6f305da"
   },
   {
     "path": "docs/NAME_RELEASE_032.md",
@@ -150,6 +155,11 @@
     "sha256": "a59dc5f1263d69a423130c917568175ed13b6acae551a5fb8ed1eb5ee56330c0"
   },
   {
+    "path": "docs/REGRESSION_034.md",
+    "bytes": 2630,
+    "sha256": "09b2ede1d1de6ef6b9927132997d9545563cd909967d8bf311d8649e07013b48"
+  },
+  {
     "path": "docs/TRACKPAD_TEST_021.md",
     "bytes": 1161,
     "sha256": "8025518a56037a3828c5fab08a5fcba1761b3eca3051b510a40a4d16738cf847"
@@ -170,6 +180,71 @@
     "sha256": "c362550821b5822b2dc1495502e27a9b6128bf7c9b57d32b2e4c2a1b90d615ce"
   },
   {
+    "path": "docs/media/ASSET_MANIFEST.json",
+    "bytes": 1784,
+    "sha256": "0bf0cd0730b8e0f9d77d057588bf4d1104ee4d61f114ac8a8622686bf34a1344"
+  },
+  {
+    "path": "docs/media/edge-033-home.jpg",
+    "bytes": 210505,
+    "sha256": "246ff54c5ac1c88400477a38627028fa3c9c073df99b18c40b25846433403dfc"
+  },
+  {
+    "path": "docs/media/edge-033-install-guide.jpg",
+    "bytes": 275745,
+    "sha256": "4cfd309605ea06c6e6544a2ad1ff35a2e2f55626a2b85e435bdc7b7078944784"
+  },
+  {
+    "path": "docs/media/edge-033-privacy.jpg",
+    "bytes": 180654,
+    "sha256": "f0986fc2cd403470db86c8f06fc5e24c58b1a81a12c43f774482354eaac1601c"
+  },
+  {
+    "path": "docs/media/yingqiao-connect-v2-prompt.txt",
+    "bytes": 2016,
+    "sha256": "bba215edbb343e4238d1cdd444438f7dc4e1b84cc83a12bdad12e15f12982aca"
+  },
+  {
+    "path": "docs/media/yingqiao-connect-v2.png",
+    "bytes": 1690653,
+    "sha256": "9fa504f64d26ab7fa5873efa42179a30b0a4c9ed0f6d37d312caae8dda69bba8"
+  },
+  {
+    "path": "docs/media/yingqiao-gestures-v2-prompt.txt",
+    "bytes": 1637,
+    "sha256": "85eceb1dd13ecf4b866fbd479c38578405d2b507fcd1e050fd54156f2c01ce29"
+  },
+  {
+    "path": "docs/media/yingqiao-gestures-v2.png",
+    "bytes": 1632764,
+    "sha256": "bf739d47f271d1b57c4b518a341d9e1cab6f88271bc4d0b34215b7e056b838cb"
+  },
+  {
+    "path": "docs/media/yingqiao-overview-v2-prompt.txt",
+    "bytes": 464,
+    "sha256": "f7d16c5ea5d7e471ebac8636b86ceefe8f17a1e612a8ec3c9ef693ccee4502f0"
+  },
+  {
+    "path": "docs/media/yingqiao-overview-v2.png",
+    "bytes": 1712553,
+    "sha256": "2a92afdece8ba22934cb818fb1ff808f85869b72baae43ff867889249ca8d830"
+  },
+  {
+    "path": "docs/media/yingqiao-poster-v1-prompt.txt",
+    "bytes": 1527,
+    "sha256": "bba733042c1b7fdf0832257547565d19c67ca83c458e3d88035b20232b328add"
+  },
+  {
+    "path": "docs/media/yingqiao-poster-v1.json",
+    "bytes": 370,
+    "sha256": "a63070081e393cd1c0bd84dfb839f0445973009011f8eccfdc0dd06ce0dbd84f"
+  },
+  {
+    "path": "docs/media/yingqiao-poster-v1.png",
+    "bytes": 1723459,
+    "sha256": "4b3f4cada0a8c7f86f26a00da4660a22b03bbd8439156e81dd128f163dc21694"
+  },
+  {
     "path": "docs/tablet-input-compatibility-reference.json",
     "bytes": 117,
     "sha256": "4acabdfeddbd24821560cf8c9f48ca46f8ae7305e9071877cc696e9b67f3fd37"
@@ -177,7 +252,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 198,
-    "sha256": "21c3b31e4889d22a26bea71b091004d80fc75eadda2ddb0cac4139fc105f4c76"
+    "sha256": "99526e8cee5536a08096dadb97fdfc043a279f3c8cc0a6ca22770a9c3c577a57"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -306,8 +381,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/local/availability.cpp",
-    "bytes": 38193,
-    "sha256": "0bf8106129b478d0bdcbf6ad94b44afc91c2f1820532dd54f06d364906615bef"
+    "bytes": 38258,
+    "sha256": "991c4ac5238f309abca863519833d3c4846e8e385c7cd06890b19be12ee870a1"
   },
   {
     "path": "harmony/entry/src/main/cpp/local/availability.h",
@@ -431,8 +506,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/store_policy.h",
-    "bytes": 877,
-    "sha256": "71ee78037de083f6ea9c48eae8757f6806d7bf77ac6d2f16ed5f106f9ef14d51"
+    "bytes": 990,
+    "sha256": "2d595e7b9e3c7be0bdad10c04d094cd0af87662331ac112ea554b82bb7df5fe8"
   },
   {
     "path": "harmony/entry/src/main/cpp/timing.h",
@@ -461,8 +536,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 157630,
-    "sha256": "7582e88fdd5315d59b55c9866b2482eb2b2198529b3989c34c349a6a3d3125ef"
+    "bytes": 159597,
+    "sha256": "4f1a7b37120285fd9a33e110542f9c9bbf44110bc5c632f0a51161caf6550f53"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -506,8 +581,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
-    "bytes": 2455,
-    "sha256": "fdaee6c6132b9d1f83fbd3ae4c01e3452d61821163194be500ca0bfc110ad5a2"
+    "bytes": 2757,
+    "sha256": "4ea673cea6e00cb733da4555ba4d1a4f645dbe7a514da9a390de886f212777a9"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePrivacy.ets",
@@ -806,8 +881,8 @@
   },
   {
     "path": "tests/policy_test.cpp",
-    "bytes": 3604,
-    "sha256": "d525fcb03eb5a36c74460a52825e6a542f6a711aec68e84f147f59e3efc2bdb7"
+    "bytes": 3695,
+    "sha256": "61f51e53bcd30dc1c60ffc510e66169898a5429c6888bdccd151191fb1759723"
   },
   {
     "path": "tests/portable_profile_test.cpp",

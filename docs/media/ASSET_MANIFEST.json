@@ -1,0 +1,68 @@
+[
+  {
+    "file": "yingqiao-overview-v2.png",
+    "kind": "AI promotional scene",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "sha256": "2a92afdece8ba22934cb818fb1ff808f85869b72baae43ff867889249ca8d830",
+    "appScreenshot": false
+  },
+  {
+    "file": "yingqiao-connect-v2.png",
+    "kind": "AI connection-flow illustration",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "sha256": "9fa504f64d26ab7fa5873efa42179a30b0a4c9ed0f6d37d312caae8dda69bba8",
+    "appScreenshot": false
+  },
+  {
+    "file": "yingqiao-gestures-v2.png",
+    "kind": "AI gesture illustration",
+    "dimensions": [
+      1536,
+      1024
+    ],
+    "sha256": "bf739d47f271d1b57c4b518a341d9e1cab6f88271bc4d0b34215b7e056b838cb",
+    "appScreenshot": false
+  },
+  {
+    "file": "edge-033-privacy.jpg",
+    "kind": "real unedited MatePad screenshot of 0.3.3",
+    "dimensions": [
+      3120,
+      2080
+    ],
+    "sha256": "f0986fc2cd403470db86c8f06fc5e24c58b1a81a12c43f774482354eaac1601c",
+    "appScreenshot": true,
+    "personalDeviceNameVisible": false,
+    "deviceNamePublicationAuthorized": true
+  },
+  {
+    "file": "edge-033-home.jpg",
+    "kind": "real unedited MatePad screenshot of 0.3.3",
+    "dimensions": [
+      3120,
+      2080
+    ],
+    "sha256": "246ff54c5ac1c88400477a38627028fa3c9c073df99b18c40b25846433403dfc",
+    "appScreenshot": true,
+    "personalDeviceNameVisible": true,
+    "deviceNamePublicationAuthorized": true
+  },
+  {
+    "file": "edge-033-install-guide.jpg",
+    "kind": "real unedited MatePad screenshot of 0.3.3",
+    "dimensions": [
+      3120,
+      2080
+    ],
+    "sha256": "4cfd309605ea06c6e6544a2ad1ff35a2e2f55626a2b85e435bdc7b7078944784",
+    "appScreenshot": true,
+    "personalDeviceNameVisible": true,
+    "deviceNamePublicationAuthorized": true
+  }
+]

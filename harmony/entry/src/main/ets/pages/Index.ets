@@ -508,6 +508,13 @@ struct Index {
  private systemCursorHidden: boolean = false;
  private relativeAnchorReady: boolean = false;
  private relativeAnchorEpoch: number = 0;
+ // Stock tablet firmware may convert a pressed pointer to synthetic touch.
+ // Confine (do not freeze) the system pointer for that gesture, using touch
+ // deltas from its original anchor. No global input permission or SDK override.
+ private convertedMouseDrag: boolean = false;
+ private convertedMouseX: number = 0;
+ private convertedMouseY: number = 0;
+ private convertedMouseDragMoves: number = 0;
  private relativeCursorBlocked: boolean = false;
  private relativeCursorStatus: string = 'disabled';
  private relativeWindowId: number = -1;
@@ -1007,6 +1014,7 @@ struct Index {
   this.timer = setInterval(() => this.refresh(generation), 1000);this.focusRemote();
  }
  private stop(reason: string = 'user_end', restore: boolean = true): void {
+  hilog.info(0x1234,'StoreSession','end=%{public}s generation=%{public}d',reason,this.sessionGeneration);
   this.storeStopFastHandover();
   if(reason!=='restart'&&reason!=='local_handover'){native.storePathsStop();this.storeRecoveryUntil=0;this.storeActiveHost='';}
   if (reason !== 'restart' && reason !== 'udp_fallback') { this.dynamicWANRoute.cancel(reason); }
@@ -1018,7 +1026,7 @@ struct Index {
   this.sessionGeneration++;this.stopRTC();
   this.unbindCursorChannel();
   this.unbindNativeMouseRoute();
-  this.restoreSystemCursor();
+  this.convertedMouseDrag = false;this.restoreSystemCursor();
   this.clearDesktopTopology();
   native.input('CURSORLOCK -1 0');
   this.endGestures();
@@ -1078,7 +1086,7 @@ struct Index {
     if (this.diagnosticRelativeCursor && !this.nativeMouseRouteBound) { this.restoreSystemCursor();this.relativeCursorStatus = 'native_mouse_route_unavailable'; }
     if (!relative) { this.restoreSystemCursor(false, true); }
     this.relativeWindowId = w.getWindowProperties().id;
-    native.input(`CURSORLOCK ${this.relativeWindowId} 1 ${relative ? 0 : 1}`);
+    native.input(`CURSORLOCK ${this.relativeWindowId} 1 ${relative && !this.convertedMouseDrag ? 0 : 1}`);
    } else { this.restoreSystemCursor();native.input('CURSORLOCK -1 0'); }
   } catch (e) {
    this.restoreSystemCursor();
@@ -1089,7 +1097,7 @@ struct Index {
  private onRelativeCursorSettingChanged(): void { this.relativeCursorBlocked = false;this.restoreSystemCursor();this.syncCursorLock(); }
  private restoreSystemCursor(resetAnchor: boolean = true, allowHost: boolean = false): void {
   this.relativeCursorActive = false;
-  if (resetAnchor) { this.relativeAnchorEpoch++;this.relativeAnchorReady = false;this.relativeWindowId = -1;this.relativeLastRawTimestamp = -1;this.relativeMissingRawRun = 0; }
+  if (resetAnchor) { this.convertedMouseDrag = false;this.relativeAnchorEpoch++;this.relativeAnchorReady = false;this.relativeWindowId = -1;this.relativeLastRawTimestamp = -1;this.relativeMissingRawRun = 0; }
   this.updateCursorVisibility(allowHost);
  }
  private updateCursorVisibility(allowHost: boolean = true): void {
@@ -1106,9 +1114,10 @@ struct Index {
  private syncRelativeCursor(s: Statistics): void {
   const allowed = this.diagnosticRelativeCursor && this.nativeMouseRouteBound && this.nativeMouseRouteGeneration === this.sessionGeneration && this.diagnosticCursorLock !== false && !this.relativeCursorBlocked &&
    this.remoteInputAllowed() && this.fullScreen && this.relativeAnchorReady && s.running && !s.localUI;
-  const confirmed = allowed && s.cursorLocked && s.cursorFollowMovement === false && !s.cursorLockPending &&
+  const confirmed = allowed && s.cursorLocked && s.cursorFollowMovement === this.convertedMouseDrag && !s.cursorLockPending &&
    !s.cursorLockStateUncertain && s.cursorLockWindowId === this.relativeWindowId;
   if (!confirmed) {
+   if (allowed && this.convertedMouseDrag && s.cursorLockPending && this.relativeCursorActive) { return; }
    this.restoreSystemCursor(false, true);
    if (!this.relativeCursorBlocked && !this.systemCursorHidden) { this.relativeCursorStatus = !this.diagnosticRelativeCursor ? 'disabled' : (!this.nativeMouseRouteBound || this.nativeMouseRouteGeneration !== this.sessionGeneration ? 'native_mouse_route_unavailable' : (!this.relativeAnchorReady ? 'waiting_for_safe_pointer_position' : 'waiting_for_lock_confirmation')); }
    return;
@@ -1199,7 +1208,7 @@ struct Index {
    rawDeltaX: sample.rawDeltaX, rawDeltaY: sample.rawDeltaY, nativeAction: sample.nativeAction, nativeButton: sample.nativeButton, nativeTool: sample.sourceTool }, 3);
  }
  private relativeMouseMove(event: MouseInputSample): void {
-  if (!this.relativeCursorActive || event.action !== MouseAction.Move) { return; }
+  if (this.convertedMouseDrag || !this.relativeCursorActive || event.action !== MouseAction.Move) { return; }
   const dx = event.rawDeltaX, dy = event.rawDeltaY;
   if (typeof dx !== 'number' || typeof dy !== 'number' || !Number.isFinite(dx) || !Number.isFinite(dy)) {
    this.relativeMissingRawEvents++;this.relativeMissingRawRun++;
@@ -1297,7 +1306,7 @@ struct Index {
    s.cursorSyncApplied = this.cursorSyncApplied;s.cursorSyncStaleSession = this.cursorSyncStaleSession;s.cursorSyncStaleSequence = this.cursorSyncStaleSequence;
    s.cursorSyncStaleInput = this.cursorSyncStaleInput;s.cursorSyncInvalid = this.cursorSyncInvalid;
    s.hostCursorOwner = this.hostCursorOwner;s.hostCursorVisible = this.hostCursorVisible;
-   if(Date.now()-this.lastPerformanceLog>2000){this.lastPerformanceLog=Date.now();hilog.info(0x1234,'StorePerformance','rx=%{public}d rendered=%{public}d fps=%{public}s decodeP95=%{public}s queueP95=%{public}s bytes=%{public}d',s.receivedFrames,s.renderSubmittedFrames,String(s.renderSubmittedFPS),String(s.decodeP95ms),String(s.inputQueueP95ms),s.bytesReceived);}
+   if(Date.now()-this.lastPerformanceLog>2000){this.lastPerformanceLog=Date.now();hilog.info(0x1234,'StorePerformance','rx=%{public}d rendered=%{public}d fps=%{public}s decodeP95=%{public}s queueP95=%{public}s bytes=%{public}d',s.receivedFrames,s.renderSubmittedFrames,String(s.renderSubmittedFPS),String(s.decodeP95ms),String(s.inputQueueP95ms),s.bytesReceived);hilog.info(0x1234,'StoreSession','generation=%{public}d running=%{public}d transport=%{public}d stop=%{public}s raw=%{public}d touchMoves=%{public}d convertedDrag=%{public}d held=%{public}d relative=%{public}d',this.sessionGeneration,s.running?1:0,this.sessionTransport,s.stopReason,this.relativeRawEvents,this.relativeDragTouchMoves,this.convertedMouseDragMoves,this.mouseHeld[0]?1:0,this.relativeCursorActive?1:0);}
    this.writeFile('session-status.json', JSON.stringify(s));return s;
   } catch (e) { return null; }
  }
@@ -1680,9 +1689,23 @@ struct Index {
    }
    if (this.convertedTrackpadDeviceId >= 0 && event.type === TouchType.Move) { return; }
    if (this.convertedTrackpadDeviceId >= 0 && event.type === TouchType.Down) { this.endGestures();this.twoFingers = false; }
-   if (this.convertedTrackpadDeviceId < 0 && !this.relativeCursorActive && !this.shouldPreserveCrossDisplayPointer()) { this.move(point.x, point.y); }
+   if (event.type === TouchType.Down && this.relativeCursorActive && this.fullScreen) {
+    this.convertedMouseDrag = true;this.convertedMouseX = point.x;this.convertedMouseY = point.y;this.syncCursorLock();
+   }
+   if (this.convertedMouseDrag) {
+    if (event.type === TouchType.Move || event.type === TouchType.Up) {
+     const dx = point.x - this.convertedMouseX, dy = point.y - this.convertedMouseY;
+     this.convertedMouseX = point.x;this.convertedMouseY = point.y;
+     if (Number.isFinite(dx) && Number.isFinite(dy) && (dx !== 0 || dy !== 0)) {
+      this.convertedMouseDragMoves++;this.move(this.pointerX + dx, this.pointerY + dy, true);
+     }
+    }
+   } else if (this.convertedTrackpadDeviceId < 0 && !this.relativeCursorActive && !this.shouldPreserveCrossDisplayPointer()) { this.move(point.x, point.y); }
    if (event.type === TouchType.Down) { this.focusRemote();this.button(0, true, this.storeInputTimestamp()); }
-   else if (event.type === TouchType.Up || event.type === TouchType.Cancel) { this.button(0, false, this.storeInputTimestamp()); }
+   else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+    this.button(0, false, this.storeInputTimestamp());
+    if (this.convertedMouseDrag) { this.convertedMouseDrag = false;this.syncCursorLock();this.confirmRelativeCursorSoon(); }
+   }
    return;
   }
   if (event.sourceTool === SourceTool.TOUCHPAD || event.source === SourceType.Mouse) { return; }

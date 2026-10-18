@@ -1,4 +1,5 @@
 #include "availability.h"
+#include "../store_policy.h"
 #include "../split_proof.h"
 #include "../route_selector.h"
 #include <openssl/ssl.h>
@@ -276,7 +277,7 @@ bool Manager::Configure(const std::string& host,int port,const std::string& toke
    if(!token_.empty())OPENSSL_cleanse(token_.data(),token_.size());token_=token;certificate_=certificate;session_=newSession;port_=port;
   }else if(host_!=host){oldLAN=std::move(lan_);if(request_&&request_->route=="lan")request_.reset();selector_.failed(edgelinkroute::Kind::LAN,lanPath_.epoch);}
   host_=host;
-  if(!usb_){Options o{"127.0.0.1","usb",token_,certificate_,session_,port_,nextEpoch_++};usb_=newUSB=std::make_shared<Worker>(std::move(o));usbPath_=Path();usbPath_.epoch=usb_->Config().epoch;}
+  if(edgelinkstore::DebugUSBAvailable()&&!usb_){Options o{"127.0.0.1","usb",token_,certificate_,session_,port_,nextEpoch_++};usb_=newUSB=std::make_shared<Worker>(std::move(o));usbPath_=Path();usbPath_.epoch=usb_->Config().epoch;}
   if(!host.empty()&&!lan_){Options o{host,"lan",token_,certificate_,session_,port_,nextEpoch_++};lan_=newLAN=std::make_shared<Worker>(std::move(o));lanPath_=Path();lanPath_.epoch=lan_->Config().epoch;}
   if(host.empty()){lanPath_=Path();}
  }
