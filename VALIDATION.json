@@ -1,41 +1,32 @@
 {
-  "sourceVersion": "store-v0.1.16-diagnostic.1",
-  "status": "built-not-installed-superseded-by-original-flow-port",
-  "macUniversalArchitectures": [
-    "arm64",
-    "x86_64"
+  "sourceVersion": "store-v0.2.0-test.1",
+  "status": "built-awaiting-device-acceptance",
+  "personalEditionModified": false,
+  "ordinaryConsumerUSBReleaseGatePassed": false,
+  "testOnlyUSBTunnel": "explicit ORIGINAL_USB_TEST compile option, existing authorized DevEco HDC, dedicated 49561/49562 ports",
+  "restored": [
+    "original persistent authenticated local availability worker",
+    "original standby coordinator",
+    "original tablet local handover lifecycle",
+    "original Input and Gesture sources",
+    "HEVC capture and VideoSender core retained",
+    "live desktop topology and rate capability negotiation",
+    "USB requested bitrate honored instead of fixed 40Mbps"
   ],
-  "officialSDKHarmonyBuildPassed": true,
-  "macUniversalBuildAndSelfTestPassed": true,
-  "newEditionLANStreamingUserAcceptedAt": "store-v0.1.11-test.1",
-  "ordinaryRNDISUSBStreamingObservedAt": "store-v0.1.13-test.1",
-  "ordinaryUSBUsesHDC": false,
-  "unplugLANRecoveryAndWindowRetentionUserAcceptedAt": "store-v0.1.13-test.1",
-  "remainingGate": [
-    "0.1.14 handover pause measurement and user acceptance",
-    "USB insertion restores usable device mode",
-    "consumer USB usability and multi-model hardware coverage",
-    "campus isolated-network first discovery",
-    "production signing and AppGallery review"
+  "exclusions": [
+    "no public remote sessions",
+    "no remote connection helper launched",
+    "no audio/microphone provider",
+    "no power helper or system permission changes"
   ],
-  "realModelCompatibilityCertified": false,
-  "personalApplicationsModified": false,
-  "audioOrWANReintroduced": false,
-  "tests": [
-    "RNDIS bounded parser and request/status fixtures passed",
-    "Authenticated route hysteresis, failure and display lease fixtures passed",
-    "Actual native module exports/profile fixture passed",
-    "Headless Mac production address/encoder/window policies passed"
+  "deviceAcceptancePending": true,
+  "officialHarmonySDKBuildPassed": true,
+  "macUniversalDebugCompatibilityBuildPassed": true,
+  "sourceOriginalByteIdentityVerified": [
+    "Input.swift",
+    "Gesture.swift",
+    "StandbyCoordinator.swift",
+    "LocalIngress.swift"
   ],
-  "previousCI": "0.1.14 all four cloud jobs passed (Mac ARM/Intel, Linux and Windows policies).",
-  "observedV14Switch": {
-    "direction": "LAN to ordinary USB",
-    "sameDisplay": true,
-    "macStopToRenderACKms": 278.417292,
-    "displayAdoptionMs": 0.046459,
-    "includesPhysicalUnplugDetection": false,
-    "secondMacStopToRenderACKms": 1207.009708,
-    "secondDisplayAdoptionMs": 1.108917
-  },
-  "v14PhysicalUnplugAcceptance": "User answered no; no successful recovery observed. Do not mark seamless switching accepted."
+  "policyDefaultAndDebugUSBGateTestsPassed": true
 }

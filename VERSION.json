@@ -1,7 +1,7 @@
 {
-  "version": "store-v0.1.16-diagnostic.1",
+  "version": "store-v0.2.0-test.1",
   "date": "2026-10-18",
-  "status": "superseded-uninstalled-candidate-original-extension-flow-port-requested",
+  "status": "original-extension-flow-port-awaiting-device-acceptance",
   "publicSource": true,
   "minimumHarmonyAPI": 24,
   "macBuildArchitectures": [
@@ -34,12 +34,12 @@
   "macSelfTest": "LAN address and encoder/window policy checks only; no GUI/listener/capture",
   "releaseGateDocument": "docs/APPGALLERY_READINESS.md",
   "discovery": "mDNS and datagram discovery plus bounded refresh of previously approved address; initial multicast-suppressed-network discovery still incomplete",
-  "quality": "0.1.11 original media core, HiDPI output retained; user reported clear relative improvement on LAN.",
+  "quality": "Original HEVC capture/TCP ACK/window/decode core retained; original local standby and handover restored. Device acceptance pending.",
   "coreProvenance": "docs/ACCEPTED_CORE_PROVENANCE.json",
-  "consumerUSBImplementation": "0.1.13 real user-space RNDIS USB/TLS streaming verified on current Edge; no HDC connection. Other models unverified.",
-  "networkHandoverImplementation": "0.1.14 automatic local switches observed at 278ms and 1207ms (Mac old stop to first render ACK), both retained the display. 0.1.15 excludes known-failed cached routes; 0.1.16 queues one authenticated start while old capture stops, avoiding a one-second retry. Physical unplug acceptance pending. Healthy improvement switches now require three distinct paired probe wins to prevent route flapping; failures bypass debounce.",
+  "consumerUSBImplementation": "Original USB development baseline is explicit ORIGINAL_USB_TEST build only, uses existing authorized HDC and is NOT consumer USB. RNDIS source/history retained separately; consumer USB release gate remains unmet.",
+  "networkHandoverImplementation": "Restore original persistent authenticated LocalAvailability/StandbyCoordinator/checkLocalHandover, independent 49561/49562/49563 ports. Stop periodic short-probe/RNDIS route selection in this baseline.",
   "components": {
-    "mac": "0.1.16 (17)",
-    "harmony": "0.1.16 (17)"
+    "mac": "0.2.0 (18)",
+    "harmony": "0.2.0 (18)"
   }
 }

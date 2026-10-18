@@ -200,14 +200,15 @@ struct Index {
    this.storeDevices=devices;this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
    this.storeDiscoverMessage=devices.length>0?'选择电脑即可连接':'还未发现电脑，请确认 Mac 上的映桥测试版已打开。';
    const known=devices.find((d:StoreDiscoveredMac)=>d.certificate===this.pairing?.cert);
-   if(known&&this.pairing){if(!this.active&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
+   if(known&&this.pairing){if(!this.active&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.availability?.setHost(known.host);this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
    if(!this.storeSelectedID&&devices.length===1){this.storeSelectedID=devices[0].id;}
   },(message:string)=>this.storeDiscoverMessage=message,this.pairing?.host || '');
-  this.storeDiscovery.start();this.storeWatchPaths();
+  this.storeDiscovery.start();
  }
  private storeConnectSelected():void {
   if(this.storeLinkPending)return;
   const device=this.storeDevices.find((d:StoreDiscoveredMac)=>d.id===this.storeSelectedID) || (this.storeDevices.length===1?this.storeDevices[0]:undefined);
+  if(!device&&this.pairingLoaded&&this.pairing){this.storeStage=3;this.begin('extend');return;}
   if(!device){this.message=this.storeDevices.length>1?'请在右侧选择要连接的 Mac。':'正在寻找电脑，请先确认两端在同一局域网。';if(this.storeDevices.length===0)this.storeRefreshDiscovery();return;}
   this.storeSelectedID=device.id;this.storeError='';
   if(this.pairing?.cert===device.certificate){this.pairing.host=device.host;this.host=device.host;this.storeStage=3;this.begin('extend');return;}
@@ -233,9 +234,10 @@ struct Index {
  }
  private applyStorePairing(text: string, save: boolean): void {
   const pairing=validatePairing(text);if (!pairing) { this.storeError='设备信息已失效，请重新选择附近的 Mac。';this.storeStage=2;return; }
-  this.pairing=pairing;this.host=pairing.host;this.pairingLoaded=true;this.transport=1;this.storeCodec=pairing.codecs.includes('hevc') ? 'hevc':'avc';
+  if(this.pairing && (this.pairing.cert!==pairing.cert || this.pairing.token!==pairing.token)){this.availability?.stop();this.availability=null;if(this.availabilityTimer>=0){clearInterval(this.availabilityTimer);this.availabilityTimer=-1;}}
+  this.pairing=pairing;this.host=pairing.host;this.availability?.setHost(pairing.host);this.pairingLoaded=true;this.transport=1;this.storeCodec=pairing.codecs.includes('hevc') ? 'hevc':'avc';
   if (save) { this.writeFile('store-pairing.json', JSON.stringify(pairing)); }
-  this.storeStage=3;this.message='已记住这台 Mac，可直接开启扩展屏。';this.storeError='';this.localRouteLabel='自动选择线路 · 普通 USB 接口正在验证';
+  this.storeStage=3;this.prepareLocalAvailability();this.message='已记住这台 Mac，可直接开启扩展屏。';this.storeError='';this.localRouteLabel='原版扩展屏连接流程';
  }
  private storeSelectProfile(): void {
   const panel=display.getDefaultDisplaySync();const w=panel.width,h=panel.height;
@@ -664,9 +666,19 @@ struct Index {
   } catch (e) { this.remoteMicEnabled = false; }
  }
  private context(): common.UIAbilityContext { return this.getUIContext().getHostContext() as common.UIAbilityContext; }
- private prepareLocalAvailability(): void { this.localRouteLabel='局域网直连'; }
+ private prepareLocalAvailability(): void {
+  if (!this.pairing || this.availability) { return; }
+  this.availability = new LocalAvailability(this.context(), this.host.trim(), this.pairing.token, this.pairing.cert,
+   (event: AvailabilityEvent) => this.onAvailabilityEvent(event), () => this.updateAvailabilityState());
+  this.availability.start();this.updateAvailabilityState();
+  this.availabilityTimer = setInterval(() => this.refreshLocalAvailability(), 5000);
+ }
  private updateAvailabilityState(): void { this.availability?.state(this.active || this.waitingRemoteStart, this.remoteInputWindowActive, this.ready); }
- private localRoute(): string { return this.pairingLoaded ? 'lan':''; }
+ private localRoute(): string {
+  const status = this.availability?.status();
+  if (!status || !['usb', 'lan'].includes(status.preferredRoute) || !status.paths.some((p: LocalPath) => p.route === status.preferredRoute && p.ready)) { return ''; }
+  return status.preferredRoute;
+ }
  private refreshLocalAvailability(): void {
   this.availability?.refreshDiscovery();
   const status = this.availability?.status();if (!status) { return; }
@@ -871,8 +883,8 @@ struct Index {
   if (!reconnectAttempt) { this.internetReconnect?.cancel('new_user_start');if (this.internetRecovering) { this.stop('reconnect_superseded', false); } }
   if (!fromDiagnostic && !preserveFallback && !localHandoverRoute) { this.restoreDiagnosticProfile(); }
   if (!this.pairing || !this.ready) { this.message = '电脑或显示尚未就绪'; return; }
-  const rtc=fromDiagnostic && ['rtc','internet-rtc'].includes(this.diagnosticTransport);
-  const split = fromDiagnostic && ['split-usb-control', 'split-lan-control'].includes(splitDiagnostic);
+  const rtc=false;
+  const split = false;
   if (split && (!['bench', 'extend'].includes(mode) || !this.splitDiagnosticPathsReady())) { this.restoreDiagnosticProfile();this.message = '分流诊断需要同时就绪的 USB 与真实局域网连接。';return; }
   if (mode === 'extend') { this.cancelRemoteStart(); }
   else { this.cancelLocalStart(); }
@@ -898,7 +910,7 @@ struct Index {
   }
   this.cancelRemoteStart();
   // stop() invalidates and unregisters the old callback before any session reset.
-  this.stop(localHandoverRoute ? 'local_handover' : 'restart', false);this.saveSettings();this.mode = mode;this.storeUSBLastReport='';this.storeActiveHost=this.host;this.storeSwitchedAt=Date.now();this.storeConfigurePaths();
+  this.stop(localHandoverRoute ? 'local_handover' : 'restart', false);this.saveSettings();this.mode = mode;
   this.clearDesktopTopology();
   this.relativeCursorBlocked = false;this.relativeAnchorReady = false;this.relativeRawEvents = 0;this.relativeMissingRawEvents = 0;this.relativeMissingRawRun = 0;this.relativeRawSamples = [];this.relativeLastRawTimestamp = -1;this.lastAbsoluteMouseX = -1;this.lastAbsoluteMouseY = -1;
   this.relativeDragTrace = [];this.relativeDragTouchMoves = 0;this.relativeDragMouseMoves = 0;
@@ -917,15 +929,15 @@ struct Index {
   const widths: number[] = [this.storeWidth, this.storeWidth, this.storeWidth], heights: number[] = [this.storeHeight, this.storeHeight, this.storeHeight];
   if (split) {
    try {
-    native.connectSplit(selectedTransport === 0 ? '127.0.0.1' : this.host.trim(), selectedTransport === 0 ? 48561 : 48563, mode,
+    native.connectSplit(selectedTransport === 0 ? '127.0.0.1' : this.host.trim(), selectedTransport === 0 ? 49561 : 48563, mode,
      widths[this.resolution], heights[this.resolution], this.fps, 'tcp', this.pairing.token, this.pairing.cert,
-     selectedTransport === 0 ? this.host.trim() : '127.0.0.1', selectedTransport === 0 ? 48563 : 48561);
+     selectedTransport === 0 ? this.host.trim() : '127.0.0.1', selectedTransport === 0 ? 48563 : 49561);
    } catch (e) {
     this.stop('split_diagnostic_failed');this.message = '分流诊断未能启动，普通扩展屏和远控可照常使用。';
     this.writeFile('split-diagnostic-status.json', JSON.stringify({ errorCode: 'split_start_failed', time: Date.now() }));return;
    }
   } else {
-   native.connect(selectedTransport === 0 ? '127.0.0.1' : (this.isInternetTransport(selectedTransport) ? this.internetHost : this.host.trim()), selectedTransport === 0 ? 48561 : this.pairing.port, mode,
+   native.connect(selectedTransport === 0 ? '127.0.0.1' : (this.isInternetTransport(selectedTransport) ? this.internetHost : this.host.trim()), selectedTransport === 0 ? 49561 : this.pairing.port, mode,
     widths[this.resolution], heights[this.resolution], this.fps, rtc ? (selectedTransport===3?'tailnet-rtc':'rtc') : (selectedTransport === 4 ? 'tailnet-udp' : (selectedTransport === 3 ? 'tailnet' : (selectedTransport === 2 ? 'udp' : (this.storeCodec === 'hevc' ? 'store-hevc':'store-avc')))), this.pairing.token, this.pairing.cert, fromDiagnostic && this.diagnosticBitrateKbps >= 1500 && this.diagnosticBitrateKbps <= 240000 ? this.diagnosticBitrateKbps : 0);
   }
   this.updateAvailabilityState();
@@ -933,7 +945,7 @@ struct Index {
   native.input(`OPTION ctrlToCmd ${this.ctrlToCmd ? 1 : 0}`);
   this.message = mode === 'extend' ? '正在建立扩展桌面…' : '正在连接 Mac…';
   const generation = this.sessionGeneration;
-  this.timer = setInterval(() => this.refresh(generation), 1000);this.storeStartFastHandover();this.focusRemote();
+  this.timer = setInterval(() => this.refresh(generation), 1000);this.focusRemote();
  }
  private stop(reason: string = 'user_end', restore: boolean = true): void {
   this.storeStopFastHandover();
@@ -1310,8 +1322,7 @@ struct Index {
  private refresh(generation: number = this.sessionGeneration): void {
   if (generation !== this.sessionGeneration) { return; }
   const s = this.saveStatus();if (!s) { return; }
-  const signal:StoreSessionSignal={running:s.running,localHandoverSupported:s.localHandoverSupported===true,renderSubmittedFrames:s.renderSubmittedFrames,stopReason:s.stopReason};
-  if (this.checkStoreHandover(signal)) { return; }
+  if (this.checkLocalHandover(s)) { return; }
   if (this.checkMediaFallback(s, generation)) { return; }
   if (this.checkDynamicWANRoute(s, generation)) { return; }
   this.remoteMicEnabled = s.microphoneAllowed === true;

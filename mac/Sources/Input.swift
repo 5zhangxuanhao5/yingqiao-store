@@ -147,11 +147,13 @@ final class RemoteInput {
   if phase != 0{e?.setIntegerValueField(.scrollWheelEventScrollPhase,value:Int64(phase));e?.setIntegerValueField(.scrollWheelEventMomentumPhase,value:0)}
   scrollEvents += 1;post(e)
  }
- private var zoomRemainder:Double=0
  func magnify(_ delta:Double,phase:Int){
-  guard AXIsProcessTrusted(),delta.isFinite else{return};if phase==1{zoomRemainder=0};if phase==4||phase==8{zoomRemainder=0;return};zoomRemainder += delta
-  guard abs(zoomRemainder)>=0.12 else{return};let code:CGKeyCode=zoomRemainder>0 ? 24:27;zoomRemainder=0
-  for down in [true,false]{let event=CGEvent(keyboardEventSource:eventSource,virtualKey:code,keyDown:down);event?.flags=flags.union(.maskCommand);post(event)}
+  guard eventSink != nil || AXIsProcessTrusted(),delta.isFinite,[1,2,4,8].contains(phase) else{return}
+  if phase==2 && !magnifying{magnify(0,phase:1)}
+  if phase==4 || phase==8{guard magnifying else{return}}
+  guard let event=makeMagnifyEvent(source:eventSource,delta:max(-0.5,min(0.5,delta)),phase:UInt32(phase)) else{return}
+  event.location=point;event.flags=flags.union(CGEventFlags(rawValue:0x100));magnifying=phase==1 || phase==2;magnifyEvents += 1
+  if let eventSink{eventSink(event)}else{event.post(tap:.cgSessionEventTap)}
  }
  func key(_ source:String,_ code:CGKeyCode,_ down:Bool){
   guard eventSink != nil || AXIsProcessTrusted(),code != 63 else{return}

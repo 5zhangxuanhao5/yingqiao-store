@@ -97,7 +97,7 @@ final class StoreDashboardDocument:NSView {
   networkState.stringValue=values["discoveryReady"] as? Bool == true ? "局域网可发现":"等待连接准备"
   networkHint.stringValue="两端打开后自动寻找设备，无需扫码、复制信息或输入地址。"
   footnote.stringValue="结束会话后停止采集和编码，保留设备自动发现。"
-  startButton.enabled(!(values["preparing"] as? Bool ?? false));startButton.title=values["discoveryReady"] as? Bool == true ? "检查连接":"准备扩展屏";startButton.refreshTitle()
+  startButton.enabled(!(values["preparing"] as? Bool ?? false) && !active && !pending);startButton.title=pending ? "正在请求平板…":values["localExtensionAvailable"] as? Bool == true ? "连接扩展屏":(values["discoveryReady"] as? Bool == true ? "检查连接":"准备扩展屏");startButton.refreshTitle()
   pill.update(values["connected"] as? Bool == true ? "扩展屏中":(values["discoveryReady"] as? Bool == true ? "等待平板":"需要准备"))
   if diagnosticsOpen{BridgeTheme.fitDiagnostics(diagnostics,minimumHeight:226)}
  }

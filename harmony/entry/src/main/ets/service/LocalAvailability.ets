@@ -49,12 +49,12 @@ export class LocalAvailability {
   this.lastDiscoveryAt = Date.now();
   if (this.discovery) { try { this.discovery.off('serviceFound');this.discovery.stopSearchingMDNS(); } catch (e) {}this.discovery = null; }
   try {
-   const discovery = mdns.createDiscoveryService(this.context, '_edgelink._tcp');this.discovery = discovery;
+   const discovery = mdns.createDiscoveryService(this.context, '_yingqiaostandby._tcp');this.discovery = discovery;
    discovery.on('serviceFound', (info: mdns.LocalServiceInfo) => {
-    if (!this.alive || !info.serviceName.startsWith('映桥-Mac')) { return; }
+    if (!this.alive || !info.serviceName.startsWith('映桥测试版-Mac')) { return; }
     this.discoveryStatus = 'found';const epoch = this.epoch;
     mdns.resolveLocalService(this.context, info).then((resolved: mdns.LocalServiceInfo) => {
-     if (!this.alive || epoch !== this.epoch || resolved.port !== 48562 || !resolved.host) { return; }
+     if (!this.alive || epoch !== this.epoch || resolved.port !== 49562 || !resolved.host) { return; }
      const address = resolved.host.address;this.discoveryStatus = `resolved:${address}`;
      if (!this.numericIPv4(address) || address.startsWith('127.') || address === this.host) { return; }
      // Keep a verified current LAN connection stable. Do not let another mDNS
@@ -72,7 +72,7 @@ export class LocalAvailability {
  private configure(): void {
   if (!this.alive) { return; }
   const epoch = this.epoch;
-  native.availabilityConfigure(this.numericIPv4(this.host) ? this.host : '', 48562, this.token, this.certificate,
+  native.availabilityConfigure(this.numericIPv4(this.host) ? this.host : '', 49562, this.token, this.certificate,
    (event: AvailabilityEvent) => { if (this.alive && epoch === this.epoch) { this.callback(event); } });
  }
  status(): LocalAvailabilityStatus {

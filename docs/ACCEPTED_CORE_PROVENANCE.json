@@ -53,7 +53,7 @@
     "target": "mac/Sources/AcceptedVideoSender.swift",
     "sourceSHA256": "151724dc3184d218537bfbde30a1779cae529cf025fb98cd49bc74cab4fb6ce4",
     "copy": "VideoSender extracted; RTC provider branches and unsupported advertised capabilities removed; LAN packetization/admission/cursor/timing retained",
-    "targetSHA256": "5e216ae32b83d7c7cc41e9e9aedbfbade2d24e76469bf2873c79fc34816d3562"
+    "targetSHA256": "28042f9758291f614721ba72d4256abda196de5e873fa3efab64506df7678b5d"
   },
   {
     "source": "work/input-tests/single-app-20261015/src/DesktopOverview.swift",
@@ -61,5 +61,47 @@
     "sourceSHA256": "c4dc60350d82a43431112fad2566f913bf5bd0a478cfdde4b26906b8e2896e92",
     "targetSHA256": "c4dc60350d82a43431112fad2566f913bf5bd0a478cfdde4b26906b8e2896e92",
     "copy": "verbatim"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/StandbyCoordinator.swift",
+    "target": "mac/Sources/OriginalStandbyCoordinator.swift",
+    "sourceSHA256": "20dfc3de984d9e713ca9e424e83ce9fbf3ce3b991a3d56c016b7f12384bf24a8",
+    "targetSHA256": "20dfc3de984d9e713ca9e424e83ce9fbf3ce3b991a3d56c016b7f12384bf24a8",
+    "copy": "verbatim"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/LocalIngress.swift",
+    "target": "mac/Sources/OriginalLocalIngress.swift",
+    "sourceSHA256": "617aea1c4b1b1a575485217a913c6534631a3a97aebed58c491fb9556b1fb1e1",
+    "targetSHA256": "617aea1c4b1b1a575485217a913c6534631a3a97aebed58c491fb9556b1fb1e1",
+    "copy": "verbatim"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/Input.swift",
+    "target": "mac/Sources/Input.swift",
+    "sourceSHA256": "3bde8520a3c260d3bcb79dad549a8526145159520dcdd81f18a8891b1e7c33ee",
+    "targetSHA256": "3bde8520a3c260d3bcb79dad549a8526145159520dcdd81f18a8891b1e7c33ee",
+    "copy": "verbatim"
+  },
+  {
+    "source": "work/input-tests/single-app-20261015/src/Gesture.swift",
+    "target": "mac/Sources/Gesture.swift",
+    "sourceSHA256": "bf97c139f0d3855e8b020056254e86f51e703aa4478ebbe3cbbf4f690a0736e0",
+    "targetSHA256": "bf97c139f0d3855e8b020056254e86f51e703aa4478ebbe3cbbf4f690a0736e0",
+    "copy": "verbatim"
+  },
+  {
+    "source": "work/input-tests/mic-source-compare-20261015/project/entry/src/main/cpp/local/availability.cpp",
+    "target": "harmony/entry/src/main/cpp/local/availability.cpp",
+    "sourceSHA256": "0a6503320b417e5e64111ce0c4f490f763ec960297cfe9975aaddb03aab090a5",
+    "targetSHA256": "e0a8da827875c4275fa3e208de71d17ad62239edb6dc2fe3ded88b6b631af4fa",
+    "copy": "only independent namespace and port substitution"
+  },
+  {
+    "source": "work/input-tests/mic-source-compare-20261015/project/entry/src/main/ets/service/LocalAvailability.ets",
+    "target": "harmony/entry/src/main/ets/service/LocalAvailability.ets",
+    "sourceSHA256": "3b384901e329fb3e8d5e39ef0796e2e9cb072d5cd6fd9fe37a9797fddc6507fa",
+    "targetSHA256": "044699dfde1eec9b010ee30a35c5d1d4133ad81846004cd3d680ecf649170d31",
+    "copy": "only independent namespace and port substitution"
   }
 ]

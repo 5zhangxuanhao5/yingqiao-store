@@ -39,7 +39,7 @@ final class VideoSender {
  var keyHex:String {key.withUnsafeBytes{hex(Data($0))}}
  func handshake(width:Int,height:Int,fps:Int,desktop:DesktopInputTopology?)->String{
   var session=Data();session.appendBE(sid)
-  return "OK \(hex(session)) \(keyHex) \(hex(serverPrefix)) \(hex(clientPrefix)) \(viewerToken) \(width) \(height) \(fps)"+(timedFrames ? " timing-v1":"")+(desktop?.wireFields() ?? "")+" cursor-v1 overview-v1"
+  return "OK \(hex(session)) \(keyHex) \(hex(serverPrefix)) \(hex(clientPrefix)) \(viewerToken) \(width) \(height) \(fps)"+(timedFrames ? " timing-v1":"")+(desktop?.wireFields() ?? "")+" cursor-v1 overview-v1 desktop-live-v1 rate-v2"
  }
  func header(frame:UInt64,total:Int,flags:UInt8,type:UInt8,index:Int=0,count:Int=1)->Data {
   var d=Data("EDL1".utf8);d.appendBE(sid);d.appendBE(frame);d.appendBE(UInt16(index));d.appendBE(UInt16(count));d.appendBE(UInt32(total));d.append(flags);d.append(type);d.appendBE(UInt16(0));return d

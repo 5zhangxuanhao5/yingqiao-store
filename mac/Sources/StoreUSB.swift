@@ -13,11 +13,11 @@ extension StoreHost {
    let tcp=NWProtocolTCP.Options();tcp.noDelay=true;let parameters=NWParameters(tls:try identity.tlsOptions(),tcp:tcp)
    parameters.requiredLocalEndpoint = .hostPort(host:"127.0.0.1",port:49566)
    let listener=try NWListener(using:parameters);usbListener=listener
-   listener.newConnectionHandler={[weak self] connection in self?.accept(connection,usb:true)}
-   listener.stateUpdateHandler={state in if case .ready=state {
+   listener.newConnectionHandler={[weak self,weak listener] connection in DispatchQueue.main.async{guard let self,let listener,self.usbListener===listener else{connection.cancel();return};self.accept(connection,usb:true)}}
+   listener.stateUpdateHandler={[weak self,weak listener] state in DispatchQueue.main.async{guard let listener,self?.usbListener===listener else{return};if case .ready=state {
     let info:[String:Any]=["schema":"store-discovery-v1","id":String(hex(Data(SHA256.hash(data:Data(identity.certificate.utf8)))).prefix(24)),"name":Host.current().localizedName ?? "Mac","certificate":identity.certificate,"port":49563]
     if let data=try? JSONSerialization.data(withJSONObject:info),let text=String(data:data,encoding:.utf8){text.withCString{YQUSBStart($0)}}
-   }}
+   }}}
    listener.start(queue:.main)
   }catch{usbListener=nil;if let data=try? JSONSerialization.data(withJSONObject:["stage":"listener_failed","message":error.localizedDescription]){try? data.write(to:StoreIdentity.directory.appendingPathComponent("usb-listener-health.json"),options:.atomic)}}
  }

@@ -3,12 +3,12 @@ import ScreenCaptureKit
 import VideoToolbox
 import CoreGraphics
 final class StoreCapture {
- let width:Int,height:Int,fps:Int,codec:String,sender:VideoSender
+ let width:Int,height:Int,fps:Int,codec:String,sender:VideoSender,bitrate:Int
  var virtual:CGVirtualDisplay?,media:NativeCapture?,mediaStarted=false
  private(set) var reusedDisplay=false
  var onFailure:((String)->Void)?
  var displayID:CGDirectDisplayID?{virtual?.displayID}
- init(width:Int,height:Int,fps:Int,codec:String,sender:VideoSender){self.width=width;self.height=height;self.fps=fps;self.codec=codec;self.sender=sender}
+ init(width:Int,height:Int,fps:Int,codec:String,sender:VideoSender,bitrate:Int=40_000_000){self.bitrate=bitrate;self.width=width;self.height=height;self.fps=fps;self.codec=codec;self.sender=sender}
  static func supports(_ codec:CMVideoCodecType)->Bool{var encoder:VTCompressionSession?;let r=VTCompressionSessionCreate(allocator:nil,width:1280,height:720,codecType:codec,encoderSpecification:[kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder:true] as CFDictionary,imageBufferAttributes:nil,compressedDataAllocator:nil,outputCallback:nil,refcon:nil,compressionSessionOut:&encoder);if let encoder{VTCompressionSessionInvalidate(encoder)};return r==noErr}
  func start(adopting:CGVirtualDisplay?=nil)async throws->CGDirectDisplayID{
   // A route change does not change the panel. Reapplying a live mode causes a
@@ -29,7 +29,7 @@ final class StoreCapture {
  }
  func startMedia()async throws{
   guard !mediaStarted,let displayID else{return};mediaStarted=true
-  let capture=try NativeCapture(width:width,height:height,fps:fps,sender:sender,bitrate:40_000_000,codec:codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264,onStopped:{[weak self] _,error in self?.onFailure?(error.localizedDescription)})
+  let capture=try NativeCapture(width:width,height:height,fps:fps,sender:sender,bitrate:bitrate,codec:codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264,onStopped:{[weak self] _,error in self?.onFailure?(error.localizedDescription)})
   media=capture;try await capture.start(displayID:displayID)
  }
  func requestKeyframe(){media?.requestKeyframe()}

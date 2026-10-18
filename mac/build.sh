@@ -2,6 +2,8 @@
 set -euo pipefail
 stage=$(cd "$(dirname "$0")" && pwd)
 mkdir -p "$stage/build"
+original_usb_flags=(-D YINGQIAO_LOCAL_EXTENSION_ONLY)
+if [[ "${YQ_ORIGINAL_USB_TEST:-0}" == "1" ]]; then original_usb_flags+=(-D ORIGINAL_USB_TEST); fi
 for arch in arm64 x86_64; do
   usb="$stage/build/usb-$arch"
   mkdir -p "$usb"
@@ -16,7 +18,7 @@ for arch in arm64 x86_64; do
   objects+=("$usb/StoreUSB.o")
   libtool -static -o "$usb/libYingqiaoUSB.a" "${objects[@]}"
 
-  swiftc -j 4 -O -whole-module-optimization -swift-version 5 -target "$arch-apple-macos13.0" \
+  swiftc "${original_usb_flags[@]}" -j 4 -O -whole-module-optimization -swift-version 5 -target "$arch-apple-macos13.0" \
     -import-objc-header "$stage/Sources/CGVirtualDisplayPrivate.h" "$stage/Sources/"*.swift \
     -framework AppKit -framework Network -framework ScreenCaptureKit -framework VideoToolbox \
     "$usb/libYingqiaoUSB.a" -lc++ -framework IOUSBHost -framework IOKit -framework CoreGraphics -framework Security -framework CryptoKit -framework ApplicationServices \

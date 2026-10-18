@@ -10,3 +10,9 @@ add_library(audio_opus STATIC IMPORTED)
 set_target_properties(audio_opus PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/vendor/opus/lib/libopus.a")
 target_include_directories(edgelink PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/vendor/opus/include)
 target_link_libraries(edgelink PUBLIC audio_opus)
+
+# Explicit development baseline only; not a consumer USB implementation.
+option(YINGQIAO_ORIGINAL_USB_TEST "Use existing authorized HDC test tunnel" OFF)
+if(YINGQIAO_ORIGINAL_USB_TEST)
+ target_compile_definitions(edgelink PRIVATE ORIGINAL_USB_TEST=1)
+endif()

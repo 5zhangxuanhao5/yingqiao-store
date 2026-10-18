@@ -988,7 +988,7 @@ class Client {
   std::unique_ptr<TLS>ctrl,video;std::thread tx,feeder,outputs,audioThread,micThread;const uint64_t audioGen=audioGeneration.load();
   auto audioDone=std::make_shared<std::atomic<bool>>(true),micDone=std::make_shared<std::atomic<bool>>(true);
   try{
-   int authKbps=isTailnet()?4000:(options.bitrateKbps>0?options.bitrateKbps:(!options.splitPath&&options.host=="127.0.0.1"&&options.port==48561?80000:40000));
+   int authKbps=isTailnet()?4000:(options.bitrateKbps>0?options.bitrateKbps:(!options.splitPath&&options.host=="127.0.0.1"&&options.port==49561?80000:40000));
    auto authenticate=[&](){Write(control,"AUTH "+options.token+" "+options.mode+" "+std::to_string(options.width)+" "+std::to_string(options.height)+" "+std::to_string(options.fps)+" "+(isUDP()?"udp":"tcp")+" "+std::to_string(authKbps)+" store-v1 codec-"+(options.transport=="store-hevc"?"hevc":"avc")+"-v1\n");std::string line;uint8_t ch;while(line.size()<1024&&Read(control,&ch,1)){if(ch=='\n')break;line+=char(ch);}return line;};
    ctrl=connectWithRetry(false);control=ctrl.get();std::string answer=authenticate();
    // One exact legacy bitrate rejection permits one same-pinned TLS retry.

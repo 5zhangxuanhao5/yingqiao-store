@@ -20,5 +20,12 @@ int main(){using namespace yingqiao;int cases=0;
  assert(stable.choose(paths,"paired","wifi",102,90,false,true)=="usb");
  assert(stable.choose(paths,"paired","usb",102,102,true,false)=="wifi"); // No debounce on failure.
  DisplayLease l;l.retain("paired",100);assert(!l.adopt("other",101));assert(l.adopt("paired",105));l.retain("paired",110);l.explicitEnd();assert(!l.adopt("paired",111));
+ #ifdef ORIGINAL_USB_TEST
+ assert(edgelinkstore::Allowed("127.0.0.1",49561,"extend","store-hevc"));
+ assert(!edgelinkstore::Allowed("127.0.0.1",49562,"extend","store-hevc"));
+ assert(!edgelinkstore::Allowed("127.0.0.1",49561,"remote","store-hevc"));
+#else
+ assert(!edgelinkstore::Allowed("127.0.0.1",49561,"extend","store-hevc"));
+#endif
  assert(edgelinkstore::Allowed("192.168.1.10",49563,"extend","store-avc"));for(auto ip:{"127.0.0.1","8.8.8.8","100.64.1.1","example.com","192.168.1.5.evil","::1"})assert(!edgelinkstore::Allowed(ip,49563,"extend","store-avc"));assert(!edgelinkstore::Allowed("10.0.0.5",49563,"remote","store-avc"));assert(!edgelinkstore::Allowed("10.0.0.5",48561,"extend","tcp"));std::cout<<"PASS "<<cases<<" panel ratios, codec/FPS fallback, authenticated route hysteresis/failure, display lease, local-only gate. Policy simulation, not USB integration proof.\n";
 }

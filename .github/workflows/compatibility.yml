@@ -34,6 +34,8 @@ jobs:
           ./rndis-test
           g++ -std=c++17 -Wall -Wextra -Werror tests/policy_test.cpp -o policy-test
           ./policy-test
+          g++ -std=c++17 -Wall -Wextra -Werror -DORIGINAL_USB_TEST=1 tests/policy_test.cpp -o original-usb-policy-test
+          ./original-usb-policy-test
           g++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -I tests/host_stubs tests/native_exports_test.cpp -o exports-test
           ./exports-test
       - name: Compile and run Windows fixtures (not a Windows display driver)
@@ -78,5 +80,8 @@ jobs:
           "$RUNNER_TEMP/rndis-test"
           clang++ -std=c++17 -Wall -Wextra -Werror tests/policy_test.cpp -o "$RUNNER_TEMP/policy-test"
           "$RUNNER_TEMP/policy-test"
+          clang++ -std=c++17 -Wall -Wextra -Werror -DORIGINAL_USB_TEST=1 tests/policy_test.cpp -o "$RUNNER_TEMP/original-usb-policy-test"
+          "$RUNNER_TEMP/original-usb-policy-test"
+          swiftc -typecheck -swift-version 5 -D ORIGINAL_USB_TEST mac/Sources/StoreOriginalUSBDebug.swift
           clang++ -std=c++17 -Wall -Wextra -Werror -Wno-unused-parameter -I tests/host_stubs tests/native_exports_test.cpp -o "$RUNNER_TEMP/exports-test"
           "$RUNNER_TEMP/exports-test"

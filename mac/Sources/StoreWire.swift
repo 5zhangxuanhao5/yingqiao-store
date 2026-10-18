@@ -19,8 +19,8 @@ func privateLANAddress(_ value:String)->Bool {
  return b[0]&0xfe==0xfc || (b[0]==0xfe && b[1]&0xc0==0x80)
 }
 final class LinePeer {
- let usb:Bool;let connection:NWConnection;var buffer=Data();var closed=false;var probeReplied=false;var onLine:((String)->Void)?,onClose:(()->Void)?
- init(_ value:NWConnection,usb:Bool=false){connection=value;self.usb=usb}
+ let usb:Bool,standby:Bool;let connection:NWConnection;var buffer=Data();var closed=false;var probeReplied=false;var onLine:((String)->Void)?,onClose:(()->Void)?
+ init(_ value:NWConnection,usb:Bool=false,standby:Bool=false){connection=value;self.usb=usb;self.standby=standby}
  func start(){connection.stateUpdateHandler={[weak self] state in guard let self else{return};switch state{case .ready:self.read();case .failed,.cancelled:self.close();default:break}};connection.start(queue:.main)}
  func read(){connection.receive(minimumIncompleteLength:1,maximumLength:4096){[weak self] data,_,end,error in guard let self,!self.closed else{return};if let data{self.buffer.append(data)};guard self.buffer.count<=8192 else{self.close();return};while let i=self.buffer.firstIndex(of:10){let line=String(decoding:self.buffer.prefix(upTo:i),as:UTF8.self);self.buffer.removeSubrange(...i);self.onLine?(line)};if end || error != nil{self.close()}else{self.read()}}}
  func send(_ value:String){guard !closed,value.utf8.count<8192 else{return};connection.send(content:Data((value+"\n").utf8),completion:.contentProcessed{[weak self] error in if error != nil{DispatchQueue.main.async{self?.close()}}})}
