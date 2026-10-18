@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 4654,
-    "sha256": "474117f2f06bd558d6af0f4493b9e61612253338e94ec9ad516aad20e4a29912"
+    "bytes": 4811,
+    "sha256": "2cbf5c50f1651f5b5aa18877c03af5ff213fd8d14f4f3af92dec84ae1935b35c"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -171,8 +171,13 @@
   },
   {
     "path": "docs/USB_NETWORK_035.md",
-    "bytes": 3572,
-    "sha256": "0b74c0dbfee2ca748e7149dedc7e8ab977372cb4ab209e9934d37b35ef5f813e"
+    "bytes": 3796,
+    "sha256": "1e4c8cd381ef0d7feeee06adfb5a3cbeb99bb4907c9d3c1b56b6e0c7d1751e79"
+  },
+  {
+    "path": "docs/USB_UNPLUG_036.md",
+    "bytes": 2833,
+    "sha256": "f9973cc24a604aabcc003a46177690b62f6b55f01212bb4ceac2748e6b6fcedb"
   },
   {
     "path": "docs/compatibility-catalog.json",
@@ -257,7 +262,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 198,
-    "sha256": "5a7195c2f9298cac1323b70bed487a224c5f54ad6b36cc6b56b1354ce8b34270"
+    "sha256": "5e4dd54c6a02690b718ecb800bef7c5a4147b536a9044ed3bc4f7b3fa30e34f4"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -541,8 +546,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 160521,
-    "sha256": "05d71ede94eabe9a694d1075fe28a347ba9b10cc3416d169c5895b2bf67f28e1"
+    "bytes": 161901,
+    "sha256": "cee615cca47541acca43065760acd060e192b4236cb31270a6b612c7c4bdab59"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",

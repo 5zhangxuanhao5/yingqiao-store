@@ -113,6 +113,8 @@ interface Statistics extends WANRouteMetrics {
  cursorSyncApplied: number; cursorSyncStaleSession: number; cursorSyncStaleSequence: number; cursorSyncStaleInput: number; cursorSyncInvalid: number;
  hostCursorOwner: boolean; hostCursorVisible: boolean;
 }
+interface StoreUSBNetworkInterface {name:string;host:string;up:boolean;}
+interface StoreUSBNetworkInterfaces {error:number;interfaces:StoreUSBNetworkInterface[];}
 interface StoreSessionSignal {running:boolean;localHandoverSupported:boolean;renderSubmittedFrames:number;stopReason:string;}
 interface StorePathStatus { paths:StorePathSample[];preferredHost:string; }
 interface StorePathSample {host:string;ready:boolean;route:string;rttMs:number;probeMbps:number;}
@@ -170,6 +172,7 @@ struct Index {
  private storeLinkTimer:number=-1;
  private storeLinkHost:string='';
  private storeUSBLastReport:string='';
+ private storeUSBInterfaceObserved:boolean=false;
  private storePathTimer:number=-1;
  private storeHandoverTimer:number=-1;
  private storePathRefreshAt:number=0;
@@ -191,13 +194,23 @@ struct Index {
   if(this.storePathTimer>=0)return;
   this.storePathTimer=setInterval(()=>{
    if(!this.remoteSessionForeground)return;
-   if(Date.now()-this.storePathRefreshAt>=8000){this.storePathRefreshAt=Date.now();this.storeDiscovery?.refreshPaths();}
+   const now=Date.now();if(!this.active&&now-this.storePathRefreshAt<2000)return;this.storePathRefreshAt=now;
    this.storeConfigurePaths();
-   const verifiedUSB=this.storePathState(this.active).paths.find((p:StorePathSample)=>p.ready&&p.route==='usb-net');
+   let physicalUSBMissing=false;
+   try {
+    const interfaces=JSON.parse(native.storeUSBInterfaces()) as StoreUSBNetworkInterfaces;
+    const present=interfaces.error===0&&interfaces.interfaces.some((p:StoreUSBNetworkInterface)=>p.up&&p.host.length>0);
+    if(present)this.storeUSBInterfaceObserved=true;
+    physicalUSBMissing=this.storeUSBInterfaceObserved&&interfaces.error===0&&!present;
+    const report=`${interfaces.error}:${present?1:0}:${physicalUSBMissing?1:0}`;
+    if(report!==this.storeUSBLastReport){this.storeUSBLastReport=report;hilog.info(0x1234,'StorePathHealth','usbPresent=%{public}d interfaceKnown=%{public}d error=%{public}d',present?1:0,this.storeUSBInterfaceObserved?1:0,interfaces.error);}
+   }catch(e){}
+   const verifiedUSB=physicalUSBMissing?undefined:this.storePathState(this.active).paths.find((p:StorePathSample)=>p.ready&&p.route==='usb-net');
    this.availability?.setUSBNetwork(verifiedUSB?.host || '');
-   if(this.active){const status=native.storeUSBInterfaces();if(status!==this.storeUSBLastReport){if(native.input('CLIENTUSB '+new util.Base64Helper().encodeToString(new util.TextEncoder().encodeInto(status))))this.storeUSBLastReport=status;}}
-
-  },2000);
+   // Interface loss/standby failure is independent of a media socket whose
+   // blocking read may remain marked running after the cable is removed.
+   if(this.active){const flags=native.storeSessionFlags();if(flags>=0&&(flags&8)===0){this.checkLocalHandover({running:(flags&1)!==0,localHandoverSupported:(flags&2)!==0,renderSubmittedFrames:0,stopReason:''});}}
+  },500);
  }
  private storeStartFastHandover():void {
   if(this.storeHandoverTimer>=0)return;
@@ -1370,7 +1383,7 @@ struct Index {
   }
   return false;
  }
- private checkLocalHandover(s: Statistics): boolean {
+ private checkLocalHandover(s: StoreSessionSignal): boolean {
   if (s.stopReason === 'mac_end') { return false; }
   if (!this.active || this.mode !== 'extend' || this.activeSplitDiagnostic || (this.diagnosticMode !== '' && this.diagnosticTransport !== 'handover-lan') || !this.remoteInputWindowActive) { return false; }
   if (s.localHandoverSupported) { this.localHandoverCapable = true; }
@@ -1383,7 +1396,8 @@ struct Index {
   const measuredPaths = this.storePathState(s.running);
   const usbHost = status.usbHost || '';
   const measuredUSBPreferred = usbHost === '127.0.0.1' || measuredPaths.preferredHost === usbHost;
-  if (!s.running) {
+  const activePathUnavailable=(this.sessionTransport===0&&!usb)||(this.sessionTransport===1&&!lan);
+  if (!s.running || activePathUnavailable) {
    if (this.localHandoverDeadline === 0) { this.localHandoverDeadline = now + 8500; }
    if (now >= this.localHandoverDeadline) { return false; }
    if (this.sessionTransport === 0) { this.localUSBRetryAfter = now + 15000;route = lan ? 'lan' : ''; }
@@ -1396,14 +1410,14 @@ struct Index {
   }
   if (!route) { return false; }
   this.localHandoverNextAttempt = now + 750;this.localHandoverCount++;
-  this.localHandoverReason = s.running ? 'measured_better_path' : 'active_path_lost';
+  this.localHandoverReason = !s.running||activePathUnavailable ? 'active_path_lost' : 'measured_better_path';
   this.begin('extend', false, '', '', false, false, -1, -1, true, route);
   return true;
  }
  private refresh(generation: number = this.sessionGeneration): void {
   if (generation !== this.sessionGeneration) { return; }
   const s = this.saveStatus();if (!s) { return; }
-  if (this.checkLocalHandover(s)) { return; }
+  if (this.checkLocalHandover({running:s.running,localHandoverSupported:s.localHandoverSupported===true,renderSubmittedFrames:s.renderSubmittedFrames,stopReason:s.stopReason})) { return; }
   if (this.checkMediaFallback(s, generation)) { return; }
   if (this.checkDynamicWANRoute(s, generation)) { return; }
   this.remoteMicEnabled = s.microphoneAllowed === true;
