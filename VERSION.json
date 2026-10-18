@@ -1,5 +1,5 @@
 {
-  "version": "store-v0.1.6-test.1",
+  "version": "store-v0.1.7-diagnostic.1",
   "date": "2026-10-18",
   "status": "development-preview-not-appgallery-ready",
   "publicSource": true,
@@ -33,5 +33,5 @@
   ],
   "macSelfTest": "LAN address policy only, no GUI/listener/identity/capture",
   "releaseGateDocument": "docs/APPGALLERY_READINESS.md",
-  "discovery": "LAN directed broadcasts and staged diagnostics; no real Pad discovery acceptance yet"
+  "discovery": "Transient developer unicast probe only; not automatic discovery acceptance"
 }

@@ -7,3 +7,6 @@ USB只读探测：旧IOKit适配器无法打开设备，未发模式切换或重
 
 ## store-v0.1.5-diagnostic.1
 Mac的UDP发现增加仅阶段/时间的本机诊断文件，不记录IP、名称或凭据。候选未验收。释放HDC宿主占用后，现代IOUSBHost可打开设备；只读AOA GetProtocol请求失败，零字节、IOReturn=-536850432。没有发送AOA启动、重置、抢占或配置指令，已恢复HDC服务。
+
+## store-v0.1.7-diagnostic.1
+增加仅内存的storeProbeAddress启动参数，用于对照应用内UDP单播与自动广播。不写入固定地址、不当作自动发现成功，正常启动清空此参数。只允许私有IPv4和既定发现端口，依然不返回令牌。当前mDNS和两种广播均发送成功但尚未收到Mac；这不能单凭日志归咎网络。

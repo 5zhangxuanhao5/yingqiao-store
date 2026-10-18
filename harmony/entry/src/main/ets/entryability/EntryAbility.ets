@@ -21,6 +21,7 @@ export default class EntryAbility extends UIAbility {
   AppStorage.setOrCreate('remoteInputWindowActive', active);
  }
  onCreate(want: Want): void {
+  AppStorage.setOrCreate('storeProbeAddress',want.parameters?.['storeProbeAddress'] as string || '');
   AppStorage.setOrCreate('remoteInputWindowActive', false);
   AppStorage.setOrCreate('remoteSessionForeground', false);
   AppStorage.setOrCreate('diagnosticMode', '');
@@ -34,6 +35,7 @@ export default class EntryAbility extends UIAbility {
   AppStorage.setOrCreate('diagnosticNoFallback', want.parameters?.['noFallback'] === 1);
  }
  onNewWant(want: Want): void {
+  AppStorage.setOrCreate('storeProbeAddress',want.parameters?.['storeProbeAddress'] as string || '');
   AppStorage.setOrCreate('diagnosticMode', '');
   AppStorage.setOrCreate('diagnosticTransport', '');
   AppStorage.setOrCreate('diagnosticBitrateKbps', want.parameters?.['testBitrateKbps'] as number || 0);
