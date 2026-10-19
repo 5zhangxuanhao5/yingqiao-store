@@ -1,5 +1,5 @@
 {
-  "version": "developer-v0.3.14-test.1",
+  "version": "developer-v0.3.15-test.1",
   "date": "2026-10-19",
   "status": "developer-device-candidate",
   "publicSource": true,
@@ -39,8 +39,8 @@
   "consumerUSBImplementation": "Original USB development baseline is explicit ORIGINAL_USB_TEST build only, uses existing authorized HDC and is NOT consumer USB. RNDIS source/history retained separately; consumer USB release gate remains unmet.",
   "networkHandoverImplementation": "Restore original persistent authenticated LocalAvailability/StandbyCoordinator/checkLocalHandover, independent 49561/49562/49563 ports. Stop periodic short-probe/RNDIS route selection in this baseline.",
   "components": {
-    "mac": "0.3.14 (35), explicit HDC development route",
-    "harmony": "0.3.14 (35)"
+    "mac": "0.3.15 (36), simplified home; explicit HDC development route",
+    "harmony": "0.3.14 (35), unchanged from accepted installed build"
   },
   "distribution": "GitHub source and Mac companion; private device debug HAP only",
   "appGallerySubmission": false

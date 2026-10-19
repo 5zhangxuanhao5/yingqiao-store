@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 2037,
-    "sha256": "d645e2f1d5f2243b21d3c7842206c93fd246c14db5178f9dcf9dff9edbef5ca6"
+    "bytes": 2112,
+    "sha256": "50cbbaf352af8a838e4d18589ebae2951546c7cb43e952174933b66f485db941"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -71,8 +71,8 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 2305,
-    "sha256": "335cd0b37adc0c50eedc5b89ec01a24b7037a04934be0ce3bf711892e080d2a0"
+    "bytes": 2363,
+    "sha256": "9df37629fcc09312a5365bbddbf06bfa8ca7d340f3fcced2a9b1214a144ba977"
   },
   {
     "path": "VERSION_HISTORY.md",
@@ -103,6 +103,11 @@
     "path": "docs/DEVELOPER_0314.md",
     "bytes": 2963,
     "sha256": "c3482fcae3e381699d7d79a8ceac12f457914031fbd0beb76442e4958c22f000"
+  },
+  {
+    "path": "docs/DEVELOPER_0315.md",
+    "bytes": 952,
+    "sha256": "2465e017a417fee46d9b1a3d7317239e9bdf8399496126515f8e73407e8eb95c"
   },
   {
     "path": "docs/DEVICE_TEST.md",
@@ -582,7 +587,7 @@
   {
     "path": "mac/Info.plist",
     "bytes": 1079,
-    "sha256": "90cb092d5a04466bb2b7bec5b7e36cc8163f45e147cb5069dcf5e2d70dc1a881"
+    "sha256": "1fe104a1971cffb1b203763c6e54ceab14ea3a161b2e30b80bbd65514c7a83ab"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -666,8 +671,8 @@
   },
   {
     "path": "mac/Sources/StoreDashboard.swift",
-    "bytes": 11518,
-    "sha256": "ad228ad1fe533538727723f6ad3ec83d77fd2adcdf07b6c2c9679f309edd1460"
+    "bytes": 9436,
+    "sha256": "d393afb05aaa22d53a2f2374e877db00b7e6fa04bf9ca00c0baec39eca0ed02b"
   },
   {
     "path": "mac/Sources/StoreDiscovery.swift",

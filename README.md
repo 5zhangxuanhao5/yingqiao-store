@@ -1,12 +1,14 @@
 # 映桥 · 开发者版
 
-让华为平板成为 Mac 的独立扩展屏，支持键盘、触控板和触屏操作。本分支为 **0.3.14 开发者版**，仅在 GitHub 分发，不更新应用市场审核中的版本，也不替换映桥完整版。
+让华为平板成为 Mac 的独立扩展屏，支持键盘、触控板和触屏操作。本分支为 **0.3.15 开发者版**，仅在 GitHub 分发，不更新应用市场审核中的版本，也不替换映桥完整版。
 
-[下载本版与源码](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/developer-v0.3.14-test.1) · [版本说明](docs/DEVELOPER_0314.md)
+[下载本版与源码](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/developer-v0.3.15-test.1) · [版本说明](docs/DEVELOPER_0315.md)
 
 ## 使用
 
-Mac 下载 `Yingqiao-Mac-0.3.14.zip`，解压后放入“应用程序”。这是本机开发签名包，尚未经过 Apple 公证；系统提示时请依据 Apple 的单应用打开说明自行确认。
+本轮仅更新 Mac 至0.3.15(36)，平板沿用已验收的0.3.14(35)。
+
+Mac 下载 `Yingqiao-Mac-0.3.15.zip`，解压后放入“应用程序”。这是本机开发签名包，尚未经过 Apple 公证；系统提示时请依据 Apple 的单应用打开说明自行确认。
 
 平板开发构建需自己的华为调试证书和设备 Profile。本人设备调试 HAP 不公开上传，以免包含设备签名资料。源码保留完整恢复方法；签名、配对令牌、TLS 私钥和用户数据不入库。
 
