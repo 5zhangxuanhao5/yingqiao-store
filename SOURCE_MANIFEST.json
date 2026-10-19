@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 2112,
-    "sha256": "50cbbaf352af8a838e4d18589ebae2951546c7cb43e952174933b66f485db941"
+    "bytes": 5370,
+    "sha256": "5e79d4b595f5bc008f3361764faa2534976c41c20f12bd8c60e71da78e5a550c"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -71,8 +71,8 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 2363,
-    "sha256": "9df37629fcc09312a5365bbddbf06bfa8ca7d340f3fcced2a9b1214a144ba977"
+    "bytes": 2418,
+    "sha256": "80fa7e8c6193c597a95b201e69dd37071dc3b10537a3c30acd25220ea9238c06"
   },
   {
     "path": "VERSION_HISTORY.md",
@@ -125,14 +125,24 @@
     "sha256": "24148f52a37e37eb2c060b6de4be7b5d63c488f9f8a99c2d8310d7e67a059b79"
   },
   {
+    "path": "docs/DOCS_0315_1.md",
+    "bytes": 555,
+    "sha256": "51aab1025f2a8f41f2fe0a4197ce8d3914cf1865d012e208f22a0aadb89425a9"
+  },
+  {
     "path": "docs/FIRST_RUN_NEARBY_030.md",
     "bytes": 2146,
     "sha256": "517190d8608c70e2722bbead4f6c870bbd02ac3274a211e3258e2ab0696048c4"
   },
   {
+    "path": "docs/INSTALL.md",
+    "bytes": 12195,
+    "sha256": "72596daa5e48e4549225dab685aca5ffdb1ead86c6331bfceb19a0129ad9c866"
+  },
+  {
     "path": "docs/MAC_INSTALL.md",
-    "bytes": 4093,
-    "sha256": "68e69af286c10006de013dc569c2e64a24d8af85b2fd5c6946c7efb18b76fd00"
+    "bytes": 454,
+    "sha256": "694fd3481abfa983a03410e886a883fe56cf0f7f1ee0418ffeb23e4869edc579"
   },
   {
     "path": "docs/NAME_RELEASE_032.md",
@@ -171,8 +181,8 @@
   },
   {
     "path": "docs/downloads.md",
-    "bytes": 1476,
-    "sha256": "8fe98a63904483f688c9516980e8aa76211b0fd80793524cf9bcf254a97df9db"
+    "bytes": 1086,
+    "sha256": "4b9ef80ab2dcd46e253827e037f3db94f72c837415fbd21f3dd2120e92695a45"
   },
   {
     "path": "docs/tablet-input-compatibility-reference.json",

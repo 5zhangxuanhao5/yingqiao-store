@@ -43,5 +43,6 @@
     "harmony": "0.3.14 (35), unchanged from accepted installed build"
   },
   "distribution": "GitHub source and Mac companion; private device debug HAP only",
-  "appGallerySubmission": false
+  "appGallerySubmission": false,
+  "documentationRevision": "developer-v0.3.15-docs.1"
 }
