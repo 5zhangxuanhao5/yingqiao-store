@@ -26,6 +26,11 @@ d['definitions']['deviceConfig']['properties']['multiModalInputOptions']=options
 (out/schema_rel).write_text(json.dumps(d,indent=2)+'\n')
 profile={'common':{},'tablet':{'multiModalInputOptions':{'mouse2TouchEventMode':'disabled'}}}
 (project/'entry/src/main/resources/base/profile/easy_go.json').write_text(json.dumps(profile,indent=2)+'\n')
+# This explicit developer-only build restores the original authorized HDC route.
+entry_profile=project/'entry/build-profile.json5'
+entry_config=json.loads(entry_profile.read_text())
+entry_config['buildOption']['externalNativeOptions']['arguments']='-DYINGQIAO_ORIGINAL_USB_TEST=ON'
+entry_profile.write_text(json.dumps(entry_config,indent=2)+'\n')
 assert (sdk/schema_rel).read_bytes()==original
 (out/'DEVICE_TEST_ONLY.json').write_text(json.dumps({'officialSDKUnmodified':True,'officialSchemaSHA256':hashlib.sha256(original).hexdigest(),'appGalleryReady':False,'reason':'isolated input-profile schema extension'},indent=2)+'\n')
 print('Device-test facade prepared; official SDK unchanged; not a store-ready build')

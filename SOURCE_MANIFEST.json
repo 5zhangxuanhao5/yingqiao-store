@@ -57,7 +57,7 @@
   {
     "path": "README.md",
     "bytes": 3980,
-    "sha256": "948a4588eaee72dff9cf2b5dc7f88edb55fd19f0aac4c3674aafb285d7b332f4"
+    "sha256": "cdd60d8c99e7c7536080cfb246cebf6bc1f19e1325428a5ccc255953a769f49f"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -71,8 +71,8 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 2282,
-    "sha256": "9a76358bfdf02df1d38bf5bd0a00a0e8e156d99a90f382e5128a974c37dec357"
+    "bytes": 2305,
+    "sha256": "335cd0b37adc0c50eedc5b89ec01a24b7037a04934be0ce3bf711892e080d2a0"
   },
   {
     "path": "VERSION_HISTORY.md",
@@ -100,9 +100,9 @@
     "sha256": "8e47415017defc0e0e908711345d703ae2e3dec4c391d9b2f40ce447e7d0ad1e"
   },
   {
-    "path": "docs/DEVELOPER_0313.md",
-    "bytes": 2375,
-    "sha256": "712660dbccde8397caf5db42480685165998d0b6ecbdac46366ee384fba60f6a"
+    "path": "docs/DEVELOPER_0314.md",
+    "bytes": 2963,
+    "sha256": "c3482fcae3e381699d7d79a8ceac12f457914031fbd0beb76442e4958c22f000"
   },
   {
     "path": "docs/DEVICE_TEST.md",
@@ -177,7 +177,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 199,
-    "sha256": "94c61bede0ea9ef4c94b2a284de73fe42e05f2fddc1f9c67ef9e16dd51fcac40"
+    "sha256": "0b0e0a07d6978733bf22dc0e5935be4ca67330e06803089ea5a64d39c2921788"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -501,8 +501,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/store/StoreDiscovery.ets",
-    "bytes": 14387,
-    "sha256": "dfec3745ad4531fddd841a477847f28cd4c22998afa37594b88b8dd8787f0c27"
+    "bytes": 14439,
+    "sha256": "69d87b6f6aba0d00462fea5efa3abe14d0ba9ed3c928ab020857e0cc0de17240"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
@@ -581,8 +581,8 @@
   },
   {
     "path": "mac/Info.plist",
-    "bytes": 1078,
-    "sha256": "5a151200f63777d07c985fce5d2eed3e58aa208780fcd85deb83b1ab0eb06454"
+    "bytes": 1079,
+    "sha256": "90cb092d5a04466bb2b7bec5b7e36cc8163f45e147cb5069dcf5e2d70dc1a881"
   },
   {
     "path": "mac/Resources/AppIcon.icns",
@@ -1861,13 +1861,13 @@
   },
   {
     "path": "tools/prepare-original-tablet-test.py",
-    "bytes": 2214,
-    "sha256": "03b2cdb53be78d7b56d47ddbf0706bac06a10e64d9a557eb8d5aa3da62b1a250"
+    "bytes": 2561,
+    "sha256": "5b1ec53508bf72e773c69b2c4821bcf079ec88cc3358350ad9813f5357ed09b1"
   },
   {
     "path": "tools/test-discovery-presence.cjs",
-    "bytes": 2841,
-    "sha256": "b4faffd4be09b58ee4f9bee2c129fdaecba7b3deefcec1a5ee8bc1919912954c"
+    "bytes": 3119,
+    "sha256": "abb2d349c9422e6f184418383b05327b7876e5f4aa1e071859c826d8656bf7f1"
   },
   {
     "path": "tools/test-pairing.cjs",

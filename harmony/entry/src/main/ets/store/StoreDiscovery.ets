@@ -41,7 +41,7 @@ export class StoreDiscovery {
   this.verifyDevice(item,this.epoch);
  }
  private async reachable(path:StoreDiscoveredPath,identity:StoreDiscoveredMac):Promise<boolean>{
-  try{const raw=await native.storeUSBDiscover(path.host);if(!raw)return false;const result=JSON.parse(raw) as USBIdentity;return result.certificate===identity.certificate&&result.identity.id===identity.id;}
+  try{const raw=await (path.host==='127.0.0.1'?native.storeUSBDiscover():native.storeUSBDiscover(path.host));if(!raw)return false;const result=JSON.parse(raw) as USBIdentity;return result.certificate===identity.certificate&&result.identity.id===identity.id;}
   catch(e){return false;}
  }
  private async scanKnown(generation:number):Promise<void>{
