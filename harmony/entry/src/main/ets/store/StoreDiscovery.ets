@@ -98,7 +98,13 @@ export class StoreDiscovery {
    const send=():void=>{if(generation===this.epoch){for(const destination of destinations.slice(0,5))owned.send({data:`YQDISC1 ${nonce}`,address:{address:destination,port:49565,family:1}}).then(()=>hilog.info(0x1234,'StoreDiscovery','datagram sent')).catch((e:Error)=>hilog.warn(0x1234,'StoreDiscovery','datagram send error=%{public}s',e.message));}};
    send();for(const delay of [1000,3000,6000,10000]){this.probeTimers.push(setTimeout(send,delay));}
    this.probeInterval=setInterval(send,8000);
-  }catch(e){hilog.warn(0x1234,'StoreDiscovery','datagram unavailable error=%{public}s',(e as Error).message);if(probe)probe.close().catch(()=>{});}
+  }catch(e){
+   hilog.warn(0x1234,'StoreDiscovery','datagram unavailable error=%{public}s',(e as Error).message);
+   if(probe){await probe.close().catch(()=>{});if(this.probe===probe)this.probe=null;}
+   if(generation!==this.epoch)return;
+   this.failed('设备搜索正在恢复，请稍候…');
+   this.probeTimers.push(setTimeout(()=>{if(generation===this.epoch&&!this.probe)this.startDatagram(generation);},2000));
+  }
  }
  stop():void {this.epoch++;if(this.probeInterval>=0){clearInterval(this.probeInterval);this.probeInterval=-1;}if(this.usbTimer>=0){clearInterval(this.usbTimer);this.usbTimer=-1;}for(const timer of this.probeTimers){clearTimeout(timer);}this.probeTimers=[];if(this.probe){this.probe.close().catch(()=>{});this.probe=null;}if(this.finder){try{this.finder.stopSearchingMDNS();this.finder.off('discoveryStart');this.finder.off('serviceFound');this.finder.off('serviceLost');}catch(e){}this.finder=null;}this.devices=[];this.seen.clear();this.serviceIDs.clear();}
 }

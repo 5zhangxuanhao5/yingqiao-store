@@ -254,7 +254,7 @@ struct Index {
  }
  private storeRefreshDiscovery():void {
   if(!this.storePrivacyAccepted||this.storeLinkPending)return;
-  this.storeDiscovery?.stop();this.storeDevices=[];this.storeDiscoverMessage='正在寻找附近的 Mac…';
+  this.storeDiscovery?.stop();this.storeDevices=[];this.storeReadyNearby=false;this.storeSelectedID='';this.storeDiscoverMessage='正在寻找附近的 Mac…';
   this.storeDiscovery=new StoreDiscovery(this.context(),(devices:StoreDiscoveredMac[])=>{
    this.storeDevices=devices;this.storeReadyNearby=devices.length>0;const invitation=devices.find((d:StoreDiscoveredMac)=>d.startRequested===true);if(invitation&&this.storeIntroDone&&!this.active&&!this.storeLinkPending){invitation.startRequested=false;this.pendingNearbyStart=invitation.id;}this.tryNearbyStart();this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
    this.storeDiscoverMessage=devices.length>0?'选择电脑即可连接':'还未发现电脑，请确认 Mac 上的映桥已打开。';
@@ -265,7 +265,7 @@ struct Index {
   this.storeDiscovery.start();
  }
  private tryNearbyStart():void{if(!this.pendingNearbyStart)return;const device=this.storeDevices.find((d:StoreDiscoveredMac)=>d.id===this.pendingNearbyStart);if(!device)return;this.pendingNearbyStart='';this.storeSelectedID=device.id;this.storeConnectSelected();}
- private storeCanStart():boolean{return this.storeIntroDone&&!this.storeLinkPending&&!this.active&&(this.storeDevices.length>0||this.storeReadyNearby);}
+ private storeCanStart():boolean{return this.storeIntroDone&&!this.storeLinkPending&&!this.active&&this.storeDevices.length>0;}
  private storeStartExtension():void{
   if(!this.storeCanStart())return;
   if(this.storeDevices.length>1){this.storePicker=true;return;}
@@ -274,7 +274,6 @@ struct Index {
  private storeConnectSelected():void {
   if(this.storeLinkPending||!this.storeIntroDone)return;
   const device=this.storeDevices.find((d:StoreDiscoveredMac)=>d.id===this.storeSelectedID) || (this.storeDevices.length===1?this.storeDevices[0]:undefined);
-  if(!device&&this.pairingLoaded&&this.pairing&&this.localRoute()){this.storeStage=3;this.begin('extend');return;}
   if(!device){this.message='未发现可连接的电脑，请打开电脑端映桥。';return;}
   this.storeSelectedID=device.id;this.storeError='';
   const remembered=this.rememberedMacs.find((v:StorePairing)=>v.cert===device.certificate) || (this.pairing?.cert===device.certificate?this.pairing:null);
@@ -529,6 +528,9 @@ struct Index {
  // Confine (do not freeze) the system pointer for that gesture, using touch
  // deltas from its original anchor. No global input permission or SDK override.
  private convertedMouseDrag: boolean = false;
+ private convertedMouseRawDrag: boolean = false;
+ private convertedMouseRawAt: number = 0;
+ private convertedMouseRawEpoch: number = 0;
  private convertedMouseX: number = 0;
  private convertedMouseY: number = 0;
  private convertedMouseDragMoves: number = 0;
@@ -760,7 +762,7 @@ struct Index {
   return status.preferredRoute;
  }
  private refreshLocalAvailability(): void {
-  this.availability?.refreshDiscovery();this.storeReadyNearby=this.storeDevices.length>0||!!this.localRoute();
+  this.availability?.refreshDiscovery();this.storeReadyNearby=this.storeDevices.length>0;
   const status = this.availability?.status();if (!status) { return; }
   const usb = status.paths.some((p: LocalPath) => p.route === 'usb' && p.ready), lan = status.paths.some((p: LocalPath) => p.route === 'lan' && p.ready);
   this.localRouteLabel = usb && lan ? (this.active && this.mode === 'extend'
@@ -1107,7 +1109,7 @@ struct Index {
     if (this.diagnosticRelativeCursor && !this.nativeMouseRouteBound) { this.restoreSystemCursor();this.relativeCursorStatus = 'native_mouse_route_unavailable'; }
     if (!relative) { this.restoreSystemCursor(false, true); }
     this.relativeWindowId = w.getWindowProperties().id;
-    native.input(`CURSORLOCK ${this.relativeWindowId} 1 ${relative && !this.convertedMouseDrag ? 0 : 1}`);
+    native.input(`CURSORLOCK ${this.relativeWindowId} 1 ${relative && (!this.convertedMouseDrag || this.convertedMouseRawDrag) ? 0 : 1}`);
    } else { this.restoreSystemCursor();native.input('CURSORLOCK -1 0'); }
   } catch (e) {
    this.restoreSystemCursor();
@@ -1135,7 +1137,7 @@ struct Index {
  private syncRelativeCursor(s: Statistics): void {
   const allowed = this.diagnosticRelativeCursor && this.nativeMouseRouteBound && this.nativeMouseRouteGeneration === this.sessionGeneration && this.diagnosticCursorLock !== false && !this.relativeCursorBlocked &&
    this.remoteInputAllowed() && this.fullScreen && this.relativeAnchorReady && s.running && !s.localUI;
-  const confirmed = allowed && s.cursorLocked && s.cursorFollowMovement === this.convertedMouseDrag && !s.cursorLockPending &&
+  const confirmed = allowed && s.cursorLocked && s.cursorFollowMovement === (this.convertedMouseDrag && !this.convertedMouseRawDrag) && !s.cursorLockPending &&
    !s.cursorLockStateUncertain && s.cursorLockWindowId === this.relativeWindowId;
   if (!confirmed) {
    if (allowed && this.convertedMouseDrag && s.cursorLockPending && this.relativeCursorActive) { return; }
@@ -1229,7 +1231,7 @@ struct Index {
    rawDeltaX: sample.rawDeltaX, rawDeltaY: sample.rawDeltaY, nativeAction: sample.nativeAction, nativeButton: sample.nativeButton, nativeTool: sample.sourceTool }, 3);
  }
  private relativeMouseMove(event: MouseInputSample): void {
-  if (this.convertedMouseDrag || !this.relativeCursorActive || event.action !== MouseAction.Move) { return; }
+  if ((this.convertedMouseDrag && !this.convertedMouseRawDrag) || !this.relativeCursorActive || event.action !== MouseAction.Move) { return; }
   const dx = event.rawDeltaX, dy = event.rawDeltaY;
   if (typeof dx !== 'number' || typeof dy !== 'number' || !Number.isFinite(dx) || !Number.isFinite(dy)) {
    this.relativeMissingRawEvents++;this.relativeMissingRawRun++;
@@ -1238,6 +1240,7 @@ struct Index {
   }
   if (event.timestamp > 0 && event.timestamp === this.relativeLastRawTimestamp) { return; }
   this.relativeLastRawTimestamp = event.timestamp;this.relativeMissingRawRun = 0;this.relativeRawEvents++;
+  if(this.convertedMouseRawDrag)this.convertedMouseRawAt=Date.now();
   this.relativeRawSamples.push({ dx: dx, dy: dy, absoluteX: Number.isFinite(event.x) ? event.x : this.lastAbsoluteMouseX, absoluteY: Number.isFinite(event.y) ? event.y : this.lastAbsoluteMouseY });
   if (this.relativeRawSamples.length > 16) { this.relativeRawSamples.shift(); }
   if (dx === 0 && dy === 0) { return; }
@@ -1717,21 +1720,22 @@ struct Index {
    if (this.convertedTrackpadDeviceId >= 0 && event.type === TouchType.Move) { return; }
    if (this.convertedTrackpadDeviceId >= 0 && event.type === TouchType.Down) { this.endGestures();this.twoFingers = false; }
    if (event.type === TouchType.Down && this.relativeCursorActive && this.fullScreen) {
-    this.convertedMouseDrag = true;this.convertedMouseX = point.x;this.convertedMouseY = point.y;this.syncCursorLock();
+    this.convertedMouseRawDrag = false;this.convertedMouseDrag = true;this.convertedMouseX = point.x;this.convertedMouseY = point.y;this.syncCursorLock();
    }
    if (this.convertedMouseDrag) {
-    if (event.type === TouchType.Move || event.type === TouchType.Up) {
+    if (!this.convertedMouseRawDrag && (event.type === TouchType.Move || event.type === TouchType.Up)) {
      const dx = point.x - this.convertedMouseX, dy = point.y - this.convertedMouseY;
      this.convertedMouseX = point.x;this.convertedMouseY = point.y;
      if (Number.isFinite(dx) && Number.isFinite(dy) && (dx !== 0 || dy !== 0)) {
       this.convertedMouseDragMoves++;this.move(this.pointerX + dx, this.pointerY + dy, true);
      }
     }
+    if(this.convertedMouseRawDrag){this.convertedMouseX=point.x;this.convertedMouseY=point.y;}
    } else if (this.convertedTrackpadDeviceId < 0 && !this.relativeCursorActive && !this.shouldPreserveCrossDisplayPointer()) { this.move(point.x, point.y); }
    if (event.type === TouchType.Down) { this.focusRemote();this.button(0, true, this.storeInputTimestamp()); }
    else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
     this.button(0, false, this.storeInputTimestamp());
-    if (this.convertedMouseDrag) { this.convertedMouseDrag = false;this.syncCursorLock();this.confirmRelativeCursorSoon(); }
+    if (this.convertedMouseDrag) { this.convertedMouseDrag = false;this.convertedMouseRawDrag = false;this.syncCursorLock();this.confirmRelativeCursorSoon(); }
    }
    return;
   }
@@ -1820,6 +1824,25 @@ struct Index {
    this.recentMouseDispatchKeys.push(key);if (this.recentMouseDispatchKeys.length > 32) { this.recentMouseDispatchKeys.shift(); }
   }
   if (this.convertedTrackpadDeviceId >= 0 && event.action !== MouseAction.Press && event.action !== MouseAction.Release) { return; }
+  // Promote only after an actual native hardware delta arrives during this drag.
+  // Never sum synthetic touch deltas and raw mouse deltas for the same gesture.
+  if (route === 3 && this.convertedMouseDrag && !this.convertedMouseRawDrag && this.relativeCursorActive &&
+   event.action === MouseAction.Move && Number.isFinite(event.rawDeltaX) && Number.isFinite(event.rawDeltaY) &&
+   ((event.rawDeltaX || 0) !== 0 || (event.rawDeltaY || 0) !== 0)) {
+   this.convertedMouseRawDrag = true;this.convertedMouseRawAt = Date.now();this.syncCursorLock();
+   const rawEpoch = ++this.convertedMouseRawEpoch;
+   const checkRawDrag = (): void => {
+    if(rawEpoch!==this.convertedMouseRawEpoch || !this.convertedMouseDrag || !this.convertedMouseRawDrag)return;
+    if(Date.now()-this.convertedMouseRawAt>=240){
+     this.convertedMouseRawDrag=false;this.syncCursorLock();
+     hilog.info(0x1234,'StoreDrag','raw stream inactive; compatibility restored');
+    }else{setTimeout(checkRawDrag,120);}
+   };
+   setTimeout(checkRawDrag,240);
+   hilog.info(0x1234,'StoreDrag','native relative drag selected');
+   // This first sample may already have arrived through the synthetic route.
+   return;
+  }
   this.prepareRelativeCursor(event);
   if (event.action === MouseAction.Press) { this.endGestures();this.twoFingers = false;this.focusRemote(); }
   if (this.convertedTrackpadDeviceId < 0) {

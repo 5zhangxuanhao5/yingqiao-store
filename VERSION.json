@@ -1,7 +1,7 @@
 {
-  "version": "store-v0.2.0-test.1",
-  "date": "2026-10-18",
-  "status": "original-extension-flow-port-awaiting-device-acceptance",
+  "version": "store-v0.3.8-rc.1",
+  "date": "2026-10-19",
+  "status": "drag-boundary-candidate-device-acceptance-pending",
   "publicSource": true,
   "minimumHarmonyAPI": 24,
   "macBuildArchitectures": [
@@ -39,7 +39,7 @@
   "consumerUSBImplementation": "Original USB development baseline is explicit ORIGINAL_USB_TEST build only, uses existing authorized HDC and is NOT consumer USB. RNDIS source/history retained separately; consumer USB release gate remains unmet.",
   "networkHandoverImplementation": "Restore original persistent authenticated LocalAvailability/StandbyCoordinator/checkLocalHandover, independent 49561/49562/49563 ports. Stop periodic short-probe/RNDIS route selection in this baseline.",
   "components": {
-    "mac": "0.2.0 (18)",
-    "harmony": "0.2.0 (18)"
+    "mac": "0.3.5 (26)",
+    "harmony": "0.3.8 (29)"
   }
 }
