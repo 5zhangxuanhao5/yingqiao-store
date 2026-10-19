@@ -25,10 +25,12 @@ export class StoreDiscovery {
  private devices: StoreDiscoveredMac[] = [];
  private epoch: number = 0;
  private rememberedHost:string='';
+ private rememberedCertificate:string='';
+ private knownPending:boolean=false;
  private context:common.UIAbilityContext;
  private changed:(devices:StoreDiscoveredMac[])=>void;
  private failed:(message:string)=>void;
- constructor(context:common.UIAbilityContext,changed:(devices:StoreDiscoveredMac[])=>void,failed:(message:string)=>void,rememberedHost:string=''){this.rememberedHost=rememberedHost;this.context=context;this.changed=changed;this.failed=failed;}
+ constructor(context:common.UIAbilityContext,changed:(devices:StoreDiscoveredMac[])=>void,failed:(message:string)=>void,rememberedHost:string='',rememberedCertificate:string=''){this.rememberedHost=rememberedHost;this.rememberedCertificate=rememberedCertificate;this.context=context;this.changed=changed;this.failed=failed;}
  acceptDevice(item:StoreDiscoveredMac):void {
   const previous=this.candidates.get(item.id);
   const combined=item.paths.slice();combined.unshift({host:item.host,route:item.host==='127.0.0.1'?'usb':'lan'});
@@ -38,15 +40,21 @@ export class StoreDiscovery {
   if(this.candidates.size>16){const oldest:string=Array.from(this.candidates.keys())[0];this.candidates.delete(oldest);}
   this.verifyDevice(item,this.epoch);
  }
- private async reachable(path:StoreDiscoveredPath):Promise<boolean>{
-  const channel=socket.constructTCPSocketInstance();
-  try{await channel.connect({address:{address:path.host,port:path.host==='127.0.0.1'?49561:49563,family:1},timeout:1200});return true;}
-  catch(e){return false;}finally{await channel.close().catch(()=>{});}
+ private async reachable(path:StoreDiscoveredPath,identity:StoreDiscoveredMac):Promise<boolean>{
+  try{const raw=await native.storeUSBDiscover(path.host);if(!raw)return false;const result=JSON.parse(raw) as USBIdentity;return result.certificate===identity.certificate&&result.identity.id===identity.id;}
+  catch(e){return false;}
+ }
+ private async scanKnown(generation:number):Promise<void>{
+  if(this.knownPending||!localIPv4(this.rememberedHost)||!this.rememberedCertificate)return;this.knownPending=true;
+  try{const raw=await native.storeUSBDiscover(this.rememberedHost);if(generation!==this.epoch||!raw)return;const result=JSON.parse(raw) as USBIdentity;const info=result.identity;
+   if(result.certificate!==this.rememberedCertificate||info.certificate!==result.certificate||!/^[0-9a-f]{24}$/.test(info.id))return;
+   this.acceptDevice({id:info.id,name:info.name,host:this.rememberedHost,certificate:result.certificate,serviceName:info.id,paths:[{host:this.rememberedHost,route:'lan'}]});
+  }catch(e){}finally{this.knownPending=false;}
  }
  private async verifyDevice(item:StoreDiscoveredMac,generation:number):Promise<void>{
   if(this.checks.has(item.id))return;this.checks.add(item.id);
   try{
-   const paths=item.paths.slice();const ready=await Promise.all(paths.map((p:StoreDiscoveredPath)=>this.reachable(p)));
+   const paths=item.paths.slice();const ready=await Promise.all(paths.map((p:StoreDiscoveredPath)=>this.reachable(p,item)));
    if(generation!==this.epoch||this.candidates.get(item.id)!==item)return;
    const alive=paths.filter((_p:StoreDiscoveredPath,i:number)=>ready[i]);
    const previous=this.devices.find((d:StoreDiscoveredMac)=>d.id===item.id);
@@ -62,7 +70,7 @@ export class StoreDiscovery {
  private verifyAll():void{for(const item of this.candidates.values()){this.verifyDevice(item,this.epoch);}}
  private attribute(info:mdns.LocalServiceInfo,key:string):string {let out='';for(const item of info.serviceAttribute || []) {if(item.key===key){for(const byte of item.value){out+=String.fromCharCode(byte);}return out;}}return out;}
  start():void {
-  this.stop();const generation=++this.epoch;this.startDatagram(generation);this.scanUSB(generation);this.usbTimer=setInterval(()=>this.scanUSB(generation),5000);this.presenceTimer=setInterval(()=>this.verifyAll(),3000);
+  this.stop();const generation=++this.epoch;this.startDatagram(generation);this.scanUSB(generation);this.scanKnown(generation);this.usbTimer=setInterval(()=>{this.scanUSB(generation);this.scanKnown(generation);},5000);this.presenceTimer=setInterval(()=>this.verifyAll(),3000);
   try {
    const finder=mdns.createDiscoveryService(this.context,'_yingqiaostore._tcp');this.finder=finder;
    hilog.info(0x1234,'StoreDiscovery','created');

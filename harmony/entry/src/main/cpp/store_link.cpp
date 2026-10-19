@@ -4,6 +4,7 @@
 #include <napi/native_api.h>
 #include <openssl/ssl.h>
 #include <openssl/pem.h>
+#include <openssl/sha.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -59,8 +60,29 @@ napi_value Start(napi_env env,napi_callback_info info){size_t n=2;napi_value arg
  napi_value value;napi_get_boolean(env,ok,&value);return value;}
 napi_value Status(napi_env env,napi_callback_info){std::string s;{std::lock_guard<std::mutex>g(mutex);s="{\"phase\":"+quote(phase)+",\"code\":"+quote(code)+",\"error\":"+quote(error)+",\"pairing\":"+quote(result)+"}";}napi_value value;napi_create_string_utf8(env,s.data(),s.size(),&value);return value;}
 napi_value Stop(napi_env env,napi_callback_info){cancel();{std::lock_guard<std::mutex>g(mutex);phase="idle";code.clear();result.clear();error.clear();}napi_value v;napi_get_undefined(env,&v);return v;}
-struct DiscoveryWork { napi_async_work work=nullptr;napi_deferred deferred=nullptr;std::string result; };
+struct DiscoveryWork { napi_async_work work=nullptr;napi_deferred deferred=nullptr;std::string result;std::string host; };
+void DirectIdentity(DiscoveryWork*w){
+ int fd=socket(AF_INET,SOCK_STREAM,0);if(fd<0)return;SSL_CTX*ctx=nullptr;SSL*ssl=nullptr;
+ auto cleanup=[&]{if(ssl)SSL_free(ssl);if(ctx)SSL_CTX_free(ctx);close(fd);};
+ timeval timeout{1,200000};setsockopt(fd,SOL_SOCKET,SO_RCVTIMEO,&timeout,sizeof(timeout));setsockopt(fd,SOL_SOCKET,SO_SNDTIMEO,&timeout,sizeof(timeout));
+ sockaddr_in a{};a.sin_family=AF_INET;a.sin_port=htons(49563);inet_pton(AF_INET,w->host.c_str(),&a.sin_addr);
+ int f=fcntl(fd,F_GETFL,0);fcntl(fd,F_SETFL,f|O_NONBLOCK);int rc=connect(fd,(sockaddr*)&a,sizeof(a));
+ if(rc<0&&errno==EINPROGRESS){pollfd p{fd,POLLOUT,0};int e=0;socklen_t n=sizeof(e);if(poll(&p,1,800)>0&&getsockopt(fd,SOL_SOCKET,SO_ERROR,&e,&n)==0&&e==0)rc=0;}
+ if(rc!=0){cleanup();return;}fcntl(fd,F_SETFL,f);
+ ctx=SSL_CTX_new(TLS_client_method());if(!ctx){cleanup();return;}SSL_CTX_set_min_proto_version(ctx,TLS1_2_VERSION);
+ ssl=SSL_new(ctx);SSL_set_fd(ssl,fd);if(SSL_connect(ssl)!=1){cleanup();return;}
+ X509*cert=SSL_get1_peer_certificate(ssl);BIO*b=BIO_new(BIO_s_mem());std::string pem;
+ if(cert&&b&&PEM_write_bio_X509(b,cert)==1){char*ptr=nullptr;long n=BIO_get_mem_data(b,&ptr);if(n>0&&n<8192)pem.assign(ptr,n);}if(b)BIO_free(b);X509_free(cert);
+ if(!pem.empty()){
+  unsigned char digest[SHA256_DIGEST_LENGTH];SHA256(reinterpret_cast<const unsigned char*>(pem.data()),pem.size(),digest);std::string id;const char*hex="0123456789abcdef";for(int i=0;i<12;i++){id+=hex[digest[i]>>4];id+=hex[digest[i]&15];}
+  // Read only the peer's public certificate. No token, control, media, or trust grant.
+  std::string identity="{\"schema\":\"store-discovery-v1\",\"id\":"+quote(id)+",\"name\":\"Mac\",\"certificate\":"+quote(pem)+",\"port\":49563}";
+  w->result="{\"certificate\":"+quote(pem)+",\"identity\":"+identity+"}";
+ }
+ cleanup();
+}
 void USBIdentity(napi_env,void* data){
+ auto*direct=static_cast<DiscoveryWork*>(data);if(!direct->host.empty()){DirectIdentity(direct);return;}
 #ifdef ORIGINAL_USB_TEST
  auto*w=static_cast<DiscoveryWork*>(data);
  // Bootstrap public identity only on the explicitly enabled debug USB loopback.
@@ -84,7 +106,7 @@ void USBIdentity(napi_env,void* data){
 #endif
 }
 void USBIdentityDone(napi_env env,napi_status status,void*data){auto*w=static_cast<DiscoveryWork*>(data);napi_value v;napi_create_string_utf8(env,w->result.data(),w->result.size(),&v);napi_resolve_deferred(env,w->deferred,v);napi_delete_async_work(env,w->work);delete w;}
-napi_value Discover(napi_env env,napi_callback_info){auto*w=new DiscoveryWork();napi_value promise,name;napi_create_promise(env,&w->deferred,&promise);napi_create_string_utf8(env,"publicUSBIdentity",NAPI_AUTO_LENGTH,&name);if(napi_create_async_work(env,nullptr,name,USBIdentity,USBIdentityDone,w,&w->work)!=napi_ok||napi_queue_async_work(env,w->work)!=napi_ok){napi_value v;napi_get_undefined(env,&v);napi_resolve_deferred(env,w->deferred,v);if(w->work)napi_delete_async_work(env,w->work);delete w;}return promise;}
+napi_value Discover(napi_env env,napi_callback_info info){auto*w=new DiscoveryWork();size_t argc=1;napi_value argv[1];napi_get_cb_info(env,info,&argc,argv,nullptr,nullptr);if(argc==1){auto host=arg(env,argv[0]);if(edgelinkstore::PrivateAddress(host)&&host.find(':')==std::string::npos)w->host=host;else{delete w;napi_value empty;napi_create_string_utf8(env,"",0,&empty);napi_value promise;napi_deferred deferred;napi_create_promise(env,&deferred,&promise);napi_resolve_deferred(env,deferred,empty);return promise;}}napi_value promise,name;napi_create_promise(env,&w->deferred,&promise);napi_create_string_utf8(env,"publicUSBIdentity",NAPI_AUTO_LENGTH,&name);if(napi_create_async_work(env,nullptr,name,USBIdentity,USBIdentityDone,w,&w->work)!=napi_ok||napi_queue_async_work(env,w->work)!=napi_ok){napi_value v;napi_get_undefined(env,&v);napi_resolve_deferred(env,w->deferred,v);if(w->work)napi_delete_async_work(env,w->work);delete w;}return promise;}
 
 }
 void RegisterStoreLinkAPI(napi_env env,napi_value exports){napi_add_env_cleanup_hook(env,[](void*){cancel();},nullptr);napi_property_descriptor methods[]={{"storeLinkStart",nullptr,Start,nullptr,nullptr,nullptr,napi_default,nullptr},{"storeLinkStatus",nullptr,Status,nullptr,nullptr,nullptr,napi_default,nullptr},{"storeLinkCancel",nullptr,Stop,nullptr,nullptr,nullptr,napi_default,nullptr}};napi_define_properties(env,exports,3,methods);napi_property_descriptor discovery={"storeUSBDiscover",nullptr,Discover,nullptr,nullptr,nullptr,napi_default,nullptr};napi_define_properties(env,exports,1,&discovery);}

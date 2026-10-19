@@ -218,7 +218,7 @@ struct Index {
    if(known&&this.pairing){if(!this.active&&known.host!=='127.0.0.1'&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.availability?.setHost(known.host);this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
    if(!devices.some((d:StoreDiscoveredMac)=>d.id===this.storeSelectedID)){this.storeSelectedID='';}
    if(!this.storeSelectedID&&devices.length===1){this.storeSelectedID=devices[0].id;}
-  },(message:string)=>this.storeDiscoverMessage=message,this.pairing?.host || '');
+  },(message:string)=>this.storeDiscoverMessage=message,this.pairing?.host || '',this.pairing?.cert || '');
   this.storeDiscovery.start();
  }
  private tryNearbyStart():void{if(!this.pendingNearbyStart)return;const device=this.storeDevices.find((d:StoreDiscoveredMac)=>d.id===this.pendingNearbyStart);if(!device)return;this.pendingNearbyStart='';this.storeSelectedID=device.id;this.storeConnectSelected();}
@@ -257,7 +257,7 @@ struct Index {
   if(this.pairing && (this.pairing.cert!==pairing.cert || this.pairing.token!==pairing.token)){this.availability?.stop();this.availability=null;if(this.availabilityTimer>=0){clearInterval(this.availabilityTimer);this.availabilityTimer=-1;}}
   this.pairing=pairing;this.host=pairing.host;this.availability?.setHost(pairing.host);this.pairingLoaded=true;this.transport=1;this.storeCodec=pairing.codecs.includes('hevc') ? 'hevc':'avc';
   if(save){this.rememberedMacs=this.rememberedMacs.filter((v:StorePairing)=>v.cert!==pairing.cert);this.rememberedMacs.push(pairing);this.rememberedMacs=this.rememberedMacs.slice(-16);this.writeFile('store-macs.json',JSON.stringify(this.rememberedMacs));this.writeFile('store-pairing.json',JSON.stringify(pairing));}
-  this.storeStage=3;this.prepareLocalAvailability();this.message='已记住这台 Mac，可直接开启扩展屏。';this.storeError='';this.localRouteLabel='原版扩展屏连接流程';
+  this.storeStage=3;this.prepareLocalAvailability();this.message='等待发现可连接的 Mac。';this.storeError='';this.localRouteLabel='原版扩展屏连接流程';
  }
  private storeSelectProfile(): void {
   const panel=display.getDefaultDisplaySync();const w=panel.width,h=panel.height;

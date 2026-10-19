@@ -79,6 +79,6 @@ export const storeUSBInterfaces: ()=>string;
 // Lifecycle-only snapshot; does not consume/reset statistics samples.
 export const storeSessionFlags: ()=>number;
 
-export const storeUSBDiscover: ()=>Promise<string>;
+export const storeUSBDiscover: (host?:string)=>Promise<string>;
 
 export const availabilityIdentity:(metadata:string)=>void;

@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),ts=require('/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/ets/build-tools/ets-loader/node_modules/typescript');
 const assert=require('assert');let reachable=new Set(),opens=0,closes=0,pending=null;
-const mockSocket={constructTCPSocketInstance(){opens++;return{connect:async o=>{if(pending)await pending;if(!reachable.has(o.address.address))throw Error('offline');},close:async()=>{closes++;}}}};
-const sandbox={exports:{},require:n=>n==='libedgelink.so'?{}:n==='@kit.NetworkKit'?{socket:mockSocket}:n==='./StorePairing'?{localIPv4:h=>h.startsWith('10.')||h.startsWith('192.168.')}:n==='@kit.PerformanceAnalysisKit'?{hilog:{}}:{},setInterval:()=>1,clearInterval(){},setTimeout:()=>1,clearTimeout(){},Date,Promise,Map,Set};
+const native={async storeUSBDiscover(host){opens++;try{if(pending)await pending;if(!reachable.has(host))return '';return JSON.stringify({certificate:'fixture-public-identity',identity:{id:'a'.repeat(24),certificate:'fixture-public-identity',name:'Fixture Mac',port:49563,schema:'store-discovery-v1'}});}finally{closes++;}}};
+const sandbox={exports:{},require:n=>n==='libedgelink.so'?{default:native}:n==='@kit.NetworkKit'?{socket:{}}:n==='./StorePairing'?{localIPv4:h=>h.startsWith('10.')||h.startsWith('192.168.')}:n==='@kit.PerformanceAnalysisKit'?{hilog:{}}:{},setInterval:()=>1,clearInterval(){},setTimeout:()=>1,clearTimeout(){},Date,Promise,Map,Set};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('harmony/entry/src/main/ets/store/StoreDiscovery.ets','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,sandbox);
 let visible=[];const Discovery=sandbox.exports.StoreDiscovery;const d=new Discovery({},v=>visible=v,()=>{});const item=(host,paths=[])=>({id:'a'.repeat(24),name:'Synthetic Mac',host,certificate:'fixture-public-identity',serviceName:'fixture',paths});
 const flush=()=>new Promise(r=>setImmediate(r));

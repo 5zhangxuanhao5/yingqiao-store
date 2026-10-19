@@ -57,7 +57,7 @@
   {
     "path": "README.md",
     "bytes": 3980,
-    "sha256": "a0419aa4dd46855c4238cb797b7380e2b41514e6598624f388865488164d952c"
+    "sha256": "948a4588eaee72dff9cf2b5dc7f88edb55fd19f0aac4c3674aafb285d7b332f4"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -72,7 +72,7 @@
   {
     "path": "VERSION.json",
     "bytes": 2282,
-    "sha256": "475bbe9992b462f2629a640c53895bb1fd118f3fa64482e206d90431a7d8a107"
+    "sha256": "9a76358bfdf02df1d38bf5bd0a00a0e8e156d99a90f382e5128a974c37dec357"
   },
   {
     "path": "VERSION_HISTORY.md",
@@ -100,9 +100,9 @@
     "sha256": "8e47415017defc0e0e908711345d703ae2e3dec4c391d9b2f40ce447e7d0ad1e"
   },
   {
-    "path": "docs/DEVELOPER_0312.md",
-    "bytes": 1966,
-    "sha256": "44b23b19c2d9cb81263ada4125824537ece0e8d877836ce12e9953c0ae342ffb"
+    "path": "docs/DEVELOPER_0313.md",
+    "bytes": 2375,
+    "sha256": "712660dbccde8397caf5db42480685165998d0b6ecbdac46366ee384fba60f6a"
   },
   {
     "path": "docs/DEVICE_TEST.md",
@@ -177,7 +177,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 199,
-    "sha256": "53757c6d2e9a06b9a4978936db8904a1f207e38dd6790851a3550ca4a842ea7b"
+    "sha256": "94c61bede0ea9ef4c94b2a284de73fe42e05f2fddc1f9c67ef9e16dd51fcac40"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -421,8 +421,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/store_link.cpp",
-    "bytes": 9794,
-    "sha256": "2312f19f5118298ead1183ca7037fc5bd0d1106a677bd61e277e76e306b27c9f"
+    "bytes": 12184,
+    "sha256": "44c6b6ce0ba28ec4ec9a7374e13da66b7067beea13099c2baca880fd210daebe"
   },
   {
     "path": "harmony/entry/src/main/cpp/store_paths.cpp",
@@ -441,8 +441,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/index.d.ts",
-    "bytes": 3415,
-    "sha256": "25a44ecadadef8764cb83e9701d818da26c5791d3b9104718c33f29bdcb61a8a"
+    "bytes": 3427,
+    "sha256": "0ad12160a8ed3a9f0a1ccf4c7bfb2303d33bf458a70fb98e3ebe8ae092465f12"
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/oh-package.json5",
@@ -461,8 +461,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 149847,
-    "sha256": "e406fcafc7c032409b90163b6843a63654f24ffb4d031ed09e6c94627cc4c3d7"
+    "bytes": 149854,
+    "sha256": "e8ab9987c9256a038607249b33446957211b3be1360c2b2404eb3d4f8e336e3f"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -501,8 +501,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/store/StoreDiscovery.ets",
-    "bytes": 13452,
-    "sha256": "ab4e01f595f349b9bde7e1bde77ac08e4b922e75e639cef704609c6299f686ad"
+    "bytes": 14387,
+    "sha256": "dfec3745ad4531fddd841a477847f28cd4c22998afa37594b88b8dd8787f0c27"
   },
   {
     "path": "harmony/entry/src/main/ets/store/StorePairing.ets",
@@ -1866,8 +1866,8 @@
   },
   {
     "path": "tools/test-discovery-presence.cjs",
-    "bytes": 2708,
-    "sha256": "2386566eb335bf988770e48d80aa9a7b2ac30d603f40847c02fe9c2e14544ad9"
+    "bytes": 2841,
+    "sha256": "b4faffd4be09b58ee4f9bee2c129fdaecba7b3deefcec1a5ee8bc1919912954c"
   },
   {
     "path": "tools/test-pairing.cjs",
