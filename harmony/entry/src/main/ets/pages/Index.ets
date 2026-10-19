@@ -2,8 +2,8 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { NearbyPad } from '../store/NearbyPad';
 import { StoreDiscovery, StoreDiscoveredMac } from '../store/StoreDiscovery';
 import { HarmonyAccessoryCandidate } from '../store/HarmonyAccessory';
-import { pasteboard, systemDateTime, deviceInfo } from '@kit.BasicServicesKit';
-import { validatePairing, STORE_DOWNLOAD_URL, STORE_INSTALL_STEPS, StorePairing } from '../store/StorePairing';
+import { systemDateTime, deviceInfo } from '@kit.BasicServicesKit';
+import { validatePairing, StorePairing } from '../store/StorePairing';
 import native, { NativeMouseSample, NativeCursorSample, AvailabilityEvent } from 'libedgelink.so';
 import { webview } from '@kit.ArkWeb';
 import { RTCArkWebTransport, RTCIceServer } from '../service/RTCArkWebTransport';
@@ -139,7 +139,6 @@ struct Index {
  @State storeSelectedID:string='';
  @State storeLinkPending:boolean=false;
  @State storeVerification:string='';
- @State storeShowInstallGuide:boolean=false;
  private storeDiscovery:StoreDiscovery|null=null;
  private storeLinkTimer:number=-1;
  private storeLinkHost:string='';
@@ -198,7 +197,7 @@ struct Index {
  }
 
  private storeFirstRun():void {
-  try{this.storeIntroDone=fileIo.readTextSync(`${this.context().filesDir}/store-intro-v1.json`)==='done';}catch(e){}
+  this.storeIntroDone=true;
   try{this.rememberedMacs=(JSON.parse(fileIo.readTextSync(`${this.context().filesDir}/store-macs.json`)) as StorePairing[]).map((v:StorePairing)=>validatePairing(JSON.stringify(v))).filter((v:StorePairing|null)=>v!==null) as StorePairing[];}catch(e){}
   try{this.padIdentity=fileIo.readTextSync(`${this.context().filesDir}/store-pad-id.txt`);}catch(e){}
   if(!/^[0-9a-f]{32}$/.test(this.padIdentity)){this.padIdentity=util.generateRandomUUID(true).replace(/-/g,'').toLowerCase();this.writeFile('store-pad-id.txt',this.padIdentity);}
@@ -211,18 +210,19 @@ struct Index {
  }
  private storeRefreshDiscovery():void {
   if(this.storeLinkPending)return;
-  this.storeDiscovery?.stop();this.storeDevices=[];this.storeDiscoverMessage='正在寻找附近的 Mac…';
+  this.storeDiscovery?.stop();this.storeDevices=[];this.storeReadyNearby=false;this.storeSelectedID='';this.storeDiscoverMessage='正在寻找附近的 Mac…';
   this.storeDiscovery=new StoreDiscovery(this.context(),(devices:StoreDiscoveredMac[])=>{
    this.storeDevices=devices;this.storeReadyNearby=devices.length>0;const invitation=devices.find((d:StoreDiscoveredMac)=>d.startRequested===true);if(invitation&&this.storeIntroDone&&!this.active&&!this.storeLinkPending){invitation.startRequested=false;this.pendingNearbyStart=invitation.id;}this.tryNearbyStart();this.writeFile('store-discovery-status.json',JSON.stringify({devices:devices.length,updated:Date.now()}));
    this.storeDiscoverMessage=devices.length>0?'选择电脑即可连接':'还未发现电脑，请确认 Mac 上的映桥已打开。';
    const known=devices.find((d:StoreDiscoveredMac)=>d.certificate===this.pairing?.cert);
    if(known&&this.pairing){if(!this.active&&known.host!=='127.0.0.1'&&this.pairing.host!==known.host){this.pairing.host=known.host;this.host=known.host;this.availability?.setHost(known.host);this.writeFile('store-pairing.json',JSON.stringify(this.pairing));}this.storeSelectedID=known.id;}
+   if(!devices.some((d:StoreDiscoveredMac)=>d.id===this.storeSelectedID)){this.storeSelectedID='';}
    if(!this.storeSelectedID&&devices.length===1){this.storeSelectedID=devices[0].id;}
   },(message:string)=>this.storeDiscoverMessage=message,this.pairing?.host || '');
   this.storeDiscovery.start();
  }
  private tryNearbyStart():void{if(!this.pendingNearbyStart)return;const device=this.storeDevices.find((d:StoreDiscoveredMac)=>d.id===this.pendingNearbyStart);if(!device)return;this.pendingNearbyStart='';this.storeSelectedID=device.id;this.storeConnectSelected();}
- private storeCanStart():boolean{return this.storeIntroDone&&!this.storeLinkPending&&!this.active&&(this.storeDevices.length>0||this.storeReadyNearby);}
+ private storeCanStart():boolean{return this.storeIntroDone&&!this.storeLinkPending&&!this.active&&this.storeDevices.length>0;}
  private storeStartExtension():void{
   if(!this.storeCanStart())return;
   if(this.storeDevices.length>1){this.storePicker=true;return;}
@@ -231,7 +231,6 @@ struct Index {
  private storeConnectSelected():void {
   if(this.storeLinkPending||!this.storeIntroDone)return;
   const device=this.storeDevices.find((d:StoreDiscoveredMac)=>d.id===this.storeSelectedID) || (this.storeDevices.length===1?this.storeDevices[0]:undefined);
-  if(!device&&this.pairingLoaded&&this.pairing&&this.localRoute()){this.storeStage=3;this.begin('extend');return;}
   if(!device){this.message='未发现可连接的电脑，请打开电脑端映桥。';return;}
   this.storeSelectedID=device.id;this.storeError='';
   const remembered=this.rememberedMacs.find((v:StorePairing)=>v.cert===device.certificate) || (this.pairing?.cert===device.certificate?this.pairing:null);
@@ -252,9 +251,6 @@ struct Index {
  private storeCancelLink(showMessage:boolean=true):void {
   if(this.storeLinkTimer>=0){clearInterval(this.storeLinkTimer);this.storeLinkTimer=-1;}
   native.storeLinkCancel();this.storeLinkPending=false;this.storeVerification='';if(showMessage)this.message='已取消本次连接。';
- }
- private async storeCopyLink(): Promise<void> {
-  try { await pasteboard.getSystemPasteboard().setData(pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, STORE_DOWNLOAD_URL));this.getUIContext().getPromptAction().showToast({ message: '电脑端下载链接已复制' }); } catch(e) { this.storeError='未能复制，请选中链接手动复制。'; }
  }
  private applyStorePairing(text: string, save: boolean): void {
   const pairing=validatePairing(text);if (!pairing) { this.storeError='设备信息已失效，请重新选择附近的 Mac。';this.storeStage=2;return; }
@@ -707,7 +703,7 @@ struct Index {
   return status.preferredRoute;
  }
  private refreshLocalAvailability(): void {
-  this.availability?.refreshDiscovery();this.storeReadyNearby=this.storeDevices.length>0||!!this.localRoute();
+  this.availability?.refreshDiscovery();this.storeReadyNearby=this.storeDevices.length>0;
   const status = this.availability?.status();if (!status) { return; }
   const usb = status.paths.some((p: LocalPath) => p.route === 'usb' && p.ready), lan = status.paths.some((p: LocalPath) => p.route === 'lan' && p.ready);
   this.localRouteLabel = usb && lan ? (this.active && this.mode === 'extend'
@@ -1863,19 +1859,6 @@ struct Index {
   }.width('100%').height('100%').zIndex(200)
  }
  @Builder
- private storeWelcome(){
-  Column({space:16}){
-   Text('欢迎使用映桥').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#172D2C').width('100%')
-   Text('平板和 Mac 都要安装，才能开始扩展屏').fontSize(18).fontColor('#23796C').width('100%')
-   Text('先在 Mac 下载并打开电脑端，再回来连接。下载入口会直接打开本次测试版，不需要找源码。').fontSize(15).lineHeight(24).fontColor('#607A74').width('100%')
-   Text('① 在 Mac 打开下载链接，下载 Mac 测试版 ZIP。\n② 解压，把“映桥”拖进“应用程序”并打开。\n③ 按电脑端说明完成权限设置。\n④ 回到平板，点下方“Mac 已安装，开始使用”。').fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
-   Button('复制 Mac 下载链接').onClick(()=>this.storeCopyLink()).width('100%').height(44).backgroundColor('#EAF3EE').fontColor('#23796C')
-   Button(this.storeShowInstallGuide?'收起详细安装步骤':'第一次安装？查看详细步骤').onClick(()=>this.storeShowInstallGuide=!this.storeShowInstallGuide).fontSize(13).fontColor('#23796C').backgroundColor(Color.Transparent)
-   if(this.storeShowInstallGuide){Text(STORE_INSTALL_STEPS).fontSize(14).lineHeight(25).fontColor('#607A74').width('100%');Text(STORE_DOWNLOAD_URL).fontSize(12).fontColor('#23796C').copyOption(CopyOptions.LocalDevice).width('100%')}
-   Button('Mac 已安装，开始使用').onClick(()=>{this.storeIntroDone=true;this.writeFile('store-intro-v1.json','done');this.storeRefreshDiscovery();}).width('100%').height(46).backgroundColor('#23796C').fontColor('#FFFFFF')
-  }.padding(28).width('90%').constraintSize({maxWidth:640}).backgroundColor('#FFFFFF').borderRadius(24).alignItems(HorizontalAlign.Start)
- }
- @Builder
  private home() {
   Column({space:20}) {
    Row({space:18}) {
@@ -1909,13 +1892,6 @@ struct Index {
      Column({space:4}){Text('Ctrl 作为 Mac ⌘').fontSize(14).fontColor('#172D2C');Text('保留原来的键盘、触控板和触屏操作。').fontSize(12).fontColor('#789089')}.alignItems(HorizontalAlign.Start).layoutWeight(1)
      Toggle({type:ToggleType.Switch,isOn:this.ctrlToCmd}).onChange((v:boolean)=>this.ctrlToCmd=v).selectedColor('#23796C')
     }.width('100%')
-    Divider().color('#E5ECE8')
-    Button('电脑端下载与安装说明').onClick(()=>this.storeShowInstallGuide=!this.storeShowInstallGuide).fontSize(14).fontColor('#23796C').backgroundColor('#EAF3EE').height(38).borderRadius(10)
-    if(this.storeShowInstallGuide){
-     Text(STORE_INSTALL_STEPS).fontSize(14).lineHeight(25).fontColor('#607A74').width('100%')
-     Text(STORE_DOWNLOAD_URL).copyOption(CopyOptions.LocalDevice).fontSize(13).fontColor('#23796C').width('100%')
-     Button('复制电脑端下载链接').onClick(()=>this.storeCopyLink()).fontSize(14).fontColor('#FFFFFF').backgroundColor('#23796C').height(40).borderRadius(10)
-    }
     if(this.storeError){Text(this.storeError).fontSize(13).fontColor('#A04444').width('100%')}
    }.alignItems(HorizontalAlign.Start).padding(26).width('100%').backgroundColor('#FFFFFF').border({width:1,color:'#E0E8E4'}).borderRadius(22)
   }.padding(this.homeWidth>=740?32:20).width('100%').constraintSize({maxWidth:1240}).alignItems(HorizontalAlign.Start)
@@ -1974,7 +1950,7 @@ struct Index {
     .onMouse((event: MouseEvent) => this.onJsMouse(event, 2))
    if (!this.active) {
     Scroll() {
-     if(!this.storeIntroDone){Column(){this.storeWelcome()}.width('100%').constraintSize({minHeight:this.homeHeight}).padding({top:24,bottom:24}).justifyContent(FlexAlign.Center)}else{this.home()}
+     this.home()
     }.width('100%').height('100%').align(Alignment.Top).backgroundColor('#F5F7F6').zIndex(100)
      .hitTestBehavior(HitTestMode.Default).onAreaChange((_oldValue: Area, newValue: Area) => {
       const width=Number(newValue.width),height=Number(newValue.height);if(Number.isFinite(width)&&width>0&&Math.abs(width-this.homeWidth)>1)this.homeWidth=width;if(Number.isFinite(height)&&height>0&&Math.abs(height-this.homeHeight)>1)this.homeHeight=height;
