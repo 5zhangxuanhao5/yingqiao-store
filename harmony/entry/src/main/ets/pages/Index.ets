@@ -866,7 +866,7 @@ struct Index {
  }
  private onReconnectForegroundChanged(): void {
   if (AppStorage.get<boolean>('remoteSessionForeground') !== true) { this.stop('ability_background'); }
-  else { this.internetReconnect?.gatesChanged(); }
+  else { this.internetReconnect?.gatesChanged();if(!this.active&&this.storePrivacyAccepted)this.storeRefreshDiscovery(); }
  }
  private chooseTransport(value: number): void {
   if (value === this.transport) { return; }
