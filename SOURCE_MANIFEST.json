@@ -71,8 +71,8 @@
   },
   {
     "path": "VERSION.json",
-    "bytes": 2172,
-    "sha256": "dd9eed81e398a2cce7d214e91d032136ad36a9bb40b9e827ba8400cc992e0b09"
+    "bytes": 2162,
+    "sha256": "46e4059e742e72b67284ecc0587f80aac130fa47c4935863ae7c94a3bf1a3f8c"
   },
   {
     "path": "VERSION_HISTORY.md",
@@ -163,6 +163,11 @@
     "path": "docs/RELEASE_0310.md",
     "bytes": 749,
     "sha256": "1ed4234e1f388cc0fa77c57fd3d5b4240fed4858e3c467051cf34b93b8cef8c1"
+  },
+  {
+    "path": "docs/RELEASE_0311.md",
+    "bytes": 689,
+    "sha256": "e2be6f48636083e8d38d51953db377e4ebd7ddb9aef13a9f1d1ea32577e315f5"
   },
   {
     "path": "docs/RELEASE_037.md",
@@ -282,7 +287,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 199,
-    "sha256": "a1058688bfe19ed6ed2ee3250866b949c87d7e2d6318117d61c869f74ab5e447"
+    "sha256": "c0396859b8934a543bd6ffab80da590fa1b2052f03727639b3ae3627b7aac1c4"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -566,8 +571,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 164016,
-    "sha256": "8e41a82d86fcc6146bcc6a95b20b0e26b5e1f5d340c4224ad04c5015141b45fc"
+    "bytes": 164624,
+    "sha256": "4cee881832f0f19997de7aa6a72df99170b899b7c2ce03c9f21543a38c2a0b4b"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",

@@ -1,7 +1,7 @@
 {
-  "version": "store-v0.3.10-rc.1",
+  "version": "store-v0.3.11-rc.1",
   "date": "2026-10-19",
-  "status": "usb-discovery-stability-candidate-drag-unresolved",
+  "status": "tablet-input-route-candidate-unverified",
   "publicSource": true,
   "minimumHarmonyAPI": 24,
   "macBuildArchitectures": [
@@ -40,6 +40,6 @@
   "networkHandoverImplementation": "Restore original persistent authenticated LocalAvailability/StandbyCoordinator/checkLocalHandover, independent 49561/49562/49563 ports. Stop periodic short-probe/RNDIS route selection in this baseline.",
   "components": {
     "mac": "0.3.5 (26)",
-    "harmony": "0.3.10 (31)"
+    "harmony": "0.3.11 (32)"
   }
 }

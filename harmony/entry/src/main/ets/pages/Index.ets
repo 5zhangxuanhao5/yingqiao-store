@@ -530,6 +530,7 @@ struct Index {
  private convertedMouseDrag: boolean = false;
  private convertedMouseRawDrag: boolean = false;
  private convertedMouseRawAt: number = 0;
+ private convertedMouseRawRoute: number = 0;
  private convertedMouseRawEpoch: number = 0;
  private convertedMouseX: number = 0;
  private convertedMouseY: number = 0;
@@ -1330,7 +1331,7 @@ struct Index {
    s.cursorSyncApplied = this.cursorSyncApplied;s.cursorSyncStaleSession = this.cursorSyncStaleSession;s.cursorSyncStaleSequence = this.cursorSyncStaleSequence;
    s.cursorSyncStaleInput = this.cursorSyncStaleInput;s.cursorSyncInvalid = this.cursorSyncInvalid;
    s.hostCursorOwner = this.hostCursorOwner;s.hostCursorVisible = this.hostCursorVisible;
-   if(Date.now()-this.lastPerformanceLog>2000){this.lastPerformanceLog=Date.now();hilog.info(0x1234,'StorePerformance','rx=%{public}d rendered=%{public}d fps=%{public}s decodeP95=%{public}s queueP95=%{public}s bytes=%{public}d',s.receivedFrames,s.renderSubmittedFrames,String(s.renderSubmittedFPS),String(s.decodeP95ms),String(s.inputQueueP95ms),s.bytesReceived);hilog.info(0x1234,'StoreSession','generation=%{public}d running=%{public}d transport=%{public}d stop=%{public}s raw=%{public}d touchMoves=%{public}d convertedDrag=%{public}d held=%{public}d relative=%{public}d',this.sessionGeneration,s.running?1:0,this.sessionTransport,s.stopReason,this.relativeRawEvents,this.relativeDragTouchMoves,this.convertedMouseDragMoves,this.mouseHeld[0]?1:0,this.relativeCursorActive?1:0);}
+   if(Date.now()-this.lastPerformanceLog>2000){this.lastPerformanceLog=Date.now();hilog.info(0x1234,'StorePerformance','rx=%{public}d rendered=%{public}d fps=%{public}s decodeP95=%{public}s queueP95=%{public}s bytes=%{public}d',s.receivedFrames,s.renderSubmittedFrames,String(s.renderSubmittedFPS),String(s.decodeP95ms),String(s.inputQueueP95ms),s.bytesReceived);hilog.info(0x1234,'StoreSession','generation=%{public}d running=%{public}d transport=%{public}d stop=%{public}s raw=%{public}d touchMoves=%{public}d convertedDrag=%{public}d held=%{public}d relative=%{public}d',this.sessionGeneration,s.running?1:0,this.sessionTransport,s.stopReason,this.relativeRawEvents,this.relativeDragTouchMoves,this.convertedMouseDragMoves,this.mouseHeld[0]?1:0,this.relativeCursorActive?1:0);hilog.info(0x1234,'StoreDragRoutes','jsChild=%{public}d jsParent=%{public}d native=%{public}d callback=%{public}d forwarded=%{public}d held=%{public}d selected=%{public}d',this.mouseRouteEvents[1],this.mouseRouteEvents[2],this.mouseRouteEvents[3],this.nativeMouseCallbackCounts.callbacks,this.nativeMouseCallbackCounts.forwarded,this.mouseHeld[0]?1:0,this.convertedMouseRawDrag?this.convertedMouseRawRoute:0);}
    this.writeFile('session-status.json', JSON.stringify(s));return s;
   } catch (e) { return null; }
  }
@@ -1824,12 +1825,12 @@ struct Index {
    this.recentMouseDispatchKeys.push(key);if (this.recentMouseDispatchKeys.length > 32) { this.recentMouseDispatchKeys.shift(); }
   }
   if (this.convertedTrackpadDeviceId >= 0 && event.action !== MouseAction.Press && event.action !== MouseAction.Release) { return; }
-  // Promote only after an actual native hardware delta arrives during this drag.
+  // Promote only after a valid hardware delta arrives during this drag.
   // Never sum synthetic touch deltas and raw mouse deltas for the same gesture.
-  if (route === 3 && this.convertedMouseDrag && !this.convertedMouseRawDrag && this.relativeCursorActive &&
+  if (this.convertedMouseDrag && !this.convertedMouseRawDrag && this.relativeCursorActive &&
    event.action === MouseAction.Move && Number.isFinite(event.rawDeltaX) && Number.isFinite(event.rawDeltaY) &&
    ((event.rawDeltaX || 0) !== 0 || (event.rawDeltaY || 0) !== 0)) {
-   this.convertedMouseRawDrag = true;this.convertedMouseRawAt = Date.now();this.syncCursorLock();
+   this.convertedMouseRawDrag = true;this.convertedMouseRawRoute = route;this.convertedMouseRawAt = Date.now();this.syncCursorLock();
    const rawEpoch = ++this.convertedMouseRawEpoch;
    const checkRawDrag = (): void => {
     if(rawEpoch!==this.convertedMouseRawEpoch || !this.convertedMouseDrag || !this.convertedMouseRawDrag)return;
@@ -1839,10 +1840,11 @@ struct Index {
     }else{setTimeout(checkRawDrag,120);}
    };
    setTimeout(checkRawDrag,240);
-   hilog.info(0x1234,'StoreDrag','native relative drag selected');
+   hilog.info(0x1234,'StoreDrag','relative drag route=%{public}d',route);
    // This first sample may already have arrived through the synthetic route.
    return;
   }
+  if(this.convertedMouseDrag&&this.convertedMouseRawDrag&&event.action===MouseAction.Move&&route!==this.convertedMouseRawRoute)return;
   this.prepareRelativeCursor(event);
   if (event.action === MouseAction.Press) { this.endGestures();this.twoFingers = false;this.focusRemote(); }
   if (this.convertedTrackpadDeviceId < 0) {
