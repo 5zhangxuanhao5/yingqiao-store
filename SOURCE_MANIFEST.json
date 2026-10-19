@@ -1871,8 +1871,8 @@
   },
   {
     "path": "tools/test-pairing.cjs",
-    "bytes": 1529,
-    "sha256": "53bbd01842297599d55f5d89150588aa0d26a0a3acbc0605d163479e4a13e547"
+    "bytes": 1653,
+    "sha256": "6dab40c07ed03bc6311435463d4a62f130555c1fb92a52bb32fbc8aea6dfe890"
   },
   {
     "path": "usb/AccessoryProtocol.hpp",
