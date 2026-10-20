@@ -6,7 +6,13 @@ import Darwin
 
 struct StoreIdentity:Codable {
  let token:String,password:String,certificate:String
- static var directory:URL {FileManager.default.urls(for:.applicationSupportDirectory,in:.userDomainMask)[0].appendingPathComponent("cn.edgelink.store.mac",isDirectory:true)}
+ static var directory:URL {
+ #if MAC_RECEIVER_PREVIEW
+ return FileManager.default.urls(for:.applicationSupportDirectory,in:.userDomainMask)[0].appendingPathComponent("cn.edgelink.macreceiver.preview",isDirectory:true)
+ #else
+ return FileManager.default.urls(for:.applicationSupportDirectory,in:.userDomainMask)[0].appendingPathComponent("cn.edgelink.store.mac",isDirectory:true)
+ #endif
+ }
  static func createOrRead()throws->StoreIdentity {
   let fm=FileManager.default,dir=directory;try fm.createDirectory(at:dir,withIntermediateDirectories:true,attributes:[.posixPermissions:0o700]);let config=dir.appendingPathComponent("identity.json")
   if fm.fileExists(atPath:config.path){return try JSONDecoder().decode(Self.self,from:Data(contentsOf:config))}

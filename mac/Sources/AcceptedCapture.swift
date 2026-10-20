@@ -25,6 +25,7 @@ private final class CaptureEncodeDiagnosticToken {var completed=false}
 
 final class NativeCapture:NSObject,SCStreamOutput,SCStreamDelegate {
  let width:Int,height:Int,fps:Int;let sender:VideoSender;let codec:CMVideoCodecType
+ let showCursor:Bool
  let queue=DispatchQueue(label:"edgelink.capture",qos:.userInteractive),lock=NSLock()
  var syntheticTimer:DispatchSourceTimer?;var pixelPool:CVPixelBufferPool?;var syntheticIndex=0
  var encoder:VTCompressionSession?,stream:SCStream?,latest:CVPixelBuffer?,latestTiming:FrameTiming?
@@ -44,8 +45,8 @@ final class NativeCapture:NSObject,SCStreamOutput,SCStreamDelegate {
  // Policy values are candidate defaults, not hardware guarantees.
  private let contentDeadline=4.0,startDeadline=6.0,firstFrameDeadline=4.0,stopDeadline=2.0
  let onStopped:((NativeCapture,Error)->Void)?
- init(width:Int,height:Int,fps:Int,sender:VideoSender,bitrate:Int=40_000_000,codec:CMVideoCodecType=kCMVideoCodecType_HEVC,onStopped:((NativeCapture,Error)->Void)?=nil)throws {
-  self.width=width;self.height=height;self.fps=fps;self.sender=sender;self.codec=codec;self.onStopped=onStopped;super.init()
+ init(width:Int,height:Int,fps:Int,sender:VideoSender,bitrate:Int=40_000_000,codec:CMVideoCodecType=kCMVideoCodecType_HEVC,onStopped:((NativeCapture,Error)->Void)?=nil,showCursor:Bool=false)throws {
+  self.showCursor=showCursor;self.width=width;self.height=height;self.fps=fps;self.sender=sender;self.codec=codec;self.onStopped=onStopped;super.init()
   // On this M4, the AVE hardware encoder measured 5.6 ms P95 versus
   // 9.5 ms for the RTVC "low latency" mode. Select by measurement.
   let specification=[kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder:true] as CFDictionary
@@ -101,7 +102,7 @@ final class NativeCapture:NSObject,SCStreamOutput,SCStreamDelegate {
    let content=boxed.value
    diagnostics.record("contentReturned",detail:["displayIDs":content.displays.map{String($0.displayID)}.joined(separator:",")])
    guard let display=content.displays.first(where:{$0.displayID==displayID}) else{throw NSError(domain:"Capture",code:1,userInfo:[NSLocalizedDescriptionKey:"目标屏幕不可捕获"])}
-   let configuration=SCStreamConfiguration();configuration.width=width;configuration.height=height;configuration.pixelFormat=kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;configuration.minimumFrameInterval=CMTime(value:1,timescale:Int32(fps));configuration.queueDepth=3;configuration.capturesAudio=false;configuration.showsCursor=false
+   let configuration=SCStreamConfiguration();configuration.width=width;configuration.height=height;configuration.pixelFormat=kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange;configuration.minimumFrameInterval=CMTime(value:1,timescale:Int32(fps));configuration.queueDepth=3;configuration.capturesAudio=false;configuration.showsCursor=showCursor
    let proxy=CaptureOutputProxy(self)
    let s=SCStream(filter:SCContentFilter(display:display,excludingWindows:[]),configuration:configuration,delegate:proxy)
    try s.addStreamOutput(proxy,type:.screen,sampleHandlerQueue:queue)

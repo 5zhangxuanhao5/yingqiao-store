@@ -144,4 +144,9 @@ if CommandLine.arguments.contains("--encoder-self-test"){
  Task{do{for codec in [kCMVideoCodecType_HEVC,kCMVideoCodecType_H264]{let sender=try VideoSender(port:0,tcpMode:true);let capture=try NativeCapture(width:3120,height:2080,fps:60,sender:sender,codec:codec);await capture.stop();sender.stop();print("PASS original-core hardware encoder",codec)};exit(0)}catch{print("FAIL original-core hardware encoder",(error as NSError).code);exit(1)}};dispatchMain()
 }
 if CommandLine.arguments.contains("--self-test"){MainActor.assumeIsolated{StandbyCoordinator.selfTest();StoreNearbyPads.selfTest()};StoreOriginalUSBDebug.selfTest();StoreFrameWindow.selfTest();StoreEncoderSettings.selfTest();precondition(!privateLANAddress(""));precondition(!privateLANAddress("%"));precondition(!privateLANAddress("%%"));precondition(StoreUSB.address()==nil);precondition(privateLANAddress("192.168.1.5"));precondition(privateLANAddress("fd00::1"));precondition(!privateLANAddress("8.8.8.8"));precondition(!privateLANAddress("100.64.0.1"));precondition(!privateLANAddress("127.0.0.1"));print("PASS store LAN address policy; no window, listener, capture, identity, or permission request");exit(0)}
+#if MAC_RECEIVER_PREVIEW
+if CommandLine.arguments.contains("--mac-preview-self-test"){MacPreviewWire.selfTest();exit(0)}
+let app=NSApplication.shared,delegate=MainActor.assumeIsolated{MacPreviewApp()};app.delegate=delegate;app.setActivationPolicy(.regular);app.run()
+#else
 let app=NSApplication.shared,delegate=MainActor.assumeIsolated{StoreHost()};app.delegate=delegate;app.setActivationPolicy(.regular);app.run()
+#endif

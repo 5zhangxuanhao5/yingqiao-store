@@ -4,11 +4,13 @@ import VideoToolbox
 import CoreGraphics
 final class StoreCapture {
  let width:Int,height:Int,fps:Int,codec:String,sender:VideoSender,bitrate:Int
+ let displayName:String,displayProduct:UInt32,displaySerial:UInt32
+ let showCursor:Bool
  var virtual:CGVirtualDisplay?,media:NativeCapture?,mediaStarted=false
  private(set) var reusedDisplay=false
  var onFailure:((String)->Void)?
  var displayID:CGDirectDisplayID?{virtual?.displayID}
- init(width:Int,height:Int,fps:Int,codec:String,sender:VideoSender,bitrate:Int=40_000_000){self.bitrate=bitrate;self.width=width;self.height=height;self.fps=fps;self.codec=codec;self.sender=sender}
+ init(width:Int,height:Int,fps:Int,codec:String,sender:VideoSender,bitrate:Int=40_000_000,displayName:String="映桥 · 平板扩展屏",displayProduct:UInt32=0x5354,displaySerial:UInt32=0x59515354,showCursor:Bool=false){self.showCursor=showCursor;self.displayName=displayName;self.displayProduct=displayProduct;self.displaySerial=displaySerial;self.bitrate=bitrate;self.width=width;self.height=height;self.fps=fps;self.codec=codec;self.sender=sender}
  static func supports(_ codec:CMVideoCodecType)->Bool{var encoder:VTCompressionSession?;let r=VTCompressionSessionCreate(allocator:nil,width:1280,height:720,codecType:codec,encoderSpecification:[kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder:true] as CFDictionary,imageBufferAttributes:nil,compressedDataAllocator:nil,outputCallback:nil,refcon:nil,compressionSessionOut:&encoder);if let encoder{VTCompressionSessionInvalidate(encoder)};return r==noErr}
  func start(adopting:CGVirtualDisplay?=nil)async throws->CGDirectDisplayID{
   // A route change does not change the panel. Reapplying a live mode causes a
@@ -20,7 +22,7 @@ final class StoreCapture {
    virtual=display;reusedDisplay=true;return display.displayID
   }
   let layout=ExtensionDisplayLayout.snapshot(excluding:adopting?.displayID)
-  let d=CGVirtualDisplayDescriptor();d.name="映桥 · 平板扩展屏";d.maxPixelsWide=UInt32(width);d.maxPixelsHigh=UInt32(height);d.sizeInMillimeters=CGSize(width:300,height:300*Double(height)/Double(width));d.vendorID=0x5947;d.productID=0x5354;d.serialNum=0x59515354;d.queue=DispatchQueue(label:"cn.edgelink.store.virtual")
+  let d=CGVirtualDisplayDescriptor();d.name=displayName;d.maxPixelsWide=UInt32(width);d.maxPixelsHigh=UInt32(height);d.sizeInMillimeters=CGSize(width:300,height:300*Double(height)/Double(width));d.vendorID=0x5947;d.productID=displayProduct;d.serialNum=displaySerial;d.queue=DispatchQueue(label:"cn.edgelink.store.virtual")
   guard let display=adopting ?? CGVirtualDisplay(descriptor:d) else{throw NSError(domain:"Display",code:1)};virtual=display
   let settings=CGVirtualDisplaySettings();settings.hiDPI=1;settings.modes=[CGVirtualDisplayMode(width:UInt(width/2),height:UInt(height/2),refreshRate:Double(fps))]
   guard display.apply(settings) else{throw NSError(domain:"Display",code:2)}
@@ -29,7 +31,7 @@ final class StoreCapture {
  }
  func startMedia()async throws{
   guard !mediaStarted,let displayID else{return};mediaStarted=true
-  let capture=try NativeCapture(width:width,height:height,fps:fps,sender:sender,bitrate:bitrate,codec:codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264,onStopped:{[weak self] _,error in self?.onFailure?(error.localizedDescription)})
+  let capture=try NativeCapture(width:width,height:height,fps:fps,sender:sender,bitrate:bitrate,codec:codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264,onStopped:{[weak self] _,error in self?.onFailure?(error.localizedDescription)},showCursor:showCursor)
   media=capture;try await capture.start(displayID:displayID)
  }
  func requestKeyframe(){media?.requestKeyframe()}
