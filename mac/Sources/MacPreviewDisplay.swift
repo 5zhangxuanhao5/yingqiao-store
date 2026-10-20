@@ -50,6 +50,10 @@ final class MacPreviewPlayback {
   video.enqueue(sample);lock.lock();count+=1;lock.unlock()
  }
 }
+final class MacPreviewWindow:NSWindow {
+ override var canBecomeKey:Bool{true}
+ override var canBecomeMain:Bool{true}
+}
 final class MacPreviewDisplay:NSView {
  let playback=MacPreviewPlayback()
  let message=NSTextField(wrappingLabelWithString:"正在连接，请在发送端确认连接请求…")

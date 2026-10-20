@@ -19,6 +19,7 @@ import ApplicationServices
  var clientKey:SymmetricKey?,clientSID:UInt32=0,clientPrefix=Data(),targetService:NetService?,connectEpoch=0
  var requestedWidth=0,requestedHeight=0,receivedFrames=0
  var resolvedTarget:(host:String,port:NWEndpoint.Port,pin:String)?,lastEvent="launch",automaticTestAttempted=false
+ var pendingTarget:NetService?,savedPresentation:NSApplication.PresentationOptions?
  var loopback:Bool{CommandLine.arguments.contains("--mac-preview-loopback")}
  var syntheticMode:Bool{loopback}
  static func fingerprint(_ pem:String)->String? {
@@ -61,9 +62,9 @@ import ApplicationServices
  func startHost(){guard listener==nil else{return};status.stringValue="正在准备独立的加密连接…"
   Task{@MainActor in do{
    let id=try await Task.detached{try StoreIdentity.createOrRead()}.value;identity=id
-   let tcp=NWProtocolTCP.Options();tcp.noDelay=true;let params=NWParameters(tls:try id.tlsOptions(),tcp:tcp);params.includePeerToPeer=true
+   let tcp=NWProtocolTCP.Options();tcp.noDelay=true;let params=NWParameters(tls:try id.tlsOptions(),tcp:tcp);params.includePeerToPeer=true;params.allowLocalEndpointReuse=true
    if loopback{params.requiredLocalEndpoint = .hostPort(host:"127.0.0.1",port:.any)}
-   let l=try NWListener(using:params,on:.any);listener=l
+   let l=try NWListener(using:params,on:loopback ? .any:NWEndpoint.Port(rawValue:49770)!);listener=l
    l.newConnectionHandler={[weak self] c in DispatchQueue.main.async{self?.accept(c)}}
    l.stateUpdateHandler={[weak self] state in DispatchQueue.main.async{guard let self,self.listener===l else{return};switch state{
     case .ready:
@@ -137,22 +138,25 @@ import ApplicationServices
  }
  func netServiceBrowser(_ browser:NetServiceBrowser,didFind service:NetService,moreComing:Bool){guard !services.contains(where:{$0==service}) else{return};services.append(service);service.delegate=self;service.resolve(withTimeout:4)}
  func netServiceBrowser(_ browser:NetServiceBrowser,didRemove service:NetService,moreComing:Bool){services.removeAll{$0==service};available.removeAll{$0==service};updateDevices()}
- func netServiceDidResolveAddress(_ sender:NetService){guard let txt=sender.txtRecordData(),let pin=NetService.dictionary(fromTXTRecord:txt)["sha256"],pin.count==64,sender.port>0,sender.port<65536,sender.hostName != nil else{return};if !available.contains(sender){available.append(sender)};updateDevices()}
+ func netServiceDidResolveAddress(_ sender:NetService){guard let txt=sender.txtRecordData(),let pin=NetService.dictionary(fromTXTRecord:txt)["sha256"],pin.count==64,sender.port>0,sender.port<65536,sender.hostName != nil else{return};if !available.contains(sender){available.append(sender)};if pendingTarget===sender{pendingTarget=nil;openReceiver(sender)};updateDevices()}
+ func netService(_ sender:NetService,didNotResolve errorDict:[String:NSNumber]){if pendingTarget===sender{pendingTarget=nil;status.stringValue="电脑地址刷新失败，请确认两台 Mac 的局域网权限已开启。";trace("resolveFailed");updateDevices()}}
  func updateDevices(){devices.removeAllItems();for s in available{devices.addItem(withTitle:s.name)};if available.isEmpty{devices.addItem(withTitle:"尚未发现发送端")};connectButton.enabled(!available.isEmpty && control==nil)
   if !automaticTestAttempted,role.selectedSegment==0,let i=CommandLine.arguments.firstIndex(of:"--mac-preview-connect-fingerprint"),CommandLine.arguments.indices.contains(i+1){
    let pin=CommandLine.arguments[i+1]
    if pin.count==64,let index=available.firstIndex(where:{service in guard let txt=service.txtRecordData(),let data=NetService.dictionary(fromTXTRecord:txt)["sha256"] else{return false};return String(data:data,encoding:.utf8)==pin}){automaticTestAttempted=true;devices.selectItem(at:index);DispatchQueue.main.async{[weak self] in self?.connectSelected()}}
   }
  }
- @objc func connectSelected(){guard role.selectedSegment==0,control==nil,videoWindow==nil,available.indices.contains(devices.indexOfSelectedItem) else{return};let service=available[devices.indexOfSelectedItem];targetService=service
+ @objc func connectSelected(){guard role.selectedSegment==0,control==nil,videoWindow==nil,pendingTarget==nil,available.indices.contains(devices.indexOfSelectedItem) else{return};let service=available[devices.indexOfSelectedItem];pendingTarget=service;connectButton.enabled(false);status.stringValue="正在更新电脑地址…";service.stop();service.resolve(withTimeout:4)}
+ func openReceiver(_ service:NetService){guard role.selectedSegment==0,control==nil,videoWindow==nil else{return};targetService=service
   guard let txt=service.txtRecordData(),let pinData=NetService.dictionary(fromTXTRecord:txt)["sha256"],let pin=String(data:pinData,encoding:.utf8),let host=service.hostName,let port=NWEndpoint.Port(rawValue:UInt16(service.port)) else{status.stringValue="电脑地址正在更新，请稍后重试。";trace("targetUnavailable");return};resolvedTarget=(host,port,pin);trace("selected")
   let video=MacPreviewDisplay(frame:NSScreen.main?.frame ?? NSRect(x:0,y:0,width:1280,height:832));display=video;video.send={[weak self] in self?.sendClient($0)};video.finish={[weak self] in self?.endCurrent()}
-  let w=NSWindow(contentRect:video.frame,styleMask:[.titled,.closable,.resizable,.fullSizeContentView],backing:.buffered,defer:false);videoWindow=w;w.title="映桥 · 接收屏（Esc 结束）";w.isReleasedWhenClosed=false;w.delegate=self;w.collectionBehavior=[.fullScreenPrimary];w.contentView=video;w.acceptsMouseMovedEvents=true;w.makeKeyAndOrderFront(nil);w.makeFirstResponder(video);w.toggleFullScreen(nil)
-  // A window delegate notification can precede the final content layout.
-  // The delayed check is fenced by window identity and does not reconnect.
-  DispatchQueue.main.asyncAfter(deadline:.now()+1.0){[weak self,weak w] in guard let self,let w,w===self.videoWindow,self.control==nil,w.styleMask.contains(.fullScreen) else{return};self.connectFullscreenWindow()}
-  trace("fullscreenRequested")
+  let w=MacPreviewWindow(contentRect:video.frame,styleMask:[.borderless],backing:.buffered,defer:false);videoWindow=w;w.title="映桥 · 接收屏（Esc 结束）";w.isReleasedWhenClosed=false;w.delegate=self;w.contentView=video;w.acceptsMouseMovedEvents=true
+  // A borderless viewport covers the physical panel, including the area next
+  // to the camera. Native full-screen reserves the menu/safe-area strip.
+  savedPresentation=NSApp.presentationOptions;NSApp.presentationOptions=[.hideDock,.hideMenuBar]
+  w.setFrame(NSScreen.main?.frame ?? video.frame,display:true);w.makeKeyAndOrderFront(nil);w.makeFirstResponder(video);video.layoutSubtreeIfNeeded();trace("panelViewportReady");connectFullscreenWindow()
  }
+
  func windowDidEnterFullScreen(_ notification:Notification){guard let w=notification.object as? NSWindow,w===videoWindow else{return};trace("enteredFullscreen");connectFullscreenWindow()}
  func connectFullscreenWindow(){guard control==nil,let w=videoWindow,let video=display,let target=resolvedTarget else{trace("fullscreenTargetUnavailable");return}
   guard let d=MacPreviewWire.dimensions(width:video.bounds.width*w.backingScaleFactor,height:video.bounds.height*w.backingScaleFactor) else{status.stringValue="接收窗口尺寸尚未就绪，请按 Esc 后重试。";video.showMessage(status.stringValue);trace("viewportInvalid");return};requestedWidth=d.0;requestedHeight=d.1;trace("viewportReady");startClient(host:target.host,port:target.port,pin:target.pin)
@@ -166,11 +170,13 @@ import ApplicationServices
   let c=NWConnection(host:NWEndpoint.Host(host),port:port,using:params);control=c
   c.stateUpdateHandler={[weak self] state in DispatchQueue.main.async{guard let self,self.connectEpoch==generation,self.control===c else{return};switch state{
    case .ready:self.trace("controlReady");self.sendClient("HELLO \(self.requestedWidth) \(self.requestedHeight) 60 "+Data((Host.current().localizedName ?? "Mac 接收端").utf8.prefix(256)).base64EncodedString());self.readControl(c,generation:generation,host:host,port:port,pin:pin)
-   case .failed(let error):self.status.stringValue=error.localizedDescription;self.endClient()
+   case .waiting(let error):self.status.stringValue="等待网络连接："+error.localizedDescription+"。请检查局域网权限。";self.display?.showMessage(self.status.stringValue);self.trace("clientWaiting")
+   case .failed(let error):self.status.stringValue=error.localizedDescription;self.trace("clientFailed");self.endClient()
    case .cancelled:self.endClient()
    default:break
   }}}
-  c.start(queue:.main);status.stringValue="正在连接，并等待发送端允许…";connectButton.enabled(false)
+  c.start(queue:.main);status.stringValue="正在连接，并等待发送端允许…";display?.showMessage(status.stringValue);connectButton.enabled(false)
+  DispatchQueue.main.asyncAfter(deadline:.now()+30){[weak self,weak c] in guard let self,let c,self.connectEpoch==generation,self.control===c,self.receivedFrames==0 else{return};self.status.stringValue="连接未完成，请检查两端局域网权限，并在发送端允许连接。按 Esc 可返回。";self.trace("firstFrameTimeout");self.endClient()}
  }
  func readControl(_ c:NWConnection,generation:Int,host:String,port:NWEndpoint.Port,pin:String){c.receive(minimumIncompleteLength:1,maximumLength:8192){[weak self] data,_,end,error in guard let self,self.connectEpoch==generation else{return};if let data{self.clientBuffer.append(data)};guard self.clientBuffer.count<=16384 else{self.endClient();return}
   while let i=self.clientBuffer.firstIndex(of:10){let line=String(decoding:self.clientBuffer.prefix(upTo:i),as:UTF8.self);self.clientBuffer.removeSubrange(...i);let a=line.split(separator:" ").map(String.init)
@@ -196,13 +202,13 @@ import ApplicationServices
   }}
  }}
  func sendClient(_ text:String){control?.send(content:Data((text+"\n").utf8),completion:.contentProcessed{_ in})}
- func endClient(){connectEpoch+=1;clientTimer?.invalidate();clientTimer=nil;control?.stateUpdateHandler=nil;viewer?.stateUpdateHandler=nil;control?.cancel();viewer?.cancel();control=nil;viewer=nil;clientBuffer=Data();parser=MacPreviewWire.Parser();clientKey=nil;receivedFrames=0;display?.reset();display?.showMessage(status.stringValue);if role.selectedSegment==0{updateDevices()};writeHealth()}
+ func endClient(){connectEpoch+=1;clientTimer?.invalidate();clientTimer=nil;control?.stateUpdateHandler=nil;viewer?.stateUpdateHandler=nil;control?.cancel();viewer?.cancel();control=nil;viewer=nil;clientBuffer=Data();parser=MacPreviewWire.Parser();clientKey=nil;receivedFrames=0;if let old=savedPresentation{NSApp.presentationOptions=old;savedPresentation=nil};display?.reset();display?.showMessage(status.stringValue);if role.selectedSegment==0{updateDevices()};writeHealth()}
  @objc func endCurrent(){sendClient("RELEASE");sendClient("END");endClient();endHostSession();if let w=videoWindow{videoWindow=nil;w.close()};display=nil}
  func windowWillClose(_ notification:Notification){if let w=notification.object as? NSWindow,w===videoWindow{videoWindow=nil;sendClient("END");endClient();display=nil}}
  func windowDidResignKey(_ notification:Notification){if let w=notification.object as? NSWindow,w===videoWindow{display?.restoreCursor();sendClient("RELEASE")}}
  func windowDidBecomeKey(_ notification:Notification){if let w=notification.object as? NSWindow,w===videoWindow{display?.updateCursor()}}
  func trace(_ event:String){lastEvent=event;writeHealth()}
- func writeHealth(){var values:[String:Any]=["event":lastEvent,"message":status.stringValue,"role":role?.selectedSegment ?? -1,"fullscreen":videoWindow?.styleMask.contains(.fullScreen) ?? false,"targetResolved":resolvedTarget != nil,"schema":"mac-preview-health-v1","synthetic":syntheticMode,"sending":sender != nil,"receiving":viewer != nil,"receivedFrames":receivedFrames,"submittedFrames":display?.frames ?? 0,"decoderState":display?.video.status.rawValue ?? 0,"width":requestedWidth,"height":requestedHeight,"viewportWidth":display?.bounds.width ?? 0,"viewportHeight":display?.bounds.height ?? 0,"screenPermission":CGPreflightScreenCaptureAccess(),"inputPermission":AXIsProcessTrusted(),"time":Date().timeIntervalSince1970];if let capture{values["capture"]=capture.stats()};if let sender{values["sender"]=sender.transportStats()};if let data=try? JSONSerialization.data(withJSONObject:values,options:[.sortedKeys]){try? FileManager.default.createDirectory(at:StoreIdentity.directory,withIntermediateDirectories:true);try? data.write(to:StoreIdentity.directory.appendingPathComponent("mac-preview-health.json"),options:.atomic)}}
+ func writeHealth(){var values:[String:Any]=["event":lastEvent,"message":status.stringValue,"role":role?.selectedSegment ?? -1,"fullscreen":videoWindow != nil,"borderlessPanel":videoWindow?.styleMask.contains(.borderless) ?? false,"targetResolved":resolvedTarget != nil,"schema":"mac-preview-health-v1","synthetic":syntheticMode,"sending":sender != nil,"receiving":viewer != nil,"receivedFrames":receivedFrames,"submittedFrames":display?.frames ?? 0,"decoderState":display?.video.status.rawValue ?? 0,"width":requestedWidth,"height":requestedHeight,"viewportWidth":display?.bounds.width ?? 0,"viewportHeight":display?.bounds.height ?? 0,"screenPermission":CGPreflightScreenCaptureAccess(),"inputPermission":AXIsProcessTrusted(),"time":Date().timeIntervalSince1970];if let capture{values["capture"]=capture.stats()};if let sender{values["sender"]=sender.transportStats()};if let data=try? JSONSerialization.data(withJSONObject:values,options:[.sortedKeys]){try? FileManager.default.createDirectory(at:StoreIdentity.directory,withIntermediateDirectories:true);try? data.write(to:StoreIdentity.directory.appendingPathComponent("mac-preview-health.json"),options:.atomic)}}
  func applicationWillTerminate(_ notification:Notification){endCurrent();browser.stop();stopHostListener()}
  func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{true}
 }

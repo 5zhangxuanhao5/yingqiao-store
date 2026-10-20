@@ -35,7 +35,8 @@ if [[ "${YQ_MAC_RECEIVER_PREVIEW:-0}" == "1" ]]; then
  /usr/libexec/PlistBuddy -c 'Set :CFBundleName 映桥-Mac接屏测试' "$app/Contents/Info.plist"
  /usr/libexec/PlistBuddy -c 'Set :CFBundleDisplayName 映桥-Mac接屏测试' "$app/Contents/Info.plist"
  /usr/libexec/PlistBuddy -c 'Set :CFBundleShortVersionString 0.4.0' "$app/Contents/Info.plist"
- /usr/libexec/PlistBuddy -c 'Set :CFBundleVersion 2' "$app/Contents/Info.plist"
+ /usr/libexec/PlistBuddy -c 'Set :CFBundleVersion 3' "$app/Contents/Info.plist"
+ /usr/libexec/PlistBuddy -c 'Set :NSLocalNetworkUsageDescription 发现并连接你选择的另一台Mac，传送加密的扩展桌面。' "$app/Contents/Info.plist"
  /usr/libexec/PlistBuddy -c 'Add :NSBonjourServices:3 string _yqmacpreview._tcp' "$app/Contents/Info.plist"
 fi
 cp "$stage/Resources/AppIcon.icns" "$app/Contents/Resources/AppIcon.icns"
