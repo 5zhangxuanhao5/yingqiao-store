@@ -9,6 +9,7 @@ final class StoreCapture {
  var virtual:CGVirtualDisplay?,media:NativeCapture?,mediaStarted=false
  private(set) var reusedDisplay=false
  var onFailure:((String)->Void)?
+ var onStreamFailure:((Error)->Void)?
  var displayID:CGDirectDisplayID?{virtual?.displayID}
  init(width:Int,height:Int,fps:Int,codec:String,sender:VideoSender,bitrate:Int=40_000_000,displayName:String="映桥 · 平板扩展屏",displayProduct:UInt32=0x5354,displaySerial:UInt32=0x59515354,showCursor:Bool=false){self.showCursor=showCursor;self.displayName=displayName;self.displayProduct=displayProduct;self.displaySerial=displaySerial;self.bitrate=bitrate;self.width=width;self.height=height;self.fps=fps;self.codec=codec;self.sender=sender}
  static func supports(_ codec:CMVideoCodecType)->Bool{var encoder:VTCompressionSession?;let r=VTCompressionSessionCreate(allocator:nil,width:1280,height:720,codecType:codec,encoderSpecification:[kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder:true] as CFDictionary,imageBufferAttributes:nil,compressedDataAllocator:nil,outputCallback:nil,refcon:nil,compressionSessionOut:&encoder);if let encoder{VTCompressionSessionInvalidate(encoder)};return r==noErr}
@@ -31,8 +32,18 @@ final class StoreCapture {
  }
  func startMedia()async throws{
   guard !mediaStarted,let displayID else{return};mediaStarted=true
-  let capture=try NativeCapture(width:width,height:height,fps:fps,sender:sender,bitrate:bitrate,codec:codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264,onStopped:{[weak self] _,error in self?.onFailure?(error.localizedDescription)},showCursor:showCursor)
+  let capture=try NativeCapture(width:width,height:height,fps:fps,sender:sender,bitrate:bitrate,codec:codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264,onStopped:{[weak self] _,error in guard let self else{return};if let callback=self.onStreamFailure{callback(error)}else{self.onFailure?(error.localizedDescription)}},showCursor:showCursor)
   media=capture;try await capture.start(displayID:displayID)
+ }
+ /// Refresh the capture source after a display-list change, without tearing
+ /// down the virtual desktop, transport, or receiver's window.
+ func restartMedia()async throws{
+  let owned=virtual,old=media;media=nil
+  await old?.stop()
+  guard let owned,virtual===owned else{throw CancellationError()}
+  mediaStarted=false
+  try await startMedia()
+  requestKeyframe()
  }
  func requestKeyframe(){media?.requestKeyframe()}
  func stats()->[String:Any]{media?.stats() ?? [:]}

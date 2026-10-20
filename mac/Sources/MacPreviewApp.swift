@@ -19,6 +19,7 @@ import ApplicationServices
  var listener:NWListener?,advertisement:NetService?,identity:StoreIdentity?,peers:[ObjectIdentifier:LinePeer]=[:]
  var hostControl:LinePeer?,hostViewer:LinePeer?,sender:VideoSender?,capture:StoreCapture?,synthetic:NativeCapture?
  let input=RemoteInput();var hostStarting=false,hostStopping=false,hostLastPing=Date(),hostTimer:Timer?,epoch=0
+ var recoveringCapture=false
  var control:NWConnection?,viewer:NWConnection?,clientBuffer=Data(),parser=MacPreviewWire.Parser(),clientTimer:Timer?
  var clientKey:SymmetricKey?,clientSID:UInt32=0,clientPrefix=Data(),targetService:NetService?,connectEpoch=0
  var requestedWidth=0,requestedHeight=0,receivedFrames=0
@@ -188,15 +189,43 @@ import ApplicationServices
    else{
     let c=StoreCapture(width:width,height:height,fps:fps,codec:codec,sender:sender,displayName:"映桥 · Mac 接收屏",displayProduct:0x4d52,displaySerial:0x4d525031,showCursor:true);capture=c
     let id=try await c.start();guard generation==epoch,!p.closed else{_ = await c.stop();return};try input.configure(displayID:id,extended:false)
-    c.onFailure={[weak self,weak c] reason in DispatchQueue.main.async{guard let self,let c,self.epoch==generation,self.capture===c else{return};self.status.stringValue=reason;self.trace("captureStopped");self.endHostSession()}}
+    c.onStreamFailure={[weak self,weak c] error in DispatchQueue.main.async{guard let self,let c,self.epoch==generation,self.capture===c else{return};self.handleCaptureFailure(error,capture:c,generation:generation)}}
    }
    sender.onReady={[weak self] in Task{@MainActor in guard let self,self.epoch==generation else{return};do{if let synthetic=self.synthetic{try synthetic.startSynthetic()}else{try await self.capture?.startMedia()};guard self.epoch==generation else{return};self.hostStarting=false;self.status.stringValue="正在向 Air 发送 \(width) × \(height) 独立桌面，\(fps) FPS 目标。"}catch{guard self.epoch==generation else{return};self.status.stringValue=error.localizedDescription;self.trace("captureStartFailed");self.endHostSession()}}}
    p.send(sender.handshake(width:width,height:height,fps:fps,desktop:nil)+" codec-\(codec)-v1")
    hostTimer=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in guard let self else{return};if Date().timeIntervalSince(self.hostLastPing)>10{self.endHostSession()};self.writeHealth()}
   }catch{guard epoch==generation else{return};hostStarting=false;status.stringValue=error.localizedDescription;trace("hostSetupFailed");p.send("ERR "+error.localizedDescription);endHostSession()}}
  }
+ func handleCaptureFailure(_ error:Error,capture current:StoreCapture,generation:Int){
+  let e=error as NSError
+  // Apple's SCStream errors -3814/-3815 indicate a lost display/source list.
+  // In particular -3817 (user stopped sharing) must never auto-restart.
+  guard e.domain==SCStreamErrorDomain,[-3814,-3815].contains(e.code) else{
+   status.stringValue=error.localizedDescription;trace("captureStopped");endHostSession();return
+  }
+  guard !recoveringCapture else{return}
+  recoveringCapture=true;status.stringValue="显示器发生变化，正在恢复画面…";trace("captureRecovering")
+  Task{@MainActor in
+   for attempt in 1...3 {
+    try? await Task.sleep(nanoseconds:UInt64(attempt)*400_000_000)
+    guard epoch==generation,capture===current else{return}
+    do{
+     try await current.restartMedia()
+     guard epoch==generation,capture===current else{return}
+     recoveringCapture=false;status.stringValue="扩展桌面已恢复";trace("captureRecovered");return
+    }catch{
+     guard epoch==generation,capture===current else{return}
+     let next=error as NSError
+     guard next.domain==SCStreamErrorDomain,[-3814,-3815].contains(next.code) else{
+      recoveringCapture=false;status.stringValue=error.localizedDescription;trace("captureRecoveryFailed");endHostSession();return
+     }
+    }
+   }
+   recoveringCapture=false;status.stringValue="显示器变化后暂未恢复，请重新连接。";trace("captureRecoveryExhausted");endHostSession()
+  }
+ }
  func endHostSession(){
-  epoch+=1;hostStarting=false;hostTimer?.invalidate();hostTimer=nil;input.reset();let c=capture,s=synthetic;c?.onFailure=nil;capture=nil;synthetic=nil;sender?.stop();sender=nil
+  epoch+=1;recoveringCapture=false;hostStarting=false;hostTimer?.invalidate();hostTimer=nil;input.reset();let c=capture,s=synthetic;c?.onFailure=nil;c?.onStreamFailure=nil;capture=nil;synthetic=nil;sender?.stop();sender=nil
   let peers=[hostControl,hostViewer];hostControl=nil;hostViewer=nil;for p in peers{p?.onClose=nil;p?.close()}
   hostStopping = c != nil || s != nil;Task{_ = await c?.stop();await s?.stop();self.hostStopping=false};writeHealth()
  }
