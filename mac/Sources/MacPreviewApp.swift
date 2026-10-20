@@ -1,4 +1,4 @@
-#if MAC_RECEIVER_PREVIEW
+#if MAC_RECEIVER_PREVIEW || MAC_RECEIVER_ENABLED
 import AppKit
 import Network
 import Security
@@ -35,19 +35,25 @@ import ApplicationServices
   },.global(qos:.userInitiated));return tls
  }
  func applicationDidFinishLaunching(_ notification:Notification){
+  _ = makeInterface()
+ }
+ func makeInterface(in sharedWindow:NSWindow? = nil)->NSView {
+  let embedded = sharedWindow != nil
+  if let sharedWindow { window=sharedWindow } else {
   window=NSWindow(contentRect:NSRect(x:0,y:0,width:680,height:470),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
   window.title="映桥 · Mac 接屏测试";window.center();window.isReleasedWhenClosed=false;window.delegate=self;window.backgroundColor=BridgeTheme.fog
+  }
   let content=NSStackView();content.orientation = .vertical;content.alignment = .leading;content.spacing=22;content.edgeInsets=NSEdgeInsets(top:32,left:34,bottom:30,right:34)
   content.addArrangedSubview(BridgeTheme.label("另一台 Mac，也是你的屏幕",size:26,weight:.semibold))
-  content.addArrangedSubview(BridgeTheme.label("独立测试版 · 保留原有映桥、Edge 与 iPad 随航",size:13,color:BridgeTheme.muted))
+  content.addArrangedSubview(BridgeTheme.label(embedded ? "把另一台 Mac 变成扩展屏，也可以接收它的画面。" : "独立测试版 · 保留原有映桥、Edge 与 iPad 随航",size:13,color:BridgeTheme.muted))
   role=NSSegmentedControl(labels:["接收电脑画面","向另一台 Mac 扩展"],trackingMode:.selectOne,target:self,action:#selector(changeRole))
-  role.selectedSegment=CommandLine.arguments.contains("--mac-preview-host") || loopback ? 1:0;content.addArrangedSubview(role)
+  role.selectedSegment=CommandLine.arguments.contains("--mac-preview-host") || loopback || (embedded && !CommandLine.arguments.contains("--mac-receive")) ? 1:0;content.addArrangedSubview(role)
   devices.setAccessibilityLabel("附近可扩展的 Mac");devices.translatesAutoresizingMaskIntoConstraints=false;devices.widthAnchor.constraint(equalToConstant:570).isActive=true;content.addArrangedSubview(devices)
   status.maximumNumberOfLines=4;status.translatesAutoresizingMaskIntoConstraints=false;status.widthAnchor.constraint(equalToConstant:570).isActive=true;content.addArrangedSubview(status)
   let actions=NSStackView();actions.spacing=12;connectButton=BridgeTheme.button("连接并全屏",target:self,action:#selector(connectSelected),primary:true);endButton=BridgeTheme.button("结束接屏",target:self,action:#selector(endCurrent));actions.addArrangedSubview(connectButton);actions.addArrangedSubview(endButton);content.addArrangedSubview(actions)
   let settings=NSStackView();settings.spacing=12;settings.addArrangedSubview(BridgeTheme.button("录屏权限",target:self,action:#selector(requestScreen)));settings.addArrangedSubview(BridgeTheme.button("键鼠权限",target:self,action:#selector(requestInput)));content.addArrangedSubview(settings)
   content.addArrangedSubview(BridgeTheme.label("接收端按 Esc 结束。画面按接收窗口的真实尺寸建立，不镜像 Pro 内屏。",size:12,color:BridgeTheme.muted,wrap:true))
-  window.contentView=content;window.orderFront(nil);input.ctrlToCommand=false;browser.delegate=self;changeRole();trace("launched")
+  if !embedded { window.contentView=content;window.orderFront(nil) };input.ctrlToCommand=false;browser.delegate=self;changeRole();trace("launched");return content
  }
  @objc func requestScreen(){
   let alert=NSAlert();alert.messageText="允许这份接屏测试版采集画面";alert.informativeText="仅在这台 Mac 作为发送端时需要录屏权限。它会采集新建的 Air 扩展桌面；不会撤销或替换原映桥的权限。";alert.addButton(withTitle:"继续申请");alert.addButton(withTitle:"取消")
@@ -112,10 +118,13 @@ import ApplicationServices
   default:break
   }
  }
+ func reject(_ p:LinePeer,reason:String){
+  p.connection.send(content:Data(("ERR "+reason+"\n").utf8),completion:.contentProcessed{_ in p.close()})
+ }
  func createHostSession(_ p:LinePeer,width:Int,height:Int,fps:Int){
   trace("hostPreparing")
   guard !p.closed else{hostStarting=false;return}
-  guard syntheticMode || CGPreflightScreenCaptureAccess() else{hostStarting=false;p.send("ERR 请先在发送端为接屏测试版允许录屏");p.close();status.stringValue="收到 Air 请求；请点“录屏权限”，完成后在 Air 重新连接。";return}
+  guard syntheticMode || CGPreflightScreenCaptureAccess() else{hostStarting=false;reject(p,reason:"请先在发送端允许映桥录屏，然后重新连接。");status.stringValue="收到 Air 请求；请点“录屏权限”，完成后在 Air 重新连接。";return}
   epoch+=1;let generation=epoch;hostControl=p;hostLastPing=Date()
   Task{@MainActor in do{
    let sender=try VideoSender(port:0,tcpMode:true,targetFPS:fps);self.sender=sender;sender.start();sender.setTargetBitrate(kbps:40000)
@@ -185,7 +194,7 @@ import ApplicationServices
     self.clientTimer=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in self?.sendClient("PING");self?.writeHealth()}
    }else if a.first=="ERR"{self.status.stringValue=String(line.dropFirst(4));self.endClient();return}
   }
-  if end || error != nil{self.endClient()}else{self.readControl(c,generation:generation,host:host,port:port,pin:pin)}
+  if end || error != nil{self.status.stringValue=error?.localizedDescription ?? "发送端已结束连接，请返回后重试。";self.endClient()}else{self.readControl(c,generation:generation,host:host,port:port,pin:pin)}
  }}
  func openViewer(host:String,port:NWEndpoint.Port,pin:String,token:String,generation:Int){let tcp=NWProtocolTCP.Options();tcp.noDelay=true;let params=NWParameters(tls:Self.clientOptions(pin:pin),tcp:tcp);params.includePeerToPeer=true
   let v=NWConnection(host:NWEndpoint.Host(host),port:port,using:params);viewer=v;v.stateUpdateHandler={[weak self] state in DispatchQueue.main.async{guard let self,self.connectEpoch==generation else{return};if case .ready=state{self.trace("viewerReady");v.send(content:Data(("VIEW "+token+"\n").utf8),completion:.contentProcessed{_ in});self.readVideo(v,generation:generation)};if case .failed(let error)=state{self.status.stringValue=error.localizedDescription;self.endClient()}}};v.start(queue:.main)

@@ -6,6 +6,9 @@ import CoreImage
 
 @MainActor final class StoreHost:NSObject,NSApplicationDelegate {
  var window:NSWindow!,enable:NSButton!,dashboard:StoreDashboard!
+ #if MAC_RECEIVER_ENABLED
+ let macLink=MacPreviewApp()
+ #endif
  var statusMessage="打开平板上的映桥，自动寻找设备。"{didSet{updateDashboard()}}
  var overview:DesktopOverview?
  var hostCursor:HostCursorMonitor?,cursorRequested=false
@@ -30,6 +33,13 @@ import CoreImage
   window=NSWindow(contentRect:NSRect(x:0,y:0,width:880,height:660),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
   window.title="映桥";window.center();window.isReleasedWhenClosed=false;window.contentMinSize=NSSize(width:760,height:620);window.backgroundColor=BridgeTheme.fog;window.titlebarAppearsTransparent=true;window.appearance=NSAppearance(named:.aqua)
   dashboard=StoreDashboard(target:self,stop:#selector(userEndSession),screen:#selector(screenPermission),access:#selector(accessPermission),network:#selector(prepare),relayConfig:#selector(prepare),start:#selector(startExtension),power:#selector(prepare),powerSettings:#selector(prepare),remoteAccess:#selector(prepare));window.contentView=dashboard;enable=dashboard.document.startButton
+  #if MAC_RECEIVER_ENABLED
+  let tabs=NSTabView(frame:window.contentView!.bounds);tabs.autoresizingMask=[.width,.height]
+  let padTab=NSTabViewItem(identifier:"pad");padTab.label="平板扩展屏";padTab.view=dashboard;tabs.addTabViewItem(padTab)
+  let macTab=NSTabViewItem(identifier:"mac");macTab.label="Mac 互联";macTab.view=macLink.makeInterface(in:window);tabs.addTabViewItem(macTab)
+  window.contentView=tabs
+  if CommandLine.arguments.contains("--mac-receive") { tabs.selectTabViewItem(macTab) }
+  #endif
   availability.onChanged={[weak self] in self?.syncRequestTimer();self?.updateDashboard()};availability.onClosePath={[weak self] id in guard let self,let key=self.standbyConnections.first(where:{$0.value.id==id})?.key else{return};self.standbyConnections.removeValue(forKey:key)?.peer.close()};nearbyPads.onChanged={[weak self] in self?.announceToNearbyPads();self?.updateDashboard()};window.orderFront(nil);updateDashboard();DispatchQueue.main.async{[weak self] in self?.explainInitialPermissions()}
  }
  func updateDashboard(){
@@ -134,8 +144,19 @@ import CoreImage
  func stopSession(keepDisplay:Bool){guard controller != nil || capture != nil else{return};let oldPadSession=activePadSession;activePadSession=nil;if keepDisplay{if handoverStartedNs==nil{handoverStartedNs=monotonicNanoseconds()}}else{handoverStartedNs=nil};handoverStartWaitMs=0;generation+=1;let stopGeneration=generation;heartbeat?.invalidate();heartbeat=nil;cursorRequested=false;Task{@MainActor in self.hostCursor?.stop();self.hostCursor=nil};input.reset();let old=capture;capture=nil;sender?.stop();sender=nil;let c=controller,v=viewer;controller=nil;viewer=nil;c?.onClose=nil;v?.onClose=nil;if let c{peers.removeValue(forKey:ObjectIdentifier(c))};if let v{peers.removeValue(forKey:ObjectIdentifier(v))};c?.close();v?.close();busy=true;availability.mediaEnded()
   Task{@MainActor in let kept=await old?.stop(keepingDisplay:keepDisplay);guard generation==stopGeneration else{return};if keepDisplay,let kept{retainedDisplay=kept;retainedPadSession=oldPadSession;retentionTimer=Timer.scheduledTimer(withTimeInterval:10,repeats:false){[weak self] _ in self?.retainedDisplay=nil;self?.retainedPadSession=nil;self?.retentionTimer=nil}};busy=false;statusMessage=lastSessionError ?? (keepDisplay ? "线路暂时断开，保留工作桌面10秒等待接续。":"会话已结束，画面采集和编码已停止；可从平板再次连接。") }
  }
- func applicationWillTerminate(_ notification:Notification){nearbyPads.stop();permissionTimer?.invalidate();permissionTimer=nil;originalUSB.stop();availability.stop();requestTimer?.invalidate();YQUSBStop()}
- func applicationShouldTerminate(_ app:NSApplication)->NSApplication.TerminateReply{guard capture != nil else{return .terminateNow};endSession();Task{@MainActor in try? await Task.sleep(nanoseconds:600_000_000);app.reply(toApplicationShouldTerminate:true)};return .terminateLater}
+ func applicationWillTerminate(_ notification:Notification){
+ #if MAC_RECEIVER_ENABLED
+ macLink.applicationWillTerminate(notification)
+ #endif
+ nearbyPads.stop();permissionTimer?.invalidate();permissionTimer=nil;originalUSB.stop();availability.stop();requestTimer?.invalidate();YQUSBStop()}
+ func applicationShouldTerminate(_ app:NSApplication)->NSApplication.TerminateReply{
+ #if MAC_RECEIVER_ENABLED
+ let macActive=macLink.capture != nil || macLink.hostStarting || macLink.hostStopping
+ macLink.endCurrent()
+ #else
+ let macActive=false
+ #endif
+ guard capture != nil || macActive else{return .terminateNow};endSession();Task{@MainActor in try? await Task.sleep(nanoseconds:600_000_000);app.reply(toApplicationShouldTerminate:true)};return .terminateLater}
 }
 if CommandLine.arguments.contains("--usb-network-probe"){
  YQUSBStart("{}");for _ in 0..<15{Thread.sleep(forTimeInterval:1);let s=StoreUSB.status();print("USB",s["state"] ?? "unknown","rx",s["rxFrames"] ?? 0,"tx",s["txFrames"] ?? 0,"addressReady",!(s["address"] as? String ?? "").isEmpty);fflush(stdout)};YQUSBStop();exit(0)
@@ -144,8 +165,10 @@ if CommandLine.arguments.contains("--encoder-self-test"){
  Task{do{for codec in [kCMVideoCodecType_HEVC,kCMVideoCodecType_H264]{let sender=try VideoSender(port:0,tcpMode:true);let capture=try NativeCapture(width:3120,height:2080,fps:60,sender:sender,codec:codec);await capture.stop();sender.stop();print("PASS original-core hardware encoder",codec)};exit(0)}catch{print("FAIL original-core hardware encoder",(error as NSError).code);exit(1)}};dispatchMain()
 }
 if CommandLine.arguments.contains("--self-test"){MainActor.assumeIsolated{StandbyCoordinator.selfTest();StoreNearbyPads.selfTest()};StoreOriginalUSBDebug.selfTest();StoreFrameWindow.selfTest();StoreEncoderSettings.selfTest();precondition(!privateLANAddress(""));precondition(!privateLANAddress("%"));precondition(!privateLANAddress("%%"));precondition(StoreUSB.address()==nil);precondition(privateLANAddress("192.168.1.5"));precondition(privateLANAddress("fd00::1"));precondition(!privateLANAddress("8.8.8.8"));precondition(!privateLANAddress("100.64.0.1"));precondition(!privateLANAddress("127.0.0.1"));print("PASS store LAN address policy; no window, listener, capture, identity, or permission request");exit(0)}
-#if MAC_RECEIVER_PREVIEW
+#if MAC_RECEIVER_PREVIEW || MAC_RECEIVER_ENABLED
 if CommandLine.arguments.contains("--mac-preview-self-test"){MacPreviewWire.selfTest();exit(0)}
+#endif
+#if MAC_RECEIVER_PREVIEW
 let app=NSApplication.shared,delegate=MainActor.assumeIsolated{MacPreviewApp()};app.delegate=delegate;app.setActivationPolicy(.regular);app.run()
 #else
 let app=NSApplication.shared,delegate=MainActor.assumeIsolated{StoreHost()};app.delegate=delegate;app.setActivationPolicy(.regular);app.run()

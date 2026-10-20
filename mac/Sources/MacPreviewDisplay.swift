@@ -1,4 +1,4 @@
-#if MAC_RECEIVER_PREVIEW
+#if MAC_RECEIVER_PREVIEW || MAC_RECEIVER_ENABLED
 import AppKit
 import AVFoundation
 import VideoToolbox

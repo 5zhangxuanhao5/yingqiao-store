@@ -5,6 +5,7 @@ mkdir -p "$stage/build"
 original_usb_flags=(-D YINGQIAO_LOCAL_EXTENSION_ONLY)
 if [[ "${YQ_ORIGINAL_USB_TEST:-0}" == "1" ]]; then original_usb_flags+=(-D ORIGINAL_USB_TEST); fi
 if [[ "${YQ_MAC_RECEIVER_PREVIEW:-0}" == "1" ]]; then original_usb_flags+=(-D MAC_RECEIVER_PREVIEW); fi
+if [[ "${YQ_MAC_UNIFIED:-0}" == "1" ]]; then original_usb_flags+=(-D MAC_RECEIVER_ENABLED); fi
 for arch in arm64 x86_64; do
   usb="$stage/build/usb-$arch"
   mkdir -p "$usb"
@@ -39,6 +40,11 @@ if [[ "${YQ_MAC_RECEIVER_PREVIEW:-0}" == "1" ]]; then
  /usr/libexec/PlistBuddy -c 'Set :NSLocalNetworkUsageDescription 发现并连接你选择的另一台Mac，传送加密的扩展桌面。' "$app/Contents/Info.plist"
  /usr/libexec/PlistBuddy -c 'Add :NSBonjourServices:3 string _yqmacpreview._tcp' "$app/Contents/Info.plist"
 fi
+if [[ "${YQ_MAC_UNIFIED:-0}" == "1" ]]; then
+ /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 0.4.0" "$app/Contents/Info.plist"
+ /usr/libexec/PlistBuddy -c "Set :CFBundleVersion 40" "$app/Contents/Info.plist"
+ /usr/libexec/PlistBuddy -c "Add :NSBonjourServices:3 string _yqmacpreview._tcp" "$app/Contents/Info.plist"
+fi
 cp "$stage/Resources/AppIcon.icns" "$app/Contents/Resources/AppIcon.icns"
 cp "$stage/../third_party/lwip/COPYING" "$app/Contents/Resources/lwIP-LICENSE.txt"
 # Local preview only. Public release requires Developer ID + notarization.
@@ -46,3 +52,5 @@ codesign --force --sign - "$app"
 "$app/Contents/MacOS/YingqiaoStore" --self-test
 
 if [[ "${YQ_MAC_RECEIVER_PREVIEW:-0}" == "1" ]]; then "$app/Contents/MacOS/YingqiaoStore" --mac-preview-self-test; fi
+
+if [[ "${YQ_MAC_UNIFIED:-0}" == "1" ]]; then "$app/Contents/MacOS/YingqiaoStore" --mac-preview-self-test; fi

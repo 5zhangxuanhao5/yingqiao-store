@@ -120,6 +120,10 @@
     "sha256": "57030268f686113d0c84eb255185eb0006ce39ba73ae7994423d64b43bd0a6e0"
   },
   {
+    "path": "docs/MAC_UNIFIED.md",
+    "sha256": "ff7f53a418f8b0e7cdfb6c571f06c7eef9d85917846bfaee415acaa3e20985c2"
+  },
+  {
     "path": "docs/NAME_RELEASE_032.md",
     "sha256": "3a32ddbfcd1cf0561385829eb16abd0140b63f64fabd37c1f57f2db7d4a65ffd"
   },
@@ -537,15 +541,15 @@
   },
   {
     "path": "mac/Sources/MacPreviewApp.swift",
-    "sha256": "ed10e1dfc1a55eadb74f7e31a37b1d4d6b6c14a595358f06d4c4dff4a773b8d6"
+    "sha256": "6b6e93089bb638825a428020f0e693e7c029d94a5c04af86a879fe8eee872aad"
   },
   {
     "path": "mac/Sources/MacPreviewDisplay.swift",
-    "sha256": "3f6c800cd735138d4183e1fc2bb7e8c1d49fa285099810b98c7dbf3ee2b5600b"
+    "sha256": "a70e465bf2931412a9292113a7fc9bd4dd1b514ede8c62059df63744371ed993"
   },
   {
     "path": "mac/Sources/MacPreviewWire.swift",
-    "sha256": "054753b436ef185d509ac74690cdd316b048051c4eb2a91070c6c197290b88d5"
+    "sha256": "8e0b65c72d5b3d313f4bb1ea7c2483c90e8fea37f1fea1bda39369d5bc36f336"
   },
   {
     "path": "mac/Sources/OriginalLocalIngress.swift",
@@ -613,7 +617,7 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "sha256": "7e08a78ae59d4dd0a9c86d5cc4ee214492cd578183155ff42fed5cbad921ff80"
+    "sha256": "e91380d02ccbf0473b966cbe7de25cee5db6df8ba20778b232b90db1e08d8828"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
@@ -637,7 +641,7 @@
   },
   {
     "path": "mac/build.sh",
-    "sha256": "4de870db9472bbb04167e0e4b7c1e912f4ba654f85cca7af376ce5896c6b50c7"
+    "sha256": "73cab06e3537f6a73ac8bda343b52a3c8e142a3b42301bb46bc076023581c4e3"
   },
   {
     "path": "shared/DisplayProfile.hpp",
