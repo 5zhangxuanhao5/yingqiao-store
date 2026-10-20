@@ -134,7 +134,7 @@ import ApplicationServices
   guard peers.count<6,case let .hostPort(host,_)=connection.endpoint,privateLANAddress(host.debugDescription) || (loopback && host.debugDescription=="127.0.0.1") else{connection.cancel();return}
   let p=LinePeer(connection);peers[ObjectIdentifier(p)]=p;p.onLine={[weak self,weak p] s in if let self,let p{self.hostLine(p,s)}}
   p.onClose={[weak self,weak p] in guard let self,let p else{return};self.peers.removeValue(forKey:ObjectIdentifier(p));if p===self.hostControl || p===self.hostViewer{self.endHostSession()}}
-  p.start();DispatchQueue.main.asyncAfter(deadline:.now()+15){[weak self,weak p] in guard let self,let p,p !== self.hostControl,p !== self.hostViewer else{return};p.close()}
+  p.start();DispatchQueue.main.asyncAfter(deadline:.now()+120){[weak self,weak p] in guard let self,let p,p !== self.hostControl,p !== self.hostViewer else{return};p.close()}
  }
  func hostLine(_ p:LinePeer,_ text:String){
   let a=text.split(separator:" ").map(String.init);guard let command=a.first else{return}
@@ -191,7 +191,7 @@ import ApplicationServices
     let id=try await c.start();guard generation==epoch,!p.closed else{_ = await c.stop();return};try input.configure(displayID:id,extended:false)
     c.onStreamFailure={[weak self,weak c] error in DispatchQueue.main.async{guard let self,let c,self.epoch==generation,self.capture===c else{return};self.handleCaptureFailure(error,capture:c,generation:generation)}}
    }
-   sender.onReady={[weak self] in Task{@MainActor in guard let self,self.epoch==generation else{return};do{if let synthetic=self.synthetic{try synthetic.startSynthetic()}else{try await self.capture?.startMedia()};guard self.epoch==generation else{return};self.hostStarting=false;self.status.stringValue="正在向 Air 发送 \(width) × \(height) 独立桌面，\(fps) FPS 目标。"}catch{guard self.epoch==generation else{return};self.status.stringValue=error.localizedDescription;self.trace("captureStartFailed");self.endHostSession()}}}
+   sender.onReady={[weak self] in Task{@MainActor in guard let self,self.epoch==generation else{return};do{if let synthetic=self.synthetic{try synthetic.startSynthetic()}else{try await self.capture?.startMedia()};guard self.epoch==generation else{return};self.hostStarting=false;self.status.stringValue="正在向 Air 发送 \(width) × \(height) 独立桌面，\(fps) FPS 目标。"}catch{guard self.epoch==generation else{return};self.trace("captureStartFailed");if let current=self.capture{self.handleCaptureFailure(error,capture:current,generation:generation)}else{self.status.stringValue=error.localizedDescription;self.endHostSession()}}}}
    p.send(sender.handshake(width:width,height:height,fps:fps,desktop:nil)+" codec-\(codec)-v1")
    hostTimer=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in guard let self else{return};if Date().timeIntervalSince(self.hostLastPing)>10{self.endHostSession()};self.writeHealth()}
   }catch{guard epoch==generation else{return};hostStarting=false;status.stringValue=error.localizedDescription;trace("hostSetupFailed");p.send("ERR "+error.localizedDescription);endHostSession()}}
@@ -212,7 +212,7 @@ import ApplicationServices
     do{
      try await current.restartMedia()
      guard epoch==generation,capture===current else{return}
-     recoveringCapture=false;status.stringValue="扩展桌面已恢复";trace("captureRecovered");return
+     recoveringCapture=false;hostStarting=false;status.stringValue="扩展桌面已恢复";trace("captureRecovered");return
     }catch{
      guard epoch==generation,capture===current else{return}
      let next=error as NSError
@@ -299,7 +299,7 @@ import ApplicationServices
    default:break
   }}}
   c.start(queue:.main);status.stringValue="正在连接，并等待发送端允许…";display?.showMessage(status.stringValue);connectButton.enabled(false)
-  DispatchQueue.main.asyncAfter(deadline:.now()+30){[weak self,weak c] in guard let self,let c,self.connectEpoch==generation,self.control===c,self.receivedFrames==0 else{return};self.status.stringValue="连接未完成，请检查两端局域网权限，并在发送端允许连接。按 Esc 可返回。";self.trace("firstFrameTimeout");self.endClient()}
+  DispatchQueue.main.asyncAfter(deadline:.now()+120){[weak self,weak c] in guard let self,let c,self.connectEpoch==generation,self.control===c,self.receivedFrames==0 else{return};self.status.stringValue="连接未完成，请检查两端局域网权限，并在发送端允许连接。按 Esc 可返回。";self.trace("firstFrameTimeout");self.endClient()}
  }
  func readControl(_ c:NWConnection,generation:Int,host:String,port:NWEndpoint.Port,pin:String){c.receive(minimumIncompleteLength:1,maximumLength:8192){[weak self] data,_,end,error in guard let self,self.connectEpoch==generation else{return};if let data{self.clientBuffer.append(data)};guard self.clientBuffer.count<=16384 else{self.endClient();return}
   while let i=self.clientBuffer.firstIndex(of:10){let line=String(decoding:self.clientBuffer.prefix(upTo:i),as:UTF8.self);self.clientBuffer.removeSubrange(...i);let a=line.split(separator:" ").map(String.init)

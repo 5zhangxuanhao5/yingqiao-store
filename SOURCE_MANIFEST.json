@@ -121,7 +121,7 @@
   },
   {
     "path": "docs/MAC_UNIFIED.md",
-    "sha256": "94f5e2920c129c304c3366a06588cd7ce7b74d8ba63a902d2179f5e16b276e91"
+    "sha256": "f544de9659851db38634622dfdba457e2973cbef816f3ea643d07b3aa3edc81d"
   },
   {
     "path": "docs/NAME_RELEASE_032.md",
@@ -541,7 +541,7 @@
   },
   {
     "path": "mac/Sources/MacPreviewApp.swift",
-    "sha256": "18756f765e4966dbb50fc4ddea3fc47ba0ddfb48ffebea2a464a922cd5b51c8d"
+    "sha256": "c3e10c2be314739455f00e87926b4235e703f9452770e55d9e7263738a395d9e"
   },
   {
     "path": "mac/Sources/MacPreviewDisplay.swift",
@@ -645,7 +645,7 @@
   },
   {
     "path": "mac/build.sh",
-    "sha256": "4c0d99d271cae0f645977024b08c5d44d65cd80d4f2afc622eb1eeda015f9d81"
+    "sha256": "d12f2e80c2e1ed2a2565395dd354c12bdfee4205961a8b25002aa1d71783d12e"
   },
   {
     "path": "shared/DisplayProfile.hpp",
