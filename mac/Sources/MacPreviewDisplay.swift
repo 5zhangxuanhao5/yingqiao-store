@@ -52,12 +52,13 @@ final class MacPreviewPlayback {
 }
 final class MacPreviewDisplay:NSView {
  let playback=MacPreviewPlayback()
+ let message=NSTextField(wrappingLabelWithString:"正在连接，请在发送端确认连接请求…")
  var video:AVSampleBufferDisplayLayer{playback.video}
  var frames:Int{playback.frames}
  var send:((String)->Void)?,finish:(()->Void)?
  private var cursorHidden=false
  override var acceptsFirstResponder:Bool{true}
- override init(frame:NSRect){super.init(frame:frame);wantsLayer=true;layer?.backgroundColor=NSColor.black.cgColor;video.videoGravity = .resizeAspect;layer?.addSublayer(video)}
+ override init(frame:NSRect){super.init(frame:frame);wantsLayer=true;layer?.backgroundColor=NSColor.black.cgColor;video.videoGravity = .resizeAspect;layer?.addSublayer(video);message.textColor = .white;message.alignment = .center;message.font = .systemFont(ofSize:20);message.translatesAutoresizingMaskIntoConstraints=false;addSubview(message);NSLayoutConstraint.activate([message.centerXAnchor.constraint(equalTo:centerXAnchor),message.centerYAnchor.constraint(equalTo:centerYAnchor),message.widthAnchor.constraint(lessThanOrEqualTo:widthAnchor,multiplier:0.85)])}
  required init?(coder:NSCoder){nil}
  override func layout(){super.layout();CATransaction.begin();CATransaction.setDisableActions(true);video.frame=bounds;CATransaction.commit()}
  override func updateTrackingAreas(){super.updateTrackingAreas();for a in trackingAreas{removeTrackingArea(a)};addTrackingArea(NSTrackingArea(rect:bounds,options:[.activeInKeyWindow,.mouseMoved,.mouseEnteredAndExited,.inVisibleRect],owner:self,userInfo:nil))}
@@ -66,6 +67,7 @@ final class MacPreviewDisplay:NSView {
  override func mouseEntered(with event:NSEvent){updateCursor()}
  override func mouseExited(with event:NSEvent){restoreCursor()}
  func reset(){restoreCursor();playback.reset()}
+ func showMessage(_ text:String){message.stringValue=text;message.isHidden=text.isEmpty}
  func move(_ event:NSEvent){updateCursor();let p=convert(event.locationInWindow,from:nil);guard bounds.width>0,bounds.height>0 else{return};send?("MOVE \(p.x/bounds.width) \(1-p.y/bounds.height)")}
  override func mouseMoved(with event:NSEvent){move(event)}
  override func mouseDown(with event:NSEvent){window?.makeFirstResponder(self);move(event);send?("BUTTON 0 1 \(max(1,min(3,event.clickCount)))")}
