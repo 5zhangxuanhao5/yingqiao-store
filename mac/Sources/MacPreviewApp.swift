@@ -15,6 +15,7 @@ import ApplicationServices
  var devices:NSPopUpButton { themedPage?.document.nearbySelector ?? fallbackDevices }
  var role:NSSegmentedControl!,connectButton:BridgeActionButton!,endButton:BridgeActionButton!
  let browser=NetServiceBrowser();var services:[NetService]=[],available:[NetService]=[]
+ var readiness:[ObjectIdentifier:Date]=[:],probes:[ObjectIdentifier:NWConnection]=[:],discoveryTimer:Timer?
  var listener:NWListener?,advertisement:NetService?,identity:StoreIdentity?,peers:[ObjectIdentifier:LinePeer]=[:]
  var hostControl:LinePeer?,hostViewer:LinePeer?,sender:VideoSender?,capture:StoreCapture?,synthetic:NativeCapture?
  let input=RemoteInput();var hostStarting=false,hostStopping=false,hostLastPing=Date(),hostTimer:Timer?,epoch=0
@@ -73,7 +74,7 @@ import ApplicationServices
   role.selectedSegment=CommandLine.arguments.contains("--mac-receive") ? 1:0
   role.frame=NSRect(x:96,y:62,width:340,height:25);d.addSubview(role)
   connectButton=d.startButton;endButton=d.stopButton
-  devices.target=nil;devices.action=nil;devices.setAccessibilityLabel("选择附近的 Mac")
+  devices.target=self;devices.action=#selector(selectedMacChanged);devices.setAccessibilityLabel("选择附近的 Mac")
   d.nearbyIcon.image=NSImage(systemSymbolName:"laptopcomputer",accessibilityDescription:"Mac")
   d.nearbyTitle.stringValue="附近的 Mac";d.footnote.stringValue="接收画面时按 Esc 返回；切换页面保留连接。"
   // Internal controller continues to use its original role order.
@@ -83,6 +84,7 @@ import ApplicationServices
   return page
  }
  @objc func changeThemedRole(){changeRole();refreshThemedState()}
+ @objc func selectedMacChanged(){updateDevices()}
  @objc func refreshMacDiscovery(){guard role.selectedSegment==0 else{startHost();refreshThemedState();return};browser.stop();services=[];available=[];updateDevices();browser.searchForServices(ofType:MacPreviewWire.service,inDomain:"local.")}
  func refreshThemedState(){
   guard let d=themedPage?.document,let role else{return}
@@ -91,7 +93,8 @@ import ApplicationServices
   d.devices.active=active
   d.pill.update(active ? "扩展屏中":hostStarting || control != nil ? "正在连接":sending ? "等待连接":"寻找 Mac")
   d.nearbyState.stringValue=sending ? "本机可被其他 Mac 发现":"发现 \(available.count) 台 Mac"
-  d.nearbyHint.stringValue=sending ? "在另一台 Mac 选择接收画面，再选择本机。":available.isEmpty ? "请在另一台 Mac 打开映桥并开启发送待命。":"选择电脑后连接，首次需在对方允许。"
+  let readyCount=available.filter{isReady($0)}.count
+  d.nearbyHint.stringValue=sending ? "在另一台 Mac 选择接收画面，再选择本机。":available.isEmpty ? "请在另一台 Mac 打开映桥并开启发送待命。":readyCount==0 ? "正在检查连接和权限；对方就绪后才能连接。":"选择电脑后连接，首次需在对方允许。"
   d.screenState.stringValue=CGPreflightScreenCaptureAccess() ? "已允许":"发送画面时需要"
   d.inputState.stringValue=AXIsProcessTrusted() ? "已允许":"控制电脑时需要"
   d.screenButton.title="查看设置";d.inputButton.title="查看设置";d.screenButton.refreshTitle();d.inputButton.refreshTitle()
@@ -102,9 +105,9 @@ import ApplicationServices
   alert.beginSheetModal(for:window){r in if r == .alertFirstButtonReturn{_ = CGRequestScreenCaptureAccess()}}
  }
  @objc func requestInput(){_ = AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String:true] as CFDictionary)}
- @objc func changeRole(){endCurrent();browser.stop();services=[];available=[];devices.removeAllItems();devices.isHidden=role.selectedSegment==1
+ @objc func changeRole(){endCurrent();browser.stop();discoveryTimer?.invalidate();discoveryTimer=nil;for p in probes.values{p.cancel()};probes=[:];readiness=[:];services=[];available=[];devices.removeAllItems();devices.isHidden=role.selectedSegment==1
   if role.selectedSegment==1{connectButton.title="发送端正在待命";connectButton.enabled(false);startHost()}
-  else{stopHostListener();connectButton.title="连接并全屏";connectButton.enabled(false);status.stringValue="在 Pro 打开测试版并选择“向另一台 Mac 扩展”，这里会显示它。";browser.searchForServices(ofType:MacPreviewWire.service,inDomain:"local.")}
+  else{stopHostListener();connectButton.title="连接并全屏";connectButton.enabled(false);status.stringValue="请在另一台 Mac 打开映桥，选择“扩展到另一台 Mac”。";browser.searchForServices(ofType:MacPreviewWire.service,inDomain:"local.");discoveryTimer=Timer.scheduledTimer(withTimeInterval:3,repeats:true){[weak self] _ in self?.probeNearby()}}
   connectButton.refreshTitle()
  }
  func startHost(){guard listener==nil else{return};status.stringValue="正在准备独立的加密连接…"
@@ -134,6 +137,11 @@ import ApplicationServices
  }
  func hostLine(_ p:LinePeer,_ text:String){
   let a=text.split(separator:" ").map(String.init);guard let command=a.first else{return}
+  if command=="PROBE",a.count==1 {
+   let ready=(syntheticMode || CGPreflightScreenCaptureAccess()) && AXIsProcessTrusted() && hostControl==nil && !hostStarting && !hostStopping
+   p.connection.send(content:Data((ready ? "READY\n":"UNAVAILABLE\n").utf8),completion:.contentProcessed{_ in p.close()})
+   return
+  }
   if command=="HELLO" {
    trace("helloReceived")
    guard syntheticMode || CGPreflightScreenCaptureAccess() else {
@@ -180,29 +188,59 @@ import ApplicationServices
    else{
     let c=StoreCapture(width:width,height:height,fps:fps,codec:codec,sender:sender,displayName:"映桥 · Mac 接收屏",displayProduct:0x4d52,displaySerial:0x4d525031,showCursor:true);capture=c
     let id=try await c.start();guard generation==epoch,!p.closed else{_ = await c.stop();return};try input.configure(displayID:id,extended:false)
-    c.onFailure={[weak self] reason in self?.status.stringValue=reason;self?.endHostSession()}
+    c.onFailure={[weak self,weak c] reason in DispatchQueue.main.async{guard let self,let c,self.epoch==generation,self.capture===c else{return};self.status.stringValue=reason;self.trace("captureStopped");self.endHostSession()}}
    }
-   sender.onReady={[weak self] in Task{@MainActor in guard let self,self.epoch==generation else{return};do{if let synthetic=self.synthetic{try synthetic.startSynthetic()}else{try await self.capture?.startMedia()};self.hostStarting=false;self.status.stringValue="正在向 Air 发送 \(width) × \(height) 独立桌面，\(fps) FPS 目标。"}catch{self.status.stringValue=error.localizedDescription;self.endHostSession()}}}
+   sender.onReady={[weak self] in Task{@MainActor in guard let self,self.epoch==generation else{return};do{if let synthetic=self.synthetic{try synthetic.startSynthetic()}else{try await self.capture?.startMedia()};guard self.epoch==generation else{return};self.hostStarting=false;self.status.stringValue="正在向 Air 发送 \(width) × \(height) 独立桌面，\(fps) FPS 目标。"}catch{guard self.epoch==generation else{return};self.status.stringValue=error.localizedDescription;self.trace("captureStartFailed");self.endHostSession()}}}
    p.send(sender.handshake(width:width,height:height,fps:fps,desktop:nil)+" codec-\(codec)-v1")
    hostTimer=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in guard let self else{return};if Date().timeIntervalSince(self.hostLastPing)>10{self.endHostSession()};self.writeHealth()}
-  }catch{hostStarting=false;p.send("ERR "+error.localizedDescription);endHostSession()}}
+  }catch{guard epoch==generation else{return};hostStarting=false;status.stringValue=error.localizedDescription;trace("hostSetupFailed");p.send("ERR "+error.localizedDescription);endHostSession()}}
  }
  func endHostSession(){
-  epoch+=1;hostStarting=false;hostTimer?.invalidate();hostTimer=nil;input.reset();let c=capture,s=synthetic;capture=nil;synthetic=nil;sender?.stop();sender=nil
+  epoch+=1;hostStarting=false;hostTimer?.invalidate();hostTimer=nil;input.reset();let c=capture,s=synthetic;c?.onFailure=nil;capture=nil;synthetic=nil;sender?.stop();sender=nil
   let peers=[hostControl,hostViewer];hostControl=nil;hostViewer=nil;for p in peers{p?.onClose=nil;p?.close()}
   hostStopping = c != nil || s != nil;Task{_ = await c?.stop();await s?.stop();self.hostStopping=false};writeHealth()
  }
  func netServiceBrowser(_ browser:NetServiceBrowser,didFind service:NetService,moreComing:Bool){guard !services.contains(where:{$0==service}) else{return};services.append(service);service.delegate=self;service.resolve(withTimeout:4)}
  func netServiceBrowser(_ browser:NetServiceBrowser,didRemove service:NetService,moreComing:Bool){services.removeAll{$0==service};available.removeAll{$0==service};updateDevices()}
- func netServiceDidResolveAddress(_ sender:NetService){guard let txt=sender.txtRecordData(),let pin=NetService.dictionary(fromTXTRecord:txt)["sha256"],pin.count==64,sender.port>0,sender.port<65536,sender.hostName != nil else{return};if !available.contains(sender){available.append(sender)};if pendingTarget===sender{pendingTarget=nil;openReceiver(sender)};updateDevices()}
+ func netServiceDidResolveAddress(_ sender:NetService){guard let txt=sender.txtRecordData(),let pin=NetService.dictionary(fromTXTRecord:txt)["sha256"],pin.count==64,sender.port>0,sender.port<65536,sender.hostName != nil else{return};if !available.contains(sender){available.append(sender)};if pendingTarget===sender{pendingTarget=nil;openReceiver(sender)};probeNearby();updateDevices()}
  func netService(_ sender:NetService,didNotResolve errorDict:[String:NSNumber]){if pendingTarget===sender{pendingTarget=nil;status.stringValue="电脑地址刷新失败，请确认两台 Mac 的局域网权限已开启。";trace("resolveFailed");updateDevices()}}
- func updateDevices(){defer{refreshThemedState()};devices.removeAllItems();for s in available{devices.addItem(withTitle:s.name)};if available.isEmpty{devices.addItem(withTitle:"尚未发现发送端")};connectButton.enabled(!available.isEmpty && control==nil)
+ func probeNearby(){
+  guard role.selectedSegment==0,control==nil else{return}
+  for service in available {
+   let id=ObjectIdentifier(service)
+   guard probes[id]==nil,let host=service.hostName,let port=NWEndpoint.Port(rawValue:UInt16(service.port)),let txt=service.txtRecordData(),let bytes=NetService.dictionary(fromTXTRecord:txt)["sha256"],let pin=String(data:bytes,encoding:.utf8) else{continue}
+   let params=NWParameters(tls:Self.clientOptions(pin:pin),tcp:NWProtocolTCP.Options());params.includePeerToPeer=true
+   let c=NWConnection(host:NWEndpoint.Host(host),port:port,using:params);probes[id]=c
+   func finish(_ ready:Bool){
+    guard self.probes[id]===c else{return}
+    self.probes.removeValue(forKey:id);c.stateUpdateHandler=nil;c.cancel()
+    if ready{self.readiness[id]=Date()}else{self.readiness.removeValue(forKey:id)}
+    self.updateDevices()
+   }
+   c.stateUpdateHandler={state in DispatchQueue.main.async {
+    switch state{
+    case .ready:
+     c.send(content:Data("PROBE\n".utf8),completion:.contentProcessed{error in
+      guard error==nil else{DispatchQueue.main.async{finish(false)};return}
+      c.receive(minimumIncompleteLength:6,maximumLength:64){data,_,_,error in DispatchQueue.main.async{finish(error==nil && data.map{String(decoding:$0,as:UTF8.self).hasPrefix("READY\n")}==true)}}
+     })
+    case .failed,.cancelled:finish(false)
+    default:break
+    }
+   }}
+   c.start(queue:.main)
+   DispatchQueue.main.asyncAfter(deadline:.now()+2){finish(false)}
+  }
+  updateDevices()
+ }
+ func isReady(_ service:NetService)->Bool{readiness[ObjectIdentifier(service)].map{Date().timeIntervalSince($0)<4} ?? false}
+ func updateDevices(){defer{refreshThemedState()};let previous=devices.titleOfSelectedItem;devices.removeAllItems();for s in available{devices.addItem(withTitle:s.name)};if let previous,available.contains(where:{$0.name==previous}){devices.selectItem(withTitle:previous)};if available.isEmpty{devices.addItem(withTitle:"尚未发现发送端")};connectButton.enabled(control==nil && available.indices.contains(devices.indexOfSelectedItem) && isReady(available[devices.indexOfSelectedItem]))
   if !automaticTestAttempted,role.selectedSegment==0,let i=CommandLine.arguments.firstIndex(of:"--mac-preview-connect-fingerprint"),CommandLine.arguments.indices.contains(i+1){
    let pin=CommandLine.arguments[i+1]
-   if pin.count==64,let index=available.firstIndex(where:{service in guard let txt=service.txtRecordData(),let data=NetService.dictionary(fromTXTRecord:txt)["sha256"] else{return false};return String(data:data,encoding:.utf8)==pin}){automaticTestAttempted=true;devices.selectItem(at:index);DispatchQueue.main.async{[weak self] in self?.connectSelected()}}
+   if pin.count==64,let index=available.firstIndex(where:{service in guard self.isReady(service),let txt=service.txtRecordData(),let data=NetService.dictionary(fromTXTRecord:txt)["sha256"] else{return false};return String(data:data,encoding:.utf8)==pin}){automaticTestAttempted=true;devices.selectItem(at:index);DispatchQueue.main.async{[weak self] in self?.connectSelected()}}
   }
  }
- @objc func connectSelected(){guard role.selectedSegment==0,control==nil,videoWindow==nil,pendingTarget==nil,available.indices.contains(devices.indexOfSelectedItem) else{return};let service=available[devices.indexOfSelectedItem];pendingTarget=service;connectButton.enabled(false);status.stringValue="正在更新电脑地址…";service.stop();service.resolve(withTimeout:4)}
+ @objc func connectSelected(){guard role.selectedSegment==0,control==nil,videoWindow==nil,pendingTarget==nil,available.indices.contains(devices.indexOfSelectedItem) else{return};let service=available[devices.indexOfSelectedItem];guard isReady(service) else{probeNearby();return};pendingTarget=service;connectButton.enabled(false);status.stringValue="正在更新电脑地址…";service.stop();service.resolve(withTimeout:4)}
  func openReceiver(_ service:NetService){guard role.selectedSegment==0,control==nil,videoWindow==nil else{return};targetService=service
   guard let txt=service.txtRecordData(),let pinData=NetService.dictionary(fromTXTRecord:txt)["sha256"],let pin=String(data:pinData,encoding:.utf8),let host=service.hostName,let port=NWEndpoint.Port(rawValue:UInt16(service.port)) else{status.stringValue="电脑地址正在更新，请稍后重试。";trace("targetUnavailable");return};resolvedTarget=(host,port,pin);trace("selected")
   let video=MacPreviewDisplay(frame:NSScreen.main?.frame ?? NSRect(x:0,y:0,width:1280,height:832));display=video;video.send={[weak self] in self?.sendClient($0)};video.finish={[weak self] in self?.endCurrent()}
