@@ -8,8 +8,11 @@ import ApplicationServices
 
 @MainActor final class MacPreviewApp:NSObject,NSApplicationDelegate,NSWindowDelegate,NetServiceBrowserDelegate,NetServiceDelegate {
  var window:NSWindow!,videoWindow:NSWindow?,display:MacPreviewDisplay?
- let status=BridgeTheme.label("正在寻找提供扩展桌面的 Mac…",size:14,color:BridgeTheme.muted,wrap:true)
- let devices=NSPopUpButton(frame:.zero,pullsDown:false)
+ var themedPage:StoreDashboard?
+ let fallbackStatus=BridgeTheme.label("正在寻找提供扩展桌面的 Mac…",size:14,color:BridgeTheme.muted,wrap:true)
+ var status:NSTextField { themedPage?.document.explanation ?? fallbackStatus }
+ let fallbackDevices=NSPopUpButton(frame:.zero,pullsDown:false)
+ var devices:NSPopUpButton { themedPage?.document.nearbySelector ?? fallbackDevices }
  var role:NSSegmentedControl!,connectButton:BridgeActionButton!,endButton:BridgeActionButton!
  let browser=NetServiceBrowser();var services:[NetService]=[],available:[NetService]=[]
  var listener:NWListener?,advertisement:NetService?,identity:StoreIdentity?,peers:[ObjectIdentifier:LinePeer]=[:]
@@ -38,6 +41,7 @@ import ApplicationServices
   _ = makeInterface()
  }
  func makeInterface(in sharedWindow:NSWindow? = nil)->NSView {
+  if let sharedWindow { return makeThemedInterface(in:sharedWindow) }
   let embedded = sharedWindow != nil
   if let sharedWindow { window=sharedWindow } else {
   window=NSWindow(contentRect:NSRect(x:0,y:0,width:680,height:470),styleMask:[.titled,.closable,.miniaturizable,.resizable],backing:.buffered,defer:false)
@@ -54,6 +58,40 @@ import ApplicationServices
   let settings=NSStackView();settings.spacing=12;settings.addArrangedSubview(BridgeTheme.button("录屏权限",target:self,action:#selector(requestScreen)));settings.addArrangedSubview(BridgeTheme.button("键鼠权限",target:self,action:#selector(requestInput)));content.addArrangedSubview(settings)
   content.addArrangedSubview(BridgeTheme.label("接收端按 Esc 结束。画面按接收窗口的真实尺寸建立，不镜像 Pro 内屏。",size:12,color:BridgeTheme.muted,wrap:true))
   if !embedded { window.contentView=content;window.orderFront(nil) };input.ctrlToCommand=false;browser.delegate=self;changeRole();trace("launched");return content
+ }
+ func makeThemedInterface(in sharedWindow:NSWindow)->NSView {
+  window=sharedWindow
+  let page=StoreDashboard(target:self,stop:#selector(endCurrent),screen:#selector(requestScreen),access:#selector(requestInput),network:#selector(refreshMacDiscovery),relayConfig:#selector(refreshMacDiscovery),start:#selector(connectSelected),power:#selector(refreshMacDiscovery),powerSettings:#selector(refreshMacDiscovery),remoteAccess:#selector(refreshMacDiscovery))
+  themedPage=page
+  let d=page.document;d.tagline.isHidden=true;d.devices.peerIsMac=true
+  role=NSSegmentedControl(labels:["扩展到另一台 Mac","接收 Mac 画面"],trackingMode:.selectOne,target:self,action:#selector(changeThemedRole))
+  // Preserve the protocol controller's role indices: receiver=0, sender=1.
+  role.selectedSegment=CommandLine.arguments.contains("--mac-receive") ? 1:0
+  role.frame=NSRect(x:96,y:62,width:340,height:25);d.addSubview(role)
+  connectButton=d.startButton;endButton=d.stopButton
+  devices.target=nil;devices.action=nil;devices.setAccessibilityLabel("选择附近的 Mac")
+  d.nearbyIcon.image=NSImage(systemSymbolName:"laptopcomputer",accessibilityDescription:"Mac")
+  d.nearbyTitle.stringValue="附近的 Mac";d.footnote.stringValue="接收画面时按 Esc 返回；切换页面保留连接。"
+  // Internal controller continues to use its original role order.
+  role.setLabel("接收 Mac 画面",forSegment:0);role.setLabel("扩展到另一台 Mac",forSegment:1)
+  role.selectedSegment=CommandLine.arguments.contains("--mac-receive") ? 0:1
+  input.ctrlToCommand=false;browser.delegate=self;changeRole();trace("launched")
+  return page
+ }
+ @objc func changeThemedRole(){changeRole();refreshThemedState()}
+ @objc func refreshMacDiscovery(){guard role.selectedSegment==0 else{startHost();refreshThemedState();return};browser.stop();services=[];available=[];updateDevices();browser.searchForServices(ofType:MacPreviewWire.service,inDomain:"local.")}
+ func refreshThemedState(){
+  guard let d=themedPage?.document,let role else{return}
+  let sending=role.selectedSegment==1,active=capture != nil || viewer != nil
+  d.heading.stringValue=active ? "扩展屏已连接":sending ? "Mac 扩展屏":"接收 Mac 画面"
+  d.devices.active=active
+  d.pill.update(active ? "扩展屏中":hostStarting || control != nil ? "正在连接":sending ? "等待连接":"寻找 Mac")
+  d.nearbyState.stringValue=sending ? "本机可被其他 Mac 发现":"发现 \(available.count) 台 Mac"
+  d.nearbyHint.stringValue=sending ? "在另一台 Mac 选择接收画面，再选择本机。":available.isEmpty ? "请在另一台 Mac 打开映桥并开启发送待命。":"选择电脑后连接，首次需在对方允许。"
+  d.screenState.stringValue=CGPreflightScreenCaptureAccess() ? "已允许":"发送画面时需要"
+  d.inputState.stringValue=AXIsProcessTrusted() ? "已允许":"控制电脑时需要"
+  d.screenButton.title="查看设置";d.inputButton.title="查看设置";d.screenButton.refreshTitle();d.inputButton.refreshTitle()
+  endButton.enabled(active || hostStarting || control != nil)
  }
  @objc func requestScreen(){
   let alert=NSAlert();alert.messageText="允许这份接屏测试版采集画面";alert.informativeText="仅在这台 Mac 作为发送端时需要录屏权限。它会采集新建的 Air 扩展桌面；不会撤销或替换原映桥的权限。";alert.addButton(withTitle:"继续申请");alert.addButton(withTitle:"取消")
@@ -149,7 +187,7 @@ import ApplicationServices
  func netServiceBrowser(_ browser:NetServiceBrowser,didRemove service:NetService,moreComing:Bool){services.removeAll{$0==service};available.removeAll{$0==service};updateDevices()}
  func netServiceDidResolveAddress(_ sender:NetService){guard let txt=sender.txtRecordData(),let pin=NetService.dictionary(fromTXTRecord:txt)["sha256"],pin.count==64,sender.port>0,sender.port<65536,sender.hostName != nil else{return};if !available.contains(sender){available.append(sender)};if pendingTarget===sender{pendingTarget=nil;openReceiver(sender)};updateDevices()}
  func netService(_ sender:NetService,didNotResolve errorDict:[String:NSNumber]){if pendingTarget===sender{pendingTarget=nil;status.stringValue="电脑地址刷新失败，请确认两台 Mac 的局域网权限已开启。";trace("resolveFailed");updateDevices()}}
- func updateDevices(){devices.removeAllItems();for s in available{devices.addItem(withTitle:s.name)};if available.isEmpty{devices.addItem(withTitle:"尚未发现发送端")};connectButton.enabled(!available.isEmpty && control==nil)
+ func updateDevices(){defer{refreshThemedState()};devices.removeAllItems();for s in available{devices.addItem(withTitle:s.name)};if available.isEmpty{devices.addItem(withTitle:"尚未发现发送端")};connectButton.enabled(!available.isEmpty && control==nil)
   if !automaticTestAttempted,role.selectedSegment==0,let i=CommandLine.arguments.firstIndex(of:"--mac-preview-connect-fingerprint"),CommandLine.arguments.indices.contains(i+1){
    let pin=CommandLine.arguments[i+1]
    if pin.count==64,let index=available.firstIndex(where:{service in guard let txt=service.txtRecordData(),let data=NetService.dictionary(fromTXTRecord:txt)["sha256"] else{return false};return String(data:data,encoding:.utf8)==pin}){automaticTestAttempted=true;devices.selectItem(at:index);DispatchQueue.main.async{[weak self] in self?.connectSelected()}}
@@ -217,7 +255,7 @@ import ApplicationServices
  func windowDidResignKey(_ notification:Notification){if let w=notification.object as? NSWindow,w===videoWindow{display?.restoreCursor();sendClient("RELEASE")}}
  func windowDidBecomeKey(_ notification:Notification){if let w=notification.object as? NSWindow,w===videoWindow{display?.updateCursor()}}
  func trace(_ event:String){lastEvent=event;writeHealth()}
- func writeHealth(){var values:[String:Any]=["event":lastEvent,"message":status.stringValue,"role":role?.selectedSegment ?? -1,"fullscreen":videoWindow != nil,"borderlessPanel":videoWindow?.styleMask.contains(.borderless) ?? false,"targetResolved":resolvedTarget != nil,"schema":"mac-preview-health-v1","synthetic":syntheticMode,"sending":sender != nil,"receiving":viewer != nil,"receivedFrames":receivedFrames,"submittedFrames":display?.frames ?? 0,"decoderState":display?.video.status.rawValue ?? 0,"width":requestedWidth,"height":requestedHeight,"viewportWidth":display?.bounds.width ?? 0,"viewportHeight":display?.bounds.height ?? 0,"screenPermission":CGPreflightScreenCaptureAccess(),"inputPermission":AXIsProcessTrusted(),"time":Date().timeIntervalSince1970];if let capture{values["capture"]=capture.stats()};if let sender{values["sender"]=sender.transportStats()};if let data=try? JSONSerialization.data(withJSONObject:values,options:[.sortedKeys]){try? FileManager.default.createDirectory(at:StoreIdentity.directory,withIntermediateDirectories:true);try? data.write(to:StoreIdentity.directory.appendingPathComponent("mac-preview-health.json"),options:.atomic)}}
+ func writeHealth(){refreshThemedState();var values:[String:Any]=["event":lastEvent,"message":status.stringValue,"role":role?.selectedSegment ?? -1,"fullscreen":videoWindow != nil,"borderlessPanel":videoWindow?.styleMask.contains(.borderless) ?? false,"targetResolved":resolvedTarget != nil,"schema":"mac-preview-health-v1","synthetic":syntheticMode,"sending":sender != nil,"receiving":viewer != nil,"receivedFrames":receivedFrames,"submittedFrames":display?.frames ?? 0,"decoderState":display?.video.status.rawValue ?? 0,"width":requestedWidth,"height":requestedHeight,"viewportWidth":display?.bounds.width ?? 0,"viewportHeight":display?.bounds.height ?? 0,"screenPermission":CGPreflightScreenCaptureAccess(),"inputPermission":AXIsProcessTrusted(),"time":Date().timeIntervalSince1970];if let capture{values["capture"]=capture.stats()};if let sender{values["sender"]=sender.transportStats()};if let data=try? JSONSerialization.data(withJSONObject:values,options:[.sortedKeys]){try? FileManager.default.createDirectory(at:StoreIdentity.directory,withIntermediateDirectories:true);try? data.write(to:StoreIdentity.directory.appendingPathComponent("mac-preview-health.json"),options:.atomic)}}
  func applicationWillTerminate(_ notification:Notification){endCurrent();browser.stop();stopHostListener()}
  func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{true}
 }

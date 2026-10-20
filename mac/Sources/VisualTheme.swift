@@ -43,6 +43,7 @@ final class BridgeStatusPill:NSView {
 }
 
 final class BridgeDeviceView:NSView {
+ var peerIsMac=false {didSet{needsDisplay=true;setAccessibilityLabel(peerIsMac ? "两台 Mac 连接示意":"Mac 与 平板 连接示意")}}
  var active=false{didSet{if oldValue != active{needsDisplay=true}}}
  override init(frame:NSRect){super.init(frame:frame);setAccessibilityLabel("Mac 与 平板 连接示意")}
  required init?(coder:NSCoder){nil}
@@ -56,6 +57,6 @@ final class BridgeDeviceView:NSView {
   let connection=NSBezierPath();connection.lineWidth=1.5;connection.move(to:NSPoint(x:x+115,y:y+55));connection.line(to:NSPoint(x:x+155,y:y+55));BridgeTheme.line.setStroke();connection.stroke()
   (active ? BridgeTheme.green:BridgeTheme.muted).setFill();for dx in [118.0,133.0,148.0]{NSBezierPath(ovalIn:NSRect(x:x+dx,y:y+52,width:6,height:6)).fill()}
   let attrs:[NSAttributedString.Key:Any]=[.font:NSFont.systemFont(ofSize:11,weight:.medium),.foregroundColor:BridgeTheme.muted]
-  "Mac".draw(at:NSPoint(x:x+40,y:y-10),withAttributes:attrs);"平板".draw(at:NSPoint(x:x+181,y:y-10),withAttributes:attrs)
+  "Mac".draw(at:NSPoint(x:x+40,y:y-10),withAttributes:attrs);(peerIsMac ? "Mac":"平板").draw(at:NSPoint(x:x+181,y:y-10),withAttributes:attrs)
  }
 }
