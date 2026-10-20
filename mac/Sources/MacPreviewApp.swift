@@ -64,7 +64,7 @@ import ApplicationServices
    let id=try await Task.detached{try StoreIdentity.createOrRead()}.value;identity=id
    let tcp=NWProtocolTCP.Options();tcp.noDelay=true;let params=NWParameters(tls:try id.tlsOptions(),tcp:tcp);params.includePeerToPeer=true;params.allowLocalEndpointReuse=true
    if loopback{params.requiredLocalEndpoint = .hostPort(host:"127.0.0.1",port:.any)}
-   let l=try NWListener(using:params,on:loopback ? .any:NWEndpoint.Port(rawValue:49770)!);listener=l
+   let l=try NWListener(using:params,on:loopback ? .any:NWEndpoint.Port(rawValue:48673)!);listener=l
    l.newConnectionHandler={[weak self] c in DispatchQueue.main.async{self?.accept(c)}}
    l.stateUpdateHandler={[weak self] state in DispatchQueue.main.async{guard let self,self.listener===l else{return};switch state{
     case .ready:
