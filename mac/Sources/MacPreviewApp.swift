@@ -64,6 +64,10 @@ import ApplicationServices
   let page=StoreDashboard(target:self,stop:#selector(endCurrent),screen:#selector(requestScreen),access:#selector(requestInput),network:#selector(refreshMacDiscovery),relayConfig:#selector(refreshMacDiscovery),start:#selector(connectSelected),power:#selector(refreshMacDiscovery),powerSettings:#selector(refreshMacDiscovery),remoteAccess:#selector(refreshMacDiscovery))
   themedPage=page
   let d=page.document;d.tagline.isHidden=true;d.devices.peerIsMac=true
+  for panel in [d.permissions,d.nearby] {
+   panel.layer?.backgroundColor=NSColor.clear.cgColor
+   panel.layer?.borderWidth=0
+  }
   role=NSSegmentedControl(labels:["扩展到另一台 Mac","接收 Mac 画面"],trackingMode:.selectOne,target:self,action:#selector(changeThemedRole))
   // Preserve the protocol controller's role indices: receiver=0, sender=1.
   role.selectedSegment=CommandLine.arguments.contains("--mac-receive") ? 1:0
@@ -94,7 +98,7 @@ import ApplicationServices
   endButton.enabled(active || hostStarting || control != nil)
  }
  @objc func requestScreen(){
-  let alert=NSAlert();alert.messageText="允许这份接屏测试版采集画面";alert.informativeText="仅在这台 Mac 作为发送端时需要录屏权限。它会采集新建的 Air 扩展桌面；不会撤销或替换原映桥的权限。";alert.addButton(withTitle:"继续申请");alert.addButton(withTitle:"取消")
+  let alert=NSAlert();alert.messageText="允许映桥共享扩展桌面";alert.informativeText="这台 Mac 发送画面时需要录屏权限。映桥只在连接期间采集所建立的扩展桌面；接收画面的 Mac 无需此权限。";alert.addButton(withTitle:"继续申请");alert.addButton(withTitle:"取消")
   alert.beginSheetModal(for:window){r in if r == .alertFirstButtonReturn{_ = CGRequestScreenCaptureAccess()}}
  }
  @objc func requestInput(){_ = AXIsProcessTrustedWithOptions([kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String:true] as CFDictionary)}
@@ -132,6 +136,11 @@ import ApplicationServices
   let a=text.split(separator:" ").map(String.init);guard let command=a.first else{return}
   if command=="HELLO" {
    trace("helloReceived")
+   guard syntheticMode || CGPreflightScreenCaptureAccess() else {
+    status.stringValue="需要在本机允许映桥录屏，才能向另一台 Mac 发送画面。"
+    reject(p,reason:"发送端尚未获得录屏权限。请在发送端映桥中打开录屏设置，允许后重试。")
+    trace("screenPermissionRequired");return
+   }
    guard hostControl==nil,!hostStarting,!hostStopping,a.count==5,let w=Int(a[1]),let h=Int(a[2]),let fps=Int(a[3]),[30,60].contains(fps),w>=640,h>=480,w<=3840,h<=3200,w*h<=8_000_000,w%2==0,h%2==0,let nameData=Data(base64Encoded:a[4]),nameData.count<=256 else{p.close();return}
    let name=String(decoding:nameData,as:UTF8.self).filter{!$0.isNewline && !$0.isASCIIControl}
    hostStarting=true

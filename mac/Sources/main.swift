@@ -34,11 +34,7 @@ import CoreImage
   window.title="映桥";window.center();window.isReleasedWhenClosed=false;window.contentMinSize=NSSize(width:760,height:620);window.backgroundColor=BridgeTheme.fog;window.titlebarAppearsTransparent=true;window.appearance=NSAppearance(named:.aqua)
   dashboard=StoreDashboard(target:self,stop:#selector(userEndSession),screen:#selector(screenPermission),access:#selector(accessPermission),network:#selector(prepare),relayConfig:#selector(prepare),start:#selector(startExtension),power:#selector(prepare),powerSettings:#selector(prepare),remoteAccess:#selector(prepare));window.contentView=dashboard;enable=dashboard.document.startButton
   #if MAC_RECEIVER_ENABLED
-  let tabs=NSTabView(frame:window.contentView!.bounds);tabs.autoresizingMask=[.width,.height]
-  let padTab=NSTabViewItem(identifier:"pad");padTab.label="平板扩展屏";padTab.view=dashboard;tabs.addTabViewItem(padTab)
-  let macTab=NSTabViewItem(identifier:"mac");macTab.label="Mac 互联";macTab.view=macLink.makeInterface(in:window);tabs.addTabViewItem(macTab)
-  window.contentView=tabs
-  if CommandLine.arguments.contains("--mac-receive") { tabs.selectTabViewItem(macTab) }
+  window.contentView=UnifiedDashboard(pad:dashboard,mac:macLink.makeInterface(in:window),receive:CommandLine.arguments.contains("--mac-receive"))
   #endif
   availability.onChanged={[weak self] in self?.syncRequestTimer();self?.updateDashboard()};availability.onClosePath={[weak self] id in guard let self,let key=self.standbyConnections.first(where:{$0.value.id==id})?.key else{return};self.standbyConnections.removeValue(forKey:key)?.peer.close()};nearbyPads.onChanged={[weak self] in self?.announceToNearbyPads();self?.updateDashboard()};window.orderFront(nil);updateDashboard();DispatchQueue.main.async{[weak self] in self?.explainInitialPermissions()}
  }

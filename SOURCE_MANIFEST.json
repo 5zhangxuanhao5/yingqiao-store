@@ -121,7 +121,7 @@
   },
   {
     "path": "docs/MAC_UNIFIED.md",
-    "sha256": "8b0df9afef5a640f11d69ff655a61c1c9e260d7075aa822ca0a44736068cfc32"
+    "sha256": "103278e19e15d4d98de23d76b6c8674b31344b0249ab3995204e184b368722ae"
   },
   {
     "path": "docs/NAME_RELEASE_032.md",
@@ -541,7 +541,7 @@
   },
   {
     "path": "mac/Sources/MacPreviewApp.swift",
-    "sha256": "2f1d0ecc2c4c10c4cd13546a92022127e56abfda52296b412bd0e4cbfdcda317"
+    "sha256": "10f5de5fe0dde9f1700ca56afca4efdd491d63601a39cc0b8786298a09ff65fb"
   },
   {
     "path": "mac/Sources/MacPreviewDisplay.swift",
@@ -612,12 +612,16 @@
     "sha256": "89c4b91f9307aabba12dbb7addf3595f79ce0e6fc5b891f43508208b99f24661"
   },
   {
+    "path": "mac/Sources/UnifiedDashboard.swift",
+    "sha256": "88771fe0b1488011825959078ca244e7a80c75e392749bbae01bcbf2da7149d8"
+  },
+  {
     "path": "mac/Sources/VisualTheme.swift",
     "sha256": "90288b96299f8b9b06a6636e07b4fd828da70f29df2a788065cc488edc1b2d25"
   },
   {
     "path": "mac/Sources/main.swift",
-    "sha256": "e91380d02ccbf0473b966cbe7de25cee5db6df8ba20778b232b90db1e08d8828"
+    "sha256": "8a46b2df2a4babae291756c23057f9c5260c52cd76caab12e97db1dc7d073eb2"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
@@ -641,7 +645,7 @@
   },
   {
     "path": "mac/build.sh",
-    "sha256": "b197ec66ca40e6977c173efe99fb6a72d378015d54c51d30eebaa71b9ff1f2bc"
+    "sha256": "b73044db3020551d2eb1b6a1b14d0c5d35429d55a5db73dc38d3f223674ee594"
   },
   {
     "path": "shared/DisplayProfile.hpp",
