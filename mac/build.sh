@@ -42,7 +42,7 @@ if [[ "${YQ_MAC_RECEIVER_PREVIEW:-0}" == "1" ]]; then
 fi
 if [[ "${YQ_MAC_UNIFIED:-0}" == "1" ]]; then
  /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString 0.4.0" "$app/Contents/Info.plist"
- /usr/libexec/PlistBuddy -c "Set :CFBundleVersion 46" "$app/Contents/Info.plist"
+ /usr/libexec/PlistBuddy -c "Set :CFBundleVersion 47" "$app/Contents/Info.plist"
  /usr/libexec/PlistBuddy -c "Add :NSBonjourServices:3 string _yqmacpreview._tcp" "$app/Contents/Info.plist"
 fi
 cp "$stage/Resources/AppIcon.icns" "$app/Contents/Resources/AppIcon.icns"

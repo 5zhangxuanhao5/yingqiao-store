@@ -48,11 +48,12 @@ final class StoreDashboardDocument:NSView {
   let state=values["state"] as? String ?? "idle",active=state=="streaming",connecting=state=="connecting" || state=="stopping"
   let screen=values["screenPermission"] as? Bool ?? false,input=values["inputPermission"] as? Bool ?? false,screenRequested=values["screenPermissionRequested"] as? Bool ?? false,inputRequested=values["inputPermissionRequested"] as? Bool ?? false
   let local=values["localConnection"] as? [String:Any] ?? [:],pending=(local["pending"] as? Bool ?? false)||(values["invitationPending"] as? Bool ?? false)
+  let serviceReady=values["localServiceReady"] as? Bool ?? false
   let rows=values["nearbyPads"] as? [[String:Any]] ?? [],selected=values["selectedPadID"] as? String ?? ""
   heading.stringValue=active ? "扩展屏已连接":"扩展屏";devices.active=active
   explanation.stringValue=values["statusMessage"] as? String ?? "把平板变成 Mac 的另一块屏幕。"
-  pill.update(active ? "扩展屏中":pending || connecting ? "正在连接":!screen || !input ? "需要权限":rows.isEmpty ? "寻找平板":"已准备好",warning:!active && (!screen || !input))
-  startButton.enabled(rows.contains(where:{$0["ready"] as? Bool ?? false}) && !(values["preparing"] as? Bool ?? false) && !active && !connecting && !pending)
+  pill.update(active ? "扩展屏中":pending || connecting ? "正在连接":!screen || !input ? "需要权限":!serviceReady ? "连接未就绪":rows.isEmpty ? "寻找平板":"已准备好",warning:!active && (!screen || !input || !serviceReady))
+  startButton.enabled(StoreConnectionReadiness.canStart(service:serviceReady,permissions:screen && input,device:rows.contains(where:{$0["ready"] as? Bool ?? false}),busy:(values["preparing"] as? Bool ?? false) || active || connecting || pending))
   startButton.title=pending ? "正在连接平板…":"开启扩展屏";startButton.refreshTitle();stopButton.enabled(active || connecting || pending)
   screenState.stringValue=screen ? "已允许":screenRequested ? "等待系统授权":"首次使用时申请";screenState.textColor=screen ? BridgeTheme.green:BridgeTheme.muted
   inputState.stringValue=input ? "已允许":inputRequested ? "等待系统授权":"首次使用时申请";inputState.textColor=input ? BridgeTheme.green:BridgeTheme.muted

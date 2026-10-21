@@ -19,16 +19,36 @@ extension StoreHost {
     #else
     if loopback{connection.cancel()}else{self?.accept(connection,standby:true)}
     #endif
-   }};standby.start(queue:.main)
-   let service=NetService(domain:"local.",type:"_yingqiaostandby._tcp",name:"映桥-Mac",port:49562)
-   service.schedule(in:.main,forMode:.common);service.publish();standbyService=service
+   }}
+   standby.stateUpdateHandler={[weak self,weak standby] state in DispatchQueue.main.async{
+    guard let self,let standby,self.standbyListener===standby else{return}
+    switch state{
+    case .ready:
+     self.standbyListenerReady=true
+     if self.lanListenerReady{self.listenerRetries=0;self.listenerRetry?.invalidate();self.listenerRetry=nil}
+     let service=NetService(domain:"local.",type:"_yingqiaostandby._tcp",name:"映桥-Mac",port:49562)
+     service.schedule(in:.main,forMode:.common);service.publish();self.standbyService=service
+    case .failed(let error):
+     self.standbyListenerReady=false;self.standbyListener=nil;standby.cancel()
+     self.standbyService?.stop();self.standbyService=nil
+     self.statusMessage="待命连接暂不可用："+error.localizedDescription+"。稍后自动重试。"
+     self.retryLocalListeners()
+    case .waiting:self.standbyListenerReady=false
+    case .cancelled:self.standbyListenerReady=false
+    default:break
+    }
+    self.updateDashboard()
+   }}
+   standby.start(queue:.main)
    #if ORIGINAL_USB_TEST
+   if originalUSBListener==nil {
    let localTCP=NWProtocolTCP.Options();localTCP.noDelay=true
    let local=NWParameters(tls:try identity.tlsOptions(),tcp:localTCP)
    local.requiredLocalEndpoint = .hostPort(host:"127.0.0.1",port:49561);local.allowLocalEndpointReuse=true
    let media=try NWListener(using:local);originalUSBListener=media
    media.newConnectionHandler={[weak self] connection in DispatchQueue.main.async{self?.accept(connection,usb:true,debugUSB:true)}}
    media.start(queue:.main);originalUSB.start()
+   }
    #endif
   }catch{statusMessage="本地备用连接未准备好："+error.localizedDescription}
  }
@@ -107,7 +127,7 @@ extension StoreHost {
  }
  func performStartExtension(_ id:String){
   guard mediaPermissionsReady,!busy,capture==nil,availability.request==nil else{return}
-  guard listener != nil else{prepare();statusMessage="正在准备连接，请稍候再开启扩展屏。";return}
+  guard lanListenerReady && standbyListenerReady else{prepare();statusMessage="正在准备连接，请稍候再开启扩展屏。";return}
   if let route=availability.bestLocalRoute(deviceID:id){
    availability.select(id);if availability.startExtension(deviceID:id,preferred:route,hostIdle:true){statusMessage="已向平板请求开启扩展屏…"}else{statusMessage=availability.lastError};updateDashboard();return
   }

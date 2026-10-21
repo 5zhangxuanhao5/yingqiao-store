@@ -13,7 +13,8 @@ import CoreImage
  var overview:DesktopOverview?
  var hostCursor:HostCursorMonitor?,cursorRequested=false
  var lastSessionError:String?
- var preparing=false,bonjourReady=false
+ var preparing=false,bonjourReady=false,lanListenerReady=false,standbyListenerReady=false
+ var listenerRetry:Timer?,listenerRetries=0
  var nearbyPads=StoreNearbyPads(),selectedPadID:String?,nearbyInvitationPending=false,nearbyInvitationEpoch:UInt64=0
  var permissionAlert:NSAlert?,padChoiceAlert:NSAlert?,permissionTimer:Timer?,permissionObservationUntil:TimeInterval=0,continueInputAfterScreen=false,pendingPermissionPadID:String?
  var activePadSession:String?,retainedPadSession:String?
@@ -42,20 +43,61 @@ import CoreImage
   guard dashboard != nil else{return};let rows=nearbyPadRows()
   if let selectedPadID,!rows.contains(where:{$0.id==selectedPadID}){self.selectedPadID=nil}
   if selectedPadID==nil,rows.count==1{selectedPadID=rows[0].id}
-  dashboard.render(["state":busy ? "connecting":capture == nil ? "idle":"streaming","connected":capture != nil,"discoveryReady":listener != nil && bonjourReady,"preparing":preparing,"statusMessage":statusMessage,"screenPermission":CGPreflightScreenCaptureAccess(),"inputPermission":AXIsProcessTrusted(),"screenPermissionRequested":UserDefaults.standard.bool(forKey:"store.screenPermissionRequested"),"inputPermissionRequested":UserDefaults.standard.bool(forKey:"store.inputPermissionRequested"),"networkHelperRunning":listener != nil,"localConnection":availability.snapshot(),"localExtensionAvailable":capture==nil && !busy && rows.contains(where:{$0.ready}),"nearbyPads":rows.map{["id":$0.id,"name":$0.name,"authenticated":$0.authenticated,"ready":$0.ready]},"selectedPadID":selectedPadID ?? "","invitationPending":nearbyInvitationPending])
+  dashboard.render(["state":busy ? "connecting":capture == nil ? "idle":"streaming","connected":capture != nil,"discoveryReady":lanListenerReady && bonjourReady,"localServiceReady":lanListenerReady && standbyListenerReady,"preparing":preparing,"statusMessage":statusMessage,"screenPermission":CGPreflightScreenCaptureAccess(),"inputPermission":AXIsProcessTrusted(),"screenPermissionRequested":UserDefaults.standard.bool(forKey:"store.screenPermissionRequested"),"inputPermissionRequested":UserDefaults.standard.bool(forKey:"store.inputPermissionRequested"),"networkHelperRunning":lanListenerReady,"localConnection":availability.snapshot(),"localExtensionAvailable":capture==nil && !busy && rows.contains(where:{$0.ready}),"nearbyPads":rows.map{["id":$0.id,"name":$0.name,"authenticated":$0.authenticated,"ready":$0.ready]},"selectedPadID":selectedPadID ?? "","invitationPending":nearbyInvitationPending])
  }
 
 
+ func retryLocalListeners(){
+  guard listenerRetry==nil,listenerRetries<6 else{return}
+  listenerRetries+=1
+  listenerRetry=Timer.scheduledTimer(withTimeInterval:5,repeats:false){[weak self] _ in
+   guard let self else{return};self.listenerRetry=nil
+   self.prepare()
+  }
+ }
  @objc func prepare(){
   guard !preparing else{return}
-  guard listener==nil else{if advertisedService==nil,let identity{advertise(identity)};nearbyPads.start();updateDashboard();return}
-  enable.isEnabled=false;statusMessage="正在生成这台电脑专属的加密配对身份…"
-  preparing=true;Task{@MainActor in defer{preparing=false;updateDashboard()};do{let id=try await Task.detached{try StoreIdentity.createOrRead()}.value;identity=id;let tcp=NWProtocolTCP.Options();tcp.noDelay=true;tcp.enableKeepalive=true;let params=NWParameters(tls:try id.tlsOptions(),tcp:tcp);params.allowLocalEndpointReuse=true
-   let l=try NWListener(using:params,on:49563);listener=l;advertise(id);startDatagramDiscovery(id)
-   l.newConnectionHandler={[weak self] c in DispatchQueue.main.async{self?.accept(c)}};l.stateUpdateHandler={[weak self] state in DispatchQueue.main.async{if case .failed=state{self?.statusMessage="局域网监听失败，请检查端口占用。";self?.listener=nil;self?.enable.isEnabled=true}}};l.start(queue:.main);startOriginalLocalConnections(id);nearbyPads.start()
-   statusMessage="选择附近的平板，或在平板上选择这台 Mac。"
-  }catch{listener?.cancel();listener=nil;enable.isEnabled=true;statusMessage=error.localizedDescription}}
+  if let identity{startOriginalLocalConnections(identity)}
+  guard listener==nil else{if lanListenerReady,advertisedService==nil,let identity{advertise(identity)};nearbyPads.start();updateDashboard();return}
+  enable.isEnabled=false;statusMessage="正在准备本地连接服务…"
+  preparing=true
+  Task{@MainActor in
+   defer{preparing=false;updateDashboard()}
+   do{
+    let id=try await Task.detached{try StoreIdentity.createOrRead()}.value;identity=id
+    let tcp=NWProtocolTCP.Options();tcp.noDelay=true;tcp.enableKeepalive=true
+    let params=NWParameters(tls:try id.tlsOptions(),tcp:tcp);params.allowLocalEndpointReuse=true
+    let l=try NWListener(using:params,on:49563);listener=l;lanListenerReady=false
+    l.newConnectionHandler={[weak self] c in DispatchQueue.main.async{self?.accept(c)}}
+    l.stateUpdateHandler={[weak self,weak l] state in DispatchQueue.main.async{
+     guard let self,let l,self.listener===l else{return}
+     switch state{
+     case .ready:
+      self.lanListenerReady=true
+      if self.standbyListenerReady{self.listenerRetries=0;self.listenerRetry?.invalidate();self.listenerRetry=nil}else if self.standbyListener==nil{self.retryLocalListeners()}
+      self.advertise(id);self.startDatagramDiscovery(id)
+      self.statusMessage="选择附近的平板，或在平板上选择这台 Mac。"
+     case .failed(let error):
+      self.lanListenerReady=false;self.listener=nil;l.cancel()
+      self.advertisedService?.stop();self.advertisedService=nil;self.bonjourReady=false
+      self.statusMessage="连接服务暂不可用："+error.localizedDescription+"。稍后自动重试，也可刷新附近设备。"
+      self.retryLocalListeners()
+     case .waiting:
+      self.lanListenerReady=false;self.advertisedService?.stop();self.advertisedService=nil;self.bonjourReady=false
+      self.statusMessage="正在等待本地网络连接服务恢复…"
+     case .cancelled:self.lanListenerReady=false
+     default:break
+     }
+     self.updateDashboard()
+    }}
+    l.start(queue:.main);startOriginalLocalConnections(id);nearbyPads.start()
+   }catch{
+    listener?.cancel();listener=nil;lanListenerReady=false
+    statusMessage=error.localizedDescription;retryLocalListeners()
+   }
+  }
  }
+
  func accept(_ connection:NWConnection,usb:Bool=false,standby:Bool=false,debugUSB:Bool=false){guard peers.count<24,case let .hostPort(host,port)=connection.endpoint,(usb ? (host.debugDescription=="127.0.0.1" && (debugUSB || YQUSBTrustedPort(port.rawValue) != 0)):privateLANAddress(host.debugDescription)) else{connection.cancel();return};let p=LinePeer(connection,usb:usb,standby:standby);peers[ObjectIdentifier(p)]=p
   p.onLine={[weak self,weak p] line in guard let self,let p else{return};self.line(p,line)};p.onClose={[weak self,weak p] in guard let self,let p else{return};self.peers.removeValue(forKey:ObjectIdentifier(p));if p===self.linkPeer{self.clearLinkPrompt()};if let entry=self.standbyConnections.removeValue(forKey:ObjectIdentifier(p)){self.availability.detach(id:entry.id)};if p===self.controller || p===self.viewer{self.stopSession(keepDisplay:true)}}
   p.start();DispatchQueue.main.asyncAfter(deadline:.now()+15){[weak self,weak p] in guard let self,let p else{return};if p !== self.controller && p !== self.viewer && p !== self.linkPeer && self.standbyConnections[ObjectIdentifier(p)]==nil{p.close()}}
@@ -144,7 +186,7 @@ import CoreImage
  #if MAC_RECEIVER_ENABLED
  macLink.applicationWillTerminate(notification)
  #endif
- nearbyPads.stop();permissionTimer?.invalidate();permissionTimer=nil;originalUSB.stop();availability.stop();requestTimer?.invalidate();YQUSBStop()}
+ listenerRetry?.invalidate();listenerRetry=nil;nearbyPads.stop();permissionTimer?.invalidate();permissionTimer=nil;originalUSB.stop();availability.stop();requestTimer?.invalidate();YQUSBStop()}
  func applicationShouldTerminate(_ app:NSApplication)->NSApplication.TerminateReply{
  #if MAC_RECEIVER_ENABLED
  let macActive=macLink.capture != nil || macLink.hostStarting || macLink.hostStopping
@@ -160,7 +202,7 @@ if CommandLine.arguments.contains("--usb-network-probe"){
 if CommandLine.arguments.contains("--encoder-self-test"){
  Task{do{for codec in [kCMVideoCodecType_HEVC,kCMVideoCodecType_H264]{let sender=try VideoSender(port:0,tcpMode:true);let capture=try NativeCapture(width:3120,height:2080,fps:60,sender:sender,codec:codec);await capture.stop();sender.stop();print("PASS original-core hardware encoder",codec)};exit(0)}catch{print("FAIL original-core hardware encoder",(error as NSError).code);exit(1)}};dispatchMain()
 }
-if CommandLine.arguments.contains("--self-test"){MainActor.assumeIsolated{StandbyCoordinator.selfTest();StoreNearbyPads.selfTest()};StoreOriginalUSBDebug.selfTest();StoreFrameWindow.selfTest();StoreEncoderSettings.selfTest();precondition(!privateLANAddress(""));precondition(!privateLANAddress("%"));precondition(!privateLANAddress("%%"));precondition(StoreUSB.address()==nil);precondition(privateLANAddress("192.168.1.5"));precondition(privateLANAddress("fd00::1"));precondition(!privateLANAddress("8.8.8.8"));precondition(!privateLANAddress("100.64.0.1"));precondition(!privateLANAddress("127.0.0.1"));print("PASS store LAN address policy; no window, listener, capture, identity, or permission request");exit(0)}
+if CommandLine.arguments.contains("--self-test"){MainActor.assumeIsolated{StandbyCoordinator.selfTest();StoreNearbyPads.selfTest();StoreConnectionReadiness.selfTest()};StoreOriginalUSBDebug.selfTest();StoreFrameWindow.selfTest();StoreEncoderSettings.selfTest();precondition(!privateLANAddress(""));precondition(!privateLANAddress("%"));precondition(!privateLANAddress("%%"));precondition(StoreUSB.address()==nil);precondition(privateLANAddress("192.168.1.5"));precondition(privateLANAddress("fd00::1"));precondition(!privateLANAddress("8.8.8.8"));precondition(!privateLANAddress("100.64.0.1"));precondition(!privateLANAddress("127.0.0.1"));print("PASS store LAN address policy; no window, listener, capture, identity, or permission request");exit(0)}
 #if MAC_RECEIVER_PREVIEW || MAC_RECEIVER_ENABLED
 if CommandLine.arguments.contains("--mac-preview-self-test"){MacPreviewWire.selfTest();exit(0)}
 #endif

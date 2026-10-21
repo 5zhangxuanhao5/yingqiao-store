@@ -5,6 +5,7 @@ import Security
 import CryptoKit
 extension StoreHost:NetServiceDelegate {
  func advertise(_ identity:StoreIdentity){
+  guard lanListenerReady else{return}
   advertisedService?.stop();bonjourReady=false
   let service=NetService(domain:"local.",type:"_yingqiaostore._tcp.",name:Host.current().localizedName ?? "Mac",port:49563)
   let certificate=Array(identity.certificate.utf8);var values:[String:Data]=["schema":Data("store-discovery-v1".utf8),"id":Data(hex(Data(SHA256.hash(data:Data(certificate)))).prefix(24).utf8)]
@@ -49,7 +50,7 @@ extension StoreHost {
    let listener=try NWListener(using:.udp,on:49565);discoveryListener=listener
    listener.newConnectionHandler={[weak self,weak listener] connection in
     DispatchQueue.main.async{
-    guard let listener,self?.discoveryListener===listener else{connection.cancel();return}
+    guard let listener,self?.discoveryListener===listener,self?.lanListenerReady==true,self?.standbyListenerReady==true else{connection.cancel();return}
     self?.discoveryHealth("packet_arrived");guard let self,case let .hostPort(host,_)=connection.endpoint,privateLANAddress(host.debugDescription),self.discoveryPeers.count<16 else{self?.discoveryHealth("endpoint_rejected");connection.cancel();return};self.discoveryHealth("endpoint_accepted")
     let key=ObjectIdentifier(connection);self.discoveryPeers[key]=connection;connection.start(queue:.main)
     connection.receiveMessage{[weak self] data,_,_,_ in
@@ -79,6 +80,7 @@ extension StoreHost {
  // Wake the Pad's bounded public discovery exchange after Bonjour finds it.
  // This carries no pairing material and never starts capture or grants trust.
  func announceToNearbyPads(){
+  guard lanListenerReady && standbyListenerReady else{return}
   let now=Date();discoveryAnnouncements=discoveryAnnouncements.filter{now.timeIntervalSince($0.value)<30}
   for pad in nearbyPads.pads where privateLANAddress(pad.host) {
    guard discoveryAnnouncements[pad.host].map({now.timeIntervalSince($0)>=15}) ?? true else{continue}

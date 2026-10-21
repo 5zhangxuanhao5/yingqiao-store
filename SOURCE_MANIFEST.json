@@ -150,14 +150,19 @@
     "sha256": "694fd3481abfa983a03410e886a883fe56cf0f7f1ee0418ffeb23e4869edc579"
   },
   {
+    "path": "docs/MAC_LISTENER_TEST8.md",
+    "bytes": 1758,
+    "sha256": "aa2077d1d76245e63851f5d4378a88454254a1b40232ba6f16115dac00f82559"
+  },
+  {
     "path": "docs/MAC_RECEIVER_PREVIEW.md",
     "bytes": 4643,
     "sha256": "57030268f686113d0c84eb255185eb0006ce39ba73ae7994423d64b43bd0a6e0"
   },
   {
     "path": "docs/MAC_UNIFIED.md",
-    "bytes": 4414,
-    "sha256": "cb9d0fd8780058e7c3c1a2f7b724114bcd684c4d7c2115ad64d1546c653f65f5"
+    "bytes": 4579,
+    "sha256": "de40540f8a16fe7b3df7b5b90d996a6d8c052ab8b772ceb5d80e9901188cdfc6"
   },
   {
     "path": "docs/NAME_RELEASE_032.md",
@@ -715,14 +720,19 @@
     "sha256": "f71ac2a2b35351998448521e34273bbf73d2ef490d21b5434ca8126406383d17"
   },
   {
+    "path": "mac/Sources/StoreConnectionReadiness.swift",
+    "bytes": 774,
+    "sha256": "3f655883db734b8d47c008bb057277cac9029b566cf7cb577bef3d3b0ec6e370"
+  },
+  {
     "path": "mac/Sources/StoreDashboard.swift",
-    "bytes": 9436,
-    "sha256": "d393afb05aaa22d53a2f2374e877db00b7e6fa04bf9ca00c0baec39eca0ed02b"
+    "bytes": 9641,
+    "sha256": "9aeb4955cdb838824ce0887080eae618d7ecdcfecc96f21fdb10a712fade2ee1"
   },
   {
     "path": "mac/Sources/StoreDiscovery.swift",
-    "bytes": 8140,
-    "sha256": "9e4cad52aca156678975da4bcc235eedec4d889108d32fa6a65404af430a6ec5"
+    "bytes": 8302,
+    "sha256": "72ac580d890bf1d4e4a4e97b0289805bb6545230e5447f3da94f016fa6f98bfe"
   },
   {
     "path": "mac/Sources/StoreEncoderSettings.swift",
@@ -751,8 +761,8 @@
   },
   {
     "path": "mac/Sources/StoreOriginalConnections.swift",
-    "bytes": 9537,
-    "sha256": "953ce8f9bb619912ddeebe8ba5ce461a1b98d63e36b841c8c670326214d32d8b"
+    "bytes": 10423,
+    "sha256": "6bdf6120034e4de899a3568b490fadc7a2e14fdb33e06ffa2e59458fcf5e2a78"
   },
   {
     "path": "mac/Sources/StoreOriginalUSBDebug.swift",
@@ -786,8 +796,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 23589,
-    "sha256": "8a46b2df2a4babae291756c23057f9c5260c52cd76caab12e97db1dc7d073eb2"
+    "bytes": 25114,
+    "sha256": "10d3efebe0dfcf0a8299ccdb2e934cad3fd1fce5eef9242643edf8c306645de3"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
@@ -817,7 +827,7 @@
   {
     "path": "mac/build.sh",
     "bytes": 3731,
-    "sha256": "5828dfc93c24706eb33e94602ae5131c98f980dc851b3bd7ce8ff40e25c3d51b"
+    "sha256": "d0321b28cd0aff7fcb736b38c57c9c17f8e9b10964b74e4205156de01547dd9d"
   },
   {
     "path": "shared/DisplayProfile.hpp",
