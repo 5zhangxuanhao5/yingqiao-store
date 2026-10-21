@@ -1,6 +1,6 @@
 export const probe: () => string;
 export const setSurface: (surfaceId: string) => void;
-export const connect: (host: string, port: number, mode: string, width: number, height: number, fps: number, transport: string, token: string, certificate: string, bitrateKbps?: number) => void;
+export const connect: (host: string, port: number, mode: string, width: number, height: number, fps: number, transport: string, token: string, certificate: string, bitrateKbps?: number, resumeSession?: number) => void;
 export const disconnect: (reason?: string) => void;
 export const input: (command: string) => boolean;
 export const stats: () => string;

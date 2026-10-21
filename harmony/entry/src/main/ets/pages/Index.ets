@@ -173,7 +173,7 @@ struct Index {
  private storeStartFastHandover():void {
   if(this.storeHandoverTimer>=0)return;
   this.storeHandoverTimer=setInterval(()=>{
-   if(!this.active||this.mode!=='extend'||!this.remoteSessionForeground)return;
+   if(!this.active||this.mode!=='extend'||!this.remoteSessionForeground||BackgroundExtension.resuming||BackgroundExtension.parked())return;
    const flags=native.storeSessionFlags();
    if(flags<0||(flags&1)!==0||(flags&8)!==0)return;
    this.checkStoreHandover({running:false,localHandoverSupported:(flags&2)!==0,renderSubmittedFrames:0,stopReason:''});
@@ -979,7 +979,7 @@ struct Index {
    }
   } else {
    native.connect(selectedTransport === 0 ? '127.0.0.1' : (this.isInternetTransport(selectedTransport) ? this.internetHost : this.host.trim()), selectedTransport === 0 ? 49561 : this.pairing.port, mode,
-    widths[this.resolution], heights[this.resolution], this.fps, rtc ? (selectedTransport===3?'tailnet-rtc':'rtc') : (selectedTransport === 4 ? 'tailnet-udp' : (selectedTransport === 3 ? 'tailnet' : (selectedTransport === 2 ? 'udp' : (this.storeCodec === 'hevc' ? 'store-hevc':'store-avc')))), this.pairing.token, this.pairing.cert, fromDiagnostic && this.diagnosticBitrateKbps >= 1500 && this.diagnosticBitrateKbps <= 240000 ? this.diagnosticBitrateKbps : 0);
+    widths[this.resolution], heights[this.resolution], this.fps, rtc ? (selectedTransport===3?'tailnet-rtc':'rtc') : (selectedTransport === 4 ? 'tailnet-udp' : (selectedTransport === 3 ? 'tailnet' : (selectedTransport === 2 ? 'udp' : (this.storeCodec === 'hevc' ? 'store-hevc':'store-avc')))), this.pairing.token, this.pairing.cert, fromDiagnostic && this.diagnosticBitrateKbps >= 1500 && this.diagnosticBitrateKbps <= 240000 ? this.diagnosticBitrateKbps : 0, BackgroundExtension.resuming ? (AppStorage.get<number>('extensionParkedSession') || 0) : 0);
   }
   this.updateAvailabilityState();
   this.bindCursorChannel();
@@ -1369,6 +1369,7 @@ struct Index {
    if (!s.running && s.stopReason === 'background_suspend') { BackgroundExtension.suspend(); }
    if (BackgroundExtension.parked()) { this.streaming = false;this.resumeParkedExtension();return; }
    if (s.running && s.renderSubmittedFrames > 0) { BackgroundExtension.arm(this.context(), s.backgroundRetainSupported === true); }
+   else if (!s.running && s.error.includes('parked_session_ended')) { this.stop('mac_end');this.message = 'Mac 已结束保留会话，请重新选择电脑开启。';return; }
    else if (!s.running && BackgroundExtension.retryResume()) { this.resumeParkedExtension();return; }
   }
   if (this.checkLocalHandover(s)) { return; }

@@ -130,6 +130,11 @@
     "sha256": "51aab1025f2a8f41f2fe0a4197ce8d3914cf1865d012e208f22a0aadb89425a9"
   },
   {
+    "path": "docs/EDGE_BACKGROUND_TEST10.md",
+    "bytes": 2100,
+    "sha256": "bd58dd54233cda268ee5666b10c5eb1fd57491c3cad62eb71c028811168c31c6"
+  },
+  {
     "path": "docs/EDGE_BACKGROUND_TEST9.md",
     "bytes": 3636,
     "sha256": "3e9434aa015b3d271faed6c1fcca30cd24a967ea2816884b15276830ae163866"
@@ -217,7 +222,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 199,
-    "sha256": "2cda032f5a9a5ca18a1bc2da0f08480d7032b7e9fc4a852b26e1977eed605187"
+    "sha256": "5df44feb6fb6e5d8d7b101491e9c8b0b022cd845ec5aa5d64b573331ad395679"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -296,8 +301,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/client.cpp",
-    "bytes": 109438,
-    "sha256": "a3c3c40ad272e357f08bbd904afd1afa760beb1db30cee9f57182a760496dd4a"
+    "bytes": 109726,
+    "sha256": "75504fe31efca3154c8d5ae7e080ae03ab033b7f7a1dad1b3e9b716d1823d93e"
   },
   {
     "path": "harmony/entry/src/main/cpp/clock_refresh.h",
@@ -486,8 +491,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/index.d.ts",
-    "bytes": 3487,
-    "sha256": "6792966a01cae2fa4bc22c107d6c49599ef53bade9e898b9e34501465d82553f"
+    "bytes": 3511,
+    "sha256": "c689da1bcf21ab2e54cb64729f98ade4f167ada6f541049e9254a58a292a2d94"
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/oh-package.json5",
@@ -506,8 +511,8 @@
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 152239,
-    "sha256": "f5af6882525649d50c8e7ad48b8ad38edd3435593c4283e77b36f907def26374"
+    "bytes": 152568,
+    "sha256": "9c04452a14d28ac32166ad51a22ce7c08f1491618b50e5bc670b78596ea4ab59"
   },
   {
     "path": "harmony/entry/src/main/ets/service/BackgroundExtension.ets",
@@ -691,8 +696,8 @@
   },
   {
     "path": "mac/Sources/ExtensionParkingLease.swift",
-    "bytes": 1043,
-    "sha256": "e2e6b0292b07bf68c24519dede841e7202420ae56657a001bfcbd1cc8251cc57"
+    "bytes": 2222,
+    "sha256": "567ed308b8245f3cf7c95abf41c79fa1a8430af74db25f6c1352756198ae92c8"
   },
   {
     "path": "mac/Sources/Gesture.swift",
@@ -731,8 +736,8 @@
   },
   {
     "path": "mac/Sources/OriginalStandbyCoordinator.swift",
-    "bytes": 11468,
-    "sha256": "1b64edf06abb032a6864412295d44e4937c5be91a33a5cb2f3ce12c62d650c13"
+    "bytes": 11640,
+    "sha256": "6b4dfed16d8b8b464eb2bb6f010c612bc046b45037a31b0d58245131ae28c598"
   },
   {
     "path": "mac/Sources/StoreCapture.swift",
@@ -816,8 +821,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 26582,
-    "sha256": "e67605c776d4484cde3279eb3a5c7ffcfffc2aa508c5704dc6f28a7dbf3d9af8"
+    "bytes": 27167,
+    "sha256": "d6109cc6073ee030544eef807534ecc4978ec8fc694e70c11ab928db73a85bba"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
@@ -847,7 +852,7 @@
   {
     "path": "mac/build.sh",
     "bytes": 3731,
-    "sha256": "5535beafc4406ad7912dfdf5420991832719946a46793600341be628ff4826fc"
+    "sha256": "90a9a2198a7769c3977aa70ef48757453dc767af53e0cdd378105766dc3344a6"
   },
   {
     "path": "shared/DisplayProfile.hpp",

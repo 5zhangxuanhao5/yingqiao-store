@@ -73,7 +73,7 @@ struct TLS {
 struct Frame {uint64_t id=0,receivedAt=0,assembled=0,enqueuedAt=0;bool key=false;Bytes data;edgetiming::FrameTiming timing;};
 struct DecodeTiming {uint64_t id=0,pushedAt=0;edgetiming::FrameTiming host;};
 struct Assembly {uint64_t created=0;uint32_t total=0;uint16_t count=0;uint8_t flags=0;Bytes data;std::vector<bool>seen;int got=0;};
-struct Options {std::string host,mode,transport,token,certificate;int port=48563,width=2400,height=1600,fps=60,bitrateKbps=0;bool splitPath=false;std::string videoHost;int videoPort=0;};
+struct Options {std::string host,mode,transport,token,certificate;int port=48563,width=2400,height=1600,fps=60,bitrateKbps=0;bool splitPath=false;std::string videoHost;int videoPort=0;uint32_t resumeSession=0;};
 class Client {
  public:
  std::atomic<bool>running{false};std::thread worker;
@@ -998,11 +998,12 @@ class Client {
   auto audioDone=std::make_shared<std::atomic<bool>>(true),micDone=std::make_shared<std::atomic<bool>>(true);
   try{
    int authKbps=isTailnet()?4000:(options.bitrateKbps>0?options.bitrateKbps:(!options.splitPath&&options.host=="127.0.0.1"&&options.port==49561?80000:40000));
-   auto authenticate=[&](){Write(control,"AUTH "+options.token+" "+options.mode+" "+std::to_string(options.width)+" "+std::to_string(options.height)+" "+std::to_string(options.fps)+" "+(isUDP()?"udp":"tcp")+" "+std::to_string(authKbps)+" store-v1 codec-"+(options.transport=="store-hevc"?"hevc":"avc")+"-v1 edge-session-"+edgelinkavailability::CurrentProcessSession()+"\n");std::string line;uint8_t ch;while(line.size()<1024&&Read(control,&ch,1)){if(ch=='\n')break;line+=char(ch);}return line;};
+   auto authenticate=[&](){Write(control,"AUTH "+options.token+" "+options.mode+" "+std::to_string(options.width)+" "+std::to_string(options.height)+" "+std::to_string(options.fps)+" "+(isUDP()?"udp":"tcp")+" "+std::to_string(authKbps)+" store-v1 codec-"+(options.transport=="store-hevc"?"hevc":"avc")+"-v1 edge-session-"+edgelinkavailability::CurrentProcessSession()+(options.resumeSession ? " resume-session-"+std::to_string(options.resumeSession):"")+"\n");std::string line;uint8_t ch;while(line.size()<1024&&Read(control,&ch,1)){if(ch=='\n')break;line+=char(ch);}return line;};
    ctrl=connectWithRetry(false);control=ctrl.get();std::string answer=authenticate();
    // One exact legacy bitrate rejection permits one same-pinned TLS retry.
    // No retry weakens certificates or hides an unrelated AUTH/network failure.
    if(isTailnet()&&answer=="ERR bitrate_configuration"&&running&&!stopRequested){control=nullptr;ctrl.reset();authKbps=8000;ctrl=connectWithRetry(false);control=ctrl.get();answer=authenticate();}
+   if(answer=="ERR parked_session_ended")throw std::runtime_error("parked_session_ended");
    if(answer=="ERR permissions_required")throw std::runtime_error("请先在 Mac 的映桥中完成屏幕共享和键鼠权限设置，再重新连接");
    if(answer=="ERR remote_local_authorization_required")throw std::runtime_error("请先在 Mac 的映桥中开启“远控待机”，再重新连接");
    std::istringstream input(answer);std::string tag,sidHex,keyHex,sp,cp;int w=0,h=0,fps=0;input>>tag>>sidHex>>keyHex>>sp>>cp>>viewerToken>>w>>h>>fps;
@@ -1013,7 +1014,7 @@ class Client {
    const auto topology=ParseDesktopTopology(topologyFields,options.mode=="extend");
    const auto controlCapabilities=ParseControlCapabilities(capabilities);
    const bool cursorSupported=controlCapabilities.cursor;
-   {std::lock_guard<std::mutex>g(lock);timingNegotiated=timed;localHandoverSupported=extensionFields.find(" local-handover-v1")!=std::string::npos;backgroundRetainSupported=extensionFields.find(" background-retain-v1")!=std::string::npos;desktopTopology=topology;cursorChannelSupported=cursorSupported;cursorCapabilityKnown=true;
+   {std::lock_guard<std::mutex>g(lock);timingNegotiated=timed;localHandoverSupported=extensionFields.find(" local-handover-v1")!=std::string::npos;backgroundRetainSupported=extensionFields.find(" background-retain-v2")!=std::string::npos;desktopTopology=topology;cursorChannelSupported=cursorSupported;cursorCapabilityKnown=true;
     desktopOverviewCapabilityKnown=true;desktopOverviewSupported=controlCapabilities.desktopOverview;rateV2Supported=edgelinkwan::HasRateV2(extensionFields);rateTargetKbps=isTailnet()?4000:authKbps;rateAppliedKbps=authKbps;
     if(cursorSupported&&options.mode=="extend"&&topology.valid)commands.push_front("CURSOR 1");}
    if(options.mode=="extend"&&!isRTC()&&!isUDP()&&extensionFields.find(" desktop-live-v1")!=std::string::npos)send("TOPOLOGY 1");
@@ -1134,7 +1135,7 @@ class Client {
 static std::string String(napi_env env,napi_value value){size_t length=0;napi_get_value_string_utf8(env,value,nullptr,0,&length);std::string s(length,'\0');napi_get_value_string_utf8(env,value,s.data(),length+1,&length);return s;}
 static int Integer(napi_env env,napi_value value){int32_t x=0;napi_get_value_int32(env,value,&x);return x;}
 static napi_value Void(napi_env env){napi_value v;napi_get_undefined(env,&v);return v;}
-static napi_value Connect(napi_env env,napi_callback_info info){size_t n=10;napi_value v[10];napi_get_cb_info(env,info,&n,v,nullptr,nullptr);if(n<9||n>10)return Void(env);Options o;if(n==10)o.bitrateKbps=Integer(env,v[9]);o.host=String(env,v[0]);o.port=Integer(env,v[1]);o.mode=String(env,v[2]);o.width=Integer(env,v[3]);o.height=Integer(env,v[4]);o.fps=Integer(env,v[5]);o.transport=String(env,v[6]);o.token=String(env,v[7]);o.certificate=String(env,v[8]);if(o.host.empty()||o.host.size()>255||o.port<1||o.port>65535||o.token.size()!=64||o.certificate.size()>8192||o.width<640||o.width>3840||o.height<480||o.height>3200||o.fps<30||o.fps>120||o.bitrateKbps<0||o.bitrateKbps>240000)return Void(env);Client::Instance().start(std::move(o));return Void(env);}
+static napi_value Connect(napi_env env,napi_callback_info info){size_t n=11;napi_value v[11];napi_get_cb_info(env,info,&n,v,nullptr,nullptr);if(n<9||n>11)return Void(env);Options o;if(n>=10)o.bitrateKbps=Integer(env,v[9]);if(n==11&&napi_get_value_uint32(env,v[10],&o.resumeSession)!=napi_ok)return Void(env);o.host=String(env,v[0]);o.port=Integer(env,v[1]);o.mode=String(env,v[2]);o.width=Integer(env,v[3]);o.height=Integer(env,v[4]);o.fps=Integer(env,v[5]);o.transport=String(env,v[6]);o.token=String(env,v[7]);o.certificate=String(env,v[8]);if(o.host.empty()||o.host.size()>255||o.port<1||o.port>65535||o.token.size()!=64||o.certificate.size()>8192||o.width<640||o.width>3840||o.height<480||o.height>3200||o.fps<30||o.fps>120||o.bitrateKbps<0||o.bitrateKbps>240000)return Void(env);Client::Instance().start(std::move(o));return Void(env);}
 static napi_value ConnectSplit(napi_env env,napi_callback_info info){
  size_t n=11;napi_value v[11];napi_get_cb_info(env,info,&n,v,nullptr,nullptr);if(n!=11){napi_throw_error(env,"split_invalid_config","Split configuration requires eleven arguments");return Void(env);}
  Options o;o.host=String(env,v[0]);o.port=Integer(env,v[1]);o.mode=String(env,v[2]);o.width=Integer(env,v[3]);o.height=Integer(env,v[4]);o.fps=Integer(env,v[5]);o.transport=String(env,v[6]);o.token=String(env,v[7]);o.certificate=String(env,v[8]);o.videoHost=String(env,v[9]);o.videoPort=Integer(env,v[10]);o.splitPath=true;

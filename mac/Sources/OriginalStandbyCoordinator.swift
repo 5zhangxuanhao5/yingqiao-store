@@ -76,6 +76,8 @@ import Foundation
  }
  func mediaStarted(edgeSession:String,mode:String){guard mode=="extend",let p=paths.values.first(where:{$0.edgeSession==edgeSession && fresh($0)}) else{return};activeDeviceID=p.deviceID;selectedDeviceID=p.deviceID;if request?.edgeSession==edgeSession{request=nil};lastError="";onChanged?()}
  func mediaEnded(){activeDeviceID=nil;onChanged?()}
+ func deviceForSession(_ session:String)->String?{devices.values.first{$0.session==session}?.id}
+ func processForDevice(_ device:String)->String?{devices[device]?.session}
  func liveSession(_ session:String)->Bool{paths.values.contains{$0.edgeSession==session && fresh($0)}}
  func ownsPath(_ id:UUID,session:String)->Bool{guard let p=paths[id] else{return false};return p.edgeSession==session && fresh(p)}
  func endParkedExtension(owner:String,sessionID:UInt32){for p in paths.values where p.edgeSession==owner && fresh(p){p.send("END \(sessionID)")}}
