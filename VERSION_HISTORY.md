@@ -89,3 +89,7 @@ Independent public-source prototype. First-run companion installation guide, exp
 - 移除下载入口中的开发者姓名提示。
 - 增加 Pro 为主机、Edge 与 Air 为映桥扩展屏、iPad Pro 通过随航扩展的四屏使用例子。
 - 明确该例子的连接分工和设备兼容边界；应用程序不变。
+
+## docs-v2026.10.21.3
+
+增加独立 Mac 0.4.0-test.7 候选下载及验证边界。保留已实测 test.6 下载；没有安装或更新用户电脑上的软件。

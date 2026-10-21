@@ -6,6 +6,8 @@
 
 商店版的普通 USB 连接需手动开启 USB 共享网络；开发版 HDC 通道不需要共享网络。两者均不能笼统承诺只插线即用。详见 [完整安装教程](INSTALL.md)。
 
+- **Mac 多机型兼容候选 test.7**：[候选下载与兼容范围](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/mac-unified-v0.4.0-test.7)。新增媒体能力和缩放协商；只通过编译/模拟，未安装到现有设备，完整协商需要两台 Mac 都使用 test.7。
+
 ## 保留的开发基线
 
 当前可运行开发版：Mac0.3.15(36) + Pad0.3.14(35)。

@@ -8,6 +8,8 @@
 >
 > **Mac 互联现为合并预览版 0.4.0-test.6（build 45）**：一个应用提供“平板扩展屏”和“Mac 互联”。已在 MacBook Pro（M5 Pro）→ MacBook Air（M4）实测。默认分支保留 Mac 0.3.15 + Pad 0.3.14 开发基线；合并版源码请下载对应 Release，不能把默认分支当作 0.4.0 源码。
 
+**新增多机型兼容候选**：[Mac 0.4.0-test.7](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/mac-unified-v0.4.0-test.7) 已补充接收端解码能力协商、Retina／非 Retina 缩放和受限硬件的尺寸回退，通过通用构建与几何模拟。它尚未安装到当前设备，真机新增能力待验证；上方 test.6 保留为此前实际测试过的下载入口。多机型适配不代表已支持多台 Mac 接收端同时连接，详见候选说明。
+
 ## 一个实际使用例子：一台 Pro，三块扩展屏
 
 以 **MacBook Pro 为主机，保留 Pro 内屏作为主显示器**，可以把文档、浏览器和聊天窗口分开放到其他设备：

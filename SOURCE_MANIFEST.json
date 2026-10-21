@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 8703,
-    "sha256": "5c1ab6eb5b330bfe22ebb272a3c0e5d9bc337f688b5e72bb97cad9c2e934f533"
+    "bytes": 9195,
+    "sha256": "596f85caf844c57366eac5a47231b3804843254ce643254f1de66ef1b2b36f03"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -76,8 +76,8 @@
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 11182,
-    "sha256": "08e05c46724e2f2686da160616b55126986bc9019e0a6b60e0c7fc8e113f4232"
+    "bytes": 11347,
+    "sha256": "ba493bf5908d8133c01ea368999b073a2fbeb44612df8cc01aa3227c7fab5b72"
   },
   {
     "path": "docs/ACCEPTED_CORE_PROVENANCE.json",
@@ -175,6 +175,11 @@
     "sha256": "57d41bea45f5bb2e02eaf292cf9048c11523a2e5f88c24191aaeb66f9bedfcf5"
   },
   {
+    "path": "docs/RELEASE_DOCS_20261021_3.md",
+    "bytes": 176,
+    "sha256": "b73fe5dc1ab57d183ee96f16cedf9d6ac29dbd9a3b54241fbcb6cc488a027cd0"
+  },
+  {
     "path": "docs/TRACKPAD_TEST_021.md",
     "bytes": 1161,
     "sha256": "8025518a56037a3828c5fab08a5fcba1761b3eca3051b510a40a4d16738cf847"
@@ -191,8 +196,8 @@
   },
   {
     "path": "docs/downloads.md",
-    "bytes": 2122,
-    "sha256": "308fb9866a5b37c20ff46a3180b8845f323f7eeaf83a9ddaa03df83072e4ac26"
+    "bytes": 2422,
+    "sha256": "c562e417db2fdfcf6a7862cb155ce3fabca743610d30b5d9bab1ecd574b645a4"
   },
   {
     "path": "docs/tablet-input-compatibility-reference.json",
