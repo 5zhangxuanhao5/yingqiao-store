@@ -4,7 +4,7 @@
 
 ## 普通用户：从鸿蒙应用商城安装
 
-1. 在鸿蒙平板上打开[映桥商店详情页](https://appgallery.huawei.com/app/detail?id=cn.edgelink.store)，或在应用市场搜索“映桥”，核对开发者为张轩灏。
+1. 在鸿蒙平板上打开[映桥商店详情页](https://appgallery.huawei.com/app/detail?id=cn.edgelink.store)，或在应用市场搜索“映桥”。
 2. 按商店提示安装。**商店版不需要开发者模式、USB 调试、DevEco 或自行签名。** 若浏览器没有唤起商店，直接使用应用市场搜索。
 3. Mac 下载下方 Mac 安装包，解压放入“应用程序”；按照应用用途提示授予录屏、键鼠及系统要求的本地网络权限。
 4. 两端打开映桥，使用能互相访问的局域网；选择附近设备并在 Mac 允许首次连接。

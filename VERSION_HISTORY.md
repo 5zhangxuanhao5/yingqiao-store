@@ -83,3 +83,9 @@ Independent public-source prototype. First-run companion installation guide, exp
 - 补充 MacBook Pro M5 Pro、MacBook Air M4、MatePad Edge 的分版本实测范围。
 - 增加 Mac 合并预览版 test.6 下载和使用步骤；记录 2026-10-20 随航断开/重连后的用户确认，不把预览称为全机型稳定版。
 - 仅更新文档和仓库简介，不修改应用、签名、安装或现有设备状态。
+
+## docs-v2026.10.21.2
+
+- 移除下载入口中的开发者姓名提示。
+- 增加 Pro 为主机、Edge 与 Air 为映桥扩展屏、iPad Pro 通过随航扩展的四屏使用例子。
+- 明确该例子的连接分工和设备兼容边界；应用程序不变。
