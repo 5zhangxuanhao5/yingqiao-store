@@ -47,6 +47,7 @@ export interface AvailabilityEvent {
 export const availabilityConfigure: (host: string, port: number, token: string, certificate: string, callback: (event: AvailabilityEvent) => void) => void;
 export const availabilityState: (state: string) => void;
 export const availabilityReply: (requestId: string, accepted: boolean) => boolean;
+export const availabilityEnd: (session: number) => boolean;
 export const availabilityStop: () => void;
 export const availabilityStatus: () => string;
 export const availabilityRefresh: () => void;

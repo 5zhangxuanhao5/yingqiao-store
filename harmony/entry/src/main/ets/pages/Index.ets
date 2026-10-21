@@ -1,3 +1,4 @@
+import { BackgroundExtension } from '../service/BackgroundExtension';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { NearbyPad } from '../store/NearbyPad';
 import { StoreDiscovery, StoreDiscoveredMac } from '../store/StoreDiscovery';
@@ -73,7 +74,7 @@ interface PendingRemoteRouteIntent { mode: string; transport: number; routeInten
 interface NetworkPeer extends WANPeerRoute { relayRegion: string; rxBytes: number; txBytes: number; }
 interface NetworkState extends WANRouteSnapshot { authURL?: string; ips?: string[]; peers?: NetworkPeer[]; error?: string; }
 interface Statistics extends WANRouteMetrics {
- sessionID?: number;localHandoverSupported?: boolean;localHandoverCount?: number;localHandoverReason?: string;
+ surfaceAvailable?: boolean;backgroundRetainSupported?: boolean;sessionID?: number;localHandoverSupported?: boolean;localHandoverCount?: number;localHandoverReason?: string;
  dynamicWANRoute?: DynamicWANRouteState;
  profileTransport?: number;autoDirectWAN?: boolean;wanRouteEvidence?: WANRouteEvidenceState;
  rtcBridgeDiagnostics?: RTCBridgeDiagnostics;
@@ -268,6 +269,7 @@ struct Index {
  }
 
  @StorageProp('remoteInputWindowActive') @Watch('onWindowInputStateChanged') remoteInputWindowActive: boolean = false;
+ private backgroundResumeTimer: number = -1;
  @StorageProp('remoteSessionForeground') @Watch('onReconnectForegroundChanged') remoteSessionForeground: boolean = false;
  @StorageProp('diagnosticMode') diagnosticMode: string = '';
  @StorageProp('diagnosticTransport') diagnosticTransport: string = '';
@@ -803,8 +805,23 @@ struct Index {
   this.updateAvailabilityState();
  }
  private onReconnectForegroundChanged(): void {
-  if (AppStorage.get<boolean>('remoteSessionForeground') !== true) { this.stop('ability_background'); }
-  else { this.internetReconnect?.gatesChanged(); }
+  if (AppStorage.get<boolean>('remoteSessionForeground') !== true) {
+   if (this.active && this.mode === 'extend' && BackgroundExtension.suspend()) {
+    this.storeStopFastHandover();this.unbindCursorChannel();this.unbindNativeMouseRoute();this.restoreSystemCursor();
+    this.endGestures();native.input('LOCALUI 1');this.streaming = false;
+    this.message = '扩展桌面已保留，回到映桥后恢复画面。';
+   } else { this.stop('ability_background'); }
+  } else { this.resumeParkedExtension();this.internetReconnect?.gatesChanged(); }
+ }
+ private resumeParkedExtension(): void {
+  if (!BackgroundExtension.parked() || !this.active || this.mode !== 'extend' || AppStorage.get<boolean>('remoteSessionForeground') !== true) { return; }
+  if (!BackgroundExtension.resumeWindowOpen()) { this.stop('background_resume_timeout');this.message = '暂时无法恢复连接，请重新选择附近的 Mac。';return; }
+  if (this.backgroundResumeTimer >= 0) { return; }
+  const surface = (JSON.parse(native.stats()) as Statistics).surfaceAvailable === true;
+  if (this.ready && surface && this.remoteInputWindowActive && this.localRoute()) {
+   BackgroundExtension.prepareResume();this.begin('extend', false, '', '', false, false, -1, -1, true);return;
+  }
+  this.backgroundResumeTimer = setTimeout(() => { this.backgroundResumeTimer = -1;this.resumeParkedExtension(); }, 500);
  }
  private chooseTransport(value: number): void {
   if (value === this.transport) { return; }
@@ -971,6 +988,8 @@ struct Index {
   this.timer = setInterval(() => this.refresh(generation), 1000);this.focusRemote();
  }
  private stop(reason: string = 'user_end', restore: boolean = true): void {
+  if (this.backgroundResumeTimer >= 0) { clearTimeout(this.backgroundResumeTimer);this.backgroundResumeTimer = -1; }
+  if (!['restart', 'local_handover', 'udp_fallback'].includes(reason)) { BackgroundExtension.end(); }
   this.storeStopFastHandover();
   if(reason!=='restart'&&reason!=='local_handover'){native.storePathsStop();this.storeRecoveryUntil=0;this.storeActiveHost='';}
   if (reason !== 'restart' && reason !== 'udp_fallback') { this.dynamicWANRoute.cancel(reason); }
@@ -1345,6 +1364,12 @@ struct Index {
  private refresh(generation: number = this.sessionGeneration): void {
   if (generation !== this.sessionGeneration) { return; }
   const s = this.saveStatus();if (!s) { return; }
+  if (this.active && this.mode === 'extend') {
+   if (!s.running && s.stopReason === 'background_suspend') { BackgroundExtension.suspend(); }
+   if (BackgroundExtension.parked()) { this.streaming = false;this.resumeParkedExtension();return; }
+   if (s.running && s.renderSubmittedFrames > 0) { BackgroundExtension.arm(this.context(), s.backgroundRetainSupported === true); }
+   else if (!s.running && BackgroundExtension.retryResume()) { this.resumeParkedExtension();return; }
+  }
   if (this.checkLocalHandover(s)) { return; }
   if (this.checkMediaFallback(s, generation)) { return; }
   if (this.checkDynamicWANRoute(s, generation)) { return; }
@@ -1353,6 +1378,7 @@ struct Index {
   this.streaming = s.state === 'streaming';
   if (this.streaming && s.running && s.renderSubmittedFrames > 0) { this.internetReconnect?.connected(generation); }
   this.message = this.streaming ? (this.mode === 'extend' ? '扩展屏运行中' : '远控运行中') : (s.error || (s.running ? '连接中…' : '会话已停止'));
+  if (this.streaming && AppStorage.get<string>('extensionBackgroundError')) { this.message += ' · ' + AppStorage.get<string>('extensionBackgroundError'); }
   this.statistics = `接收 ${s.receivedFPS.toFixed(1)} FPS · 提交显示 ${s.renderSubmittedFPS.toFixed(1)} FPS · 解码 ${s.decodeP95ms.toFixed(1)} ms · 丢帧 ${s.lostFrames} · 输入 ${s.inputSent}（触 ${this.touchCount} / 鼠 ${this.mouseCount} / 键 ${this.keyCount + s.nativeKeyEvents}）`;
   if (!s.running) {
    if (this.isInternetTransport(this.sessionTransport) && recoverableInternetFailure(s.stopReason, s.error) && this.internetReconnect?.lost(generation, s.error || 'native_connection_ended')) { this.saveStatus();return; }
@@ -1360,7 +1386,7 @@ struct Index {
    this.unbindCursorChannel();
    native.input('OBSERVE -1');this.axisInputActive = false;
    if (this.timer >= 0) { clearInterval(this.timer);this.timer = -1; }
-   this.storeStopFastHandover();this.active = false;this.menuVisible = false;this.setFullScreen(false);this.restoreDiagnosticProfile();this.updateAvailabilityState();this.saveStatus();
+   BackgroundExtension.end();this.storeStopFastHandover();this.active = false;this.menuVisible = false;this.setFullScreen(false);this.restoreDiagnosticProfile();this.updateAvailabilityState();this.saveStatus();
   }
  }
  private bindCursorChannel(): void {
@@ -1916,7 +1942,7 @@ struct Index {
     XComponent({ id: 'remote', type: XComponentType.SURFACE, libraryname: 'edgelink', controller: this.controller })
      .id('remoteSurface').focusable(this.active && !this.menuVisible && !this.showText).defaultFocus(this.active).width('100%').height('100%')
      .hitTestBehavior(!this.active || this.menuVisible || this.showText ? HitTestMode.None : HitTestMode.Default)
-     .onLoad(() => { native.setSurface(this.controller.getXComponentSurfaceId());this.ready = true;this.updateAvailabilityState();this.autoDiagnostic(); })
+     .onLoad(() => { native.setSurface(this.controller.getXComponentSurfaceId());this.ready = true;this.updateAvailabilityState();this.resumeParkedExtension();this.autoDiagnostic(); })
      .onAreaChange((_old: Area, area: Area) => this.onViewportChanged(Number(area.width), Number(area.height)))
     // Keep touch/click handling here while native XComponent receives physical axis events.
     if (this.active && !this.menuVisible && !this.showText) { Column() {}

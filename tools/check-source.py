@@ -6,7 +6,7 @@ for x in json.loads((r/'SOURCE_MANIFEST.json').read_text()):
  assert p.suffix.lower() not in {'.p12','.p7b','.cer','.pem','.key','.hap','.dmg','.pkg'},x['path']
  raw=p.read_bytes();assert not re.search(rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|(?:gh[pousr]_|github_pat_)[A-Za-z0-9_]{25,}|tskey-[A-Za-z0-9-]{20,}',raw),x['path']
 profile=json.loads((r/'harmony/build-profile.json5').read_text());assert not profile['app'].get('signingConfigs');assert all('signingConfig' not in x for x in profile['app']['products'])
-manifest=json.loads((r/'harmony/entry/src/main/module.json5').read_text());assert manifest['module']['deviceTypes']==['tablet'];names={x['name'] for x in manifest['module']['requestPermissions']};assert names=={'ohos.permission.INTERNET','ohos.permission.GET_NETWORK_INFO','ohos.permission.LOCK_WINDOW_CURSOR'}
+manifest=json.loads((r/'harmony/entry/src/main/module.json5').read_text());assert manifest['module']['deviceTypes']==['tablet'];names={x['name'] for x in manifest['module']['requestPermissions']};assert names=={'ohos.permission.INTERNET','ohos.permission.GET_NETWORK_INFO','ohos.permission.LOCK_WINDOW_CURSOR','ohos.permission.KEEP_BACKGROUND_RUNNING'}
 pair=json.loads((r/'harmony/entry/src/main/resources/rawfile/pairing.json').read_text());assert not pair['token'] and not pair['cert'];assert pair['port']==49563
 cm=(r/'harmony/entry/src/main/cpp/CMakeLists.txt').read_text();assert 'remote_audio_stub.cpp' in cm and 'libohaudio.so' not in cm
 assert 'disabled_store_edition' in (r/'harmony/entry/src/main/cpp/network.cpp').read_text()

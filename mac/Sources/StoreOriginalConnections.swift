@@ -63,6 +63,7 @@ extension StoreHost {
    }else{p.close()}
    case "METRIC":if a.count==4,let median=Double(a[1]),let tail=Double(a[2]),let goodput=Double(a[3]){_ = availability.metric(id:entry.id,median:median,tail:tail,goodput:goodput)}else{p.close()}
    case "ALIVE":if a.count==2,let state=StandbyCoordinator.Availability(rawValue:a[1]){_ = availability.heartbeat(id:entry.id,availability:state);p.send("ALIVE OK")}else{p.close()}
+   case "END":if a.count==2,let sid=UInt32(a[1]),let lease=parkedLease,lease.sessionID==sid,availability.ownsPath(entry.id,session:lease.owner){p.send("END OK");endSession()}
    case "ACK":if a.count==3,["0","1"].contains(a[2]){_ = availability.acknowledge(id:entry.id,requestID:a[1],accepted:a[2]=="1")}else{p.close()}
    default:p.close()
    };return true
@@ -106,12 +107,12 @@ extension StoreHost {
   requestExtensionOnPad(id)
  }
  private func requestExtensionOnPad(_ id:String){
-  guard !busy,capture==nil,!nearbyInvitationPending,availability.request==nil,nearbyPadRows().contains(where:{$0.id==id && $0.ready}) else{return}
+  guard !busy,capture==nil,parkedLease==nil,!nearbyInvitationPending,availability.request==nil,nearbyPadRows().contains(where:{$0.id==id && $0.ready}) else{return}
   selectedPadID=id;availability.select(id);UserDefaults.standard.set(id,forKey:"store.selectedPadID");pendingPermissionPadID=id
   guard requireMediaPermissions() else{return};pendingPermissionPadID=nil;performStartExtension(id)
  }
  @objc func startExtension(){
-  guard !busy,capture==nil,!nearbyInvitationPending,availability.request==nil,padChoiceAlert==nil else{return}
+  guard !busy,capture==nil,parkedLease==nil,!nearbyInvitationPending,availability.request==nil,padChoiceAlert==nil else{return}
   let rows=nearbyPadRows().filter{$0.ready};guard !rows.isEmpty else{statusMessage="没有发现可连接的平板，请在平板上打开映桥。";updateDashboard();return}
   if rows.count==1{requestExtensionOnPad(rows[0].id);return}
   let alert=NSAlert(),picker=NSPopUpButton(frame:NSRect(x:0,y:0,width:320,height:30),pullsDown:false)
@@ -126,7 +127,7 @@ extension StoreHost {
   }}
  }
  func performStartExtension(_ id:String){
-  guard mediaPermissionsReady,!busy,capture==nil,availability.request==nil else{return}
+  guard mediaPermissionsReady,!busy,capture==nil,parkedLease==nil,availability.request==nil else{return}
   guard lanListenerReady && standbyListenerReady else{prepare();statusMessage="正在准备连接，请稍候再开启扩展屏。";return}
   if let route=availability.bestLocalRoute(deviceID:id){
    availability.select(id);if availability.startExtension(deviceID:id,preferred:route,hostIdle:true){statusMessage="已向平板请求开启扩展屏…"}else{statusMessage=availability.lastError};updateDashboard();return

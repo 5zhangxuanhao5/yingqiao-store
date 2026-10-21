@@ -26,6 +26,8 @@ jobs:
       - name: Compile and run Linux fixtures
         if: runner.os == 'Linux'
         run: |
+          g++ -std=c++17 -Wall -Wextra -Werror tests/session_end_policy_test.cpp -o session-end-test
+          ./session-end-test
           g++ -std=c++17 -Wall -Wextra -Werror tests/json_identity_test.cpp -o json-identity-test
           ./json-identity-test | python3 -c 'import json,sys; assert json.load(sys.stdin)=="-----BEGIN CERTIFICATE-----\nfixture\n-----END CERTIFICATE-----\n"'
           g++ -std=c++17 -Wall -Wextra -Werror tests/route_selection_test.cpp -o route-test
@@ -79,6 +81,8 @@ jobs:
           done
       - name: Run offline fixtures
         run: |
+          clang++ -std=c++17 -Wall -Wextra -Werror tests/session_end_policy_test.cpp -o "$RUNNER_TEMP/session-end-test"
+          "$RUNNER_TEMP/session-end-test"
           clang++ -std=c++17 -Wall -Wextra -Werror tests/portable_profile_test.cpp -o "$RUNNER_TEMP/portable-test"
           "$RUNNER_TEMP/portable-test"
           clang++ -std=c++17 -Wall -Wextra -Werror tests/usb_test.cpp -o "$RUNNER_TEMP/usb-test"

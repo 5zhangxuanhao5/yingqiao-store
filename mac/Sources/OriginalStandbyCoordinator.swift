@@ -76,6 +76,9 @@ import Foundation
  }
  func mediaStarted(edgeSession:String,mode:String){guard mode=="extend",let p=paths.values.first(where:{$0.edgeSession==edgeSession && fresh($0)}) else{return};activeDeviceID=p.deviceID;selectedDeviceID=p.deviceID;if request?.edgeSession==edgeSession{request=nil};lastError="";onChanged?()}
  func mediaEnded(){activeDeviceID=nil;onChanged?()}
+ func liveSession(_ session:String)->Bool{paths.values.contains{$0.edgeSession==session && fresh($0)}}
+ func ownsPath(_ id:UUID,session:String)->Bool{guard let p=paths[id] else{return false};return p.edgeSession==session && fresh(p)}
+ func endParkedExtension(owner:String,sessionID:UInt32){for p in paths.values where p.edgeSession==owner && fresh(p){p.send("END \(sessionID)")}}
  func endExtension(sessionID:UInt32){guard sessionID>0,let activeDeviceID else{return};for p in paths.values where p.deviceID==activeDeviceID && p.route.local{p.send("END \(sessionID)")}}
  func detach(id:UUID){guard let p=paths.removeValue(forKey:id) else{return};devices[p.deviceID]?.paths[p.route]=nil;if devices[p.deviceID]?.paths.isEmpty==true{devices[p.deviceID]=nil;if selectedDeviceID==p.deviceID{selectedDeviceID=nil}};if request?.pathID==id{cancelRequest(reason:"平板连接已断开")};onChanged?()}
  func cancelRequest(reason:String=""){if let r=request,let p=paths[r.pathID]{p.send("CANCEL \(r.id)")};request=nil;if !reason.isEmpty{lastError=reason};onChanged?()}
@@ -103,6 +106,8 @@ import Foundation
   precondition(c.attach(id:old,edgeSession:first,route:.lan,availability:.idle,deviceID:stable,name:"我的平板",send:{_ in}))
   precondition(c.attach(id:new,edgeSession:second,route:.lan,availability:.idle,deviceID:stable,name:"我的平板",send:{_ in}))
   precondition(c.paths[old]==nil && c.paths[new] != nil && c.paths[bLAN] != nil && closed.contains(old))
-  now=50;precondition(c.availableDevices().isEmpty)
+  precondition(c.liveSession(b) && c.ownsPath(bLAN,session:b) && !c.ownsPath(bLAN,session:second))
+  c.mediaEnded();c.endParkedExtension(owner:b,sessionID:9);precondition(sentB.contains("END 9"))
+  now=50;precondition(c.availableDevices().isEmpty && !c.liveSession(b) && !c.ownsPath(bLAN,session:b))
  }
 }

@@ -1,4 +1,5 @@
 #include "store_policy.h"
+#include "session_end_policy.h"
 #include <napi/native_api.h>
 #include "axis_observer.h"
 #include "desktop_shortcut.h"
@@ -86,7 +87,7 @@ class Client {
  edgetiming::ClockSync clockSync;bool timingNegotiated=false;DesktopTopology desktopTopology;uint64_t desktopTopologyRevision=0;
  uint64_t timingSessionEpoch=0,clockSyncRefreshes=0;
  std::atomic<uint64_t>clockRefreshProbes{0},clockRefreshAccepted{0},clockRefreshTimeouts{0},clockRefreshRejected{0},clockRefreshOverlong{0};
- bool localHandoverSupported=false;
+ bool localHandoverSupported=false,backgroundRetainSupported=false,backgroundRetentionArmed=false;
  bool cursorChannelSupported=false,cursorCapabilityKnown=false;uint64_t cursorAcceptedInputSeq=0,cursorSessionEpoch=0,cursorLastSequence=0;
  bool desktopOverviewCapabilityKnown=false,desktopOverviewSupported=false;
  bool rateV2Supported=false;int rateTargetKbps=0,rateAppliedKbps=0;std::string rateReason;uint64_t rateRequests=0,rateReplies=0,rateErrors=0;double rateGoodputKbps=0,rateAgeLowerBoundMs=-1;edgelinkwan::ControlReplyMux controlReplyMux;
@@ -116,7 +117,7 @@ class Client {
  uint64_t audioPrepareStartedNs=0,audioReadySentNs=0,audioReadyAckNs=0;int audioReadinessPhase=0;
  std::atomic<uint64_t>audioHeartbeatsSent{0},audioLastHeartbeatNs{0},audioLastHeartbeatAck{0},audioLastHeartbeatRendered{0};
  std::atomic<uint64_t>micAttemptGeneration{0};std::atomic<bool>microphoneAllowed{false},microphoneSupported{false};std::atomic<uint64_t>micPackets{0},micDropped{0},micPeak{0},micRms{0},micPeakMax{0},micRmsMax{0};
- OH_AVCodec*decoder=nullptr;OHNativeWindow*window=nullptr;OH_NativeXComponent*component=nullptr;
+ std::atomic<bool>surfaceAvailable{false};OH_AVCodec*decoder=nullptr;OHNativeWindow*window=nullptr;OH_NativeXComponent*component=nullptr;
  OH_NativeXComponent_Callback surfaceCallbacks{};
  uint32_t sid=0;Bytes key,serverPrefix,clientPrefix;std::string viewerToken;
  uint64_t nextFrame=1,helloID=1,lastIDR=0,udpGapStartedAt=0;bool awaitKey=true;std::map<uint64_t,Assembly>assemblies;std::map<uint64_t,Frame>complete;
@@ -161,6 +162,7 @@ class Client {
   commands.push_back("RELEASE");changed.notify_all();
  }
  bool input(const std::string&s){
+  if(s=="BACKGROUND 1"||s=="BACKGROUND 0"){std::lock_guard<std::mutex>g(lock);backgroundRetentionArmed=s=="BACKGROUND 1"&&backgroundRetainSupported&&options.mode=="extend";return true;}
   if(s.rfind("CURSORINACTIVE ",0)==0){
    std::istringstream fields(s);std::string type,extra;int windowId=-1;
    if((fields>>type>>windowId)&&windowId>0&&!(fields>>extra))NotifyCursorWindowInactive(windowId);
@@ -283,12 +285,19 @@ class Client {
   client.input("KEY "+std::to_string(int(code))+" "+(action==OH_NATIVEXCOMPONENT_KEY_ACTION_DOWN?"1":"0"));return true;
  }
  static void FrameClock(OH_NativeXComponent*c,uint64_t,uint64_t){auto&client=Instance();if(client.running && client.component==c)client.clockTicks++;}
- static void SurfaceCreated(OH_NativeXComponent*c,void*){Instance().component=c;}
+ static void SurfaceCreated(OH_NativeXComponent*c,void*w){
+  auto&client=Instance();std::lock_guard<std::recursive_mutex>lifecycle(client.lifecycleLock);client.component=c;
+  // Surface recreation does not necessarily rerun ArkUI onLoad. Reacquire an
+  // owned window from the new surface; never reuse the destroyed decoder target.
+  if(!client.window&&w){uint64_t id=0;if(OH_NativeWindow_GetSurfaceId(static_cast<OHNativeWindow*>(w),&id)==0)OH_NativeWindow_CreateNativeWindowFromSurfaceId(id,&client.window);}
+  client.surfaceAvailable=client.window!=nullptr;
+ }
  static void SurfaceChanged(OH_NativeXComponent*,void*){}
  static void SurfaceDestroyed(OH_NativeXComponent*c,void*){
-  auto&client=Instance();if(client.component!=c)return;
+  auto&client=Instance();std::lock_guard<std::recursive_mutex>lifecycle(client.lifecycleLock);if(client.component!=c)return;client.surfaceAvailable=false;
   // The framework is removing this object: no subsequent stop may dereference it.
-  client.component=nullptr;client.stop("surface_destroyed");
+  bool park=false;{std::lock_guard<std::mutex>g(client.lock);park=client.backgroundRetentionArmed;}
+  client.component=nullptr;client.stop(park?"background_suspend":"surface_destroyed");
   if(client.window){OH_NativeWindow_DestroyNativeWindow(client.window);client.window=nullptr;}
  }
  static void NativeTouch(OH_NativeXComponent*,void*){}
@@ -347,7 +356,7 @@ class Client {
   stop();if(!window){setStatus("error","显示 Surface 尚未就绪");return;}
   rtcEpoch=BeginRtcOwner();rtcMessageID=0;rtcControlLines.clear();rtcSignals.reset();rtcActive=false;rtcAuthenticatedFrames=rtcIngressDropped=rtcRenderACKs=rtcIDRRequests=rtcLastIDR=0;
   audioGeneration++;{std::lock_guard<std::mutex>g(lock);audioStopReason.clear();audioPrepareStartedNs=audioReadySentNs=audioReadyAckNs=0;audioReadinessPhase=0;}audioLastSSLError=0;audioHeartbeatsSent=audioLastHeartbeatNs=audioLastHeartbeatAck=audioLastHeartbeatRendered=0;microphoneAllowed=false;microphoneSupported=false;micPackets=micDropped=micPeak=micRms=micPeakMax=micRmsMax=0;setMicStatus("idle");setAudioStatus("idle");audioPackets=audioRejected=audioGaps=0;
-  options=std::move(o);localHandoverSupported=false;rateV2Supported=false;rateTargetKbps=rateAppliedKbps=0;rateReason="waiting";rateRequests=rateReplies=rateErrors=0;rateGoodputKbps=0;rateAgeLowerBoundMs=-1;controlReplyMux.Reset();inputCalls=inputSent=nativeKeyEvents=0;lastStopReason="";received=decoded=rendered=lost=clockTicks=bytes=0;lastStats=Now();lastReceived=lastRendered=lastTicks=0;nextFrame=1;helloID=1;lastIDR=0;udpGapStartedAt=0;awaitKey=true;assemblies.clear();complete.clear();
+  options=std::move(o);backgroundRetentionArmed=false;backgroundRetainSupported=false;localHandoverSupported=false;rateV2Supported=false;rateTargetKbps=rateAppliedKbps=0;rateReason="waiting";rateRequests=rateReplies=rateErrors=0;rateGoodputKbps=0;rateAgeLowerBoundMs=-1;controlReplyMux.Reset();inputCalls=inputSent=nativeKeyEvents=0;lastStopReason="";received=decoded=rendered=lost=clockTicks=bytes=0;lastStats=Now();lastReceived=lastRendered=lastTicks=0;nextFrame=1;helloID=1;lastIDR=0;udpGapStartedAt=0;awaitKey=true;assemblies.clear();complete.clear();
   udpDatagrams=udpRejectedDatagrams=udpAssemblyTimeouts=udpRecoveries=idrRequests=udpHellos=udpHelloFailures=0;
   udpLargestDeclaredKeyframeBytes=udpCompletedKeyframes=udpAwaitKeyDrops=0;
   udpDecodeQueueWaits=udpDecodeQueueOverflows=udpDecodeQueueDiscardedFrames=udpSequenceGaps=udpGapTimeouts=udpGapOverflows=0;
@@ -773,8 +782,8 @@ class Client {
      requestControlDrain(); // Idempotent retry if End raced control registration.
      // This is the only post-handshake TLS writer. Success means SSL_write
      // accepted every byte, not an acknowledgement from the Mac.
-     bool handover=false;{std::lock_guard<std::mutex>g(lock);handover=lastStopReason=="local_handover"&&options.mode=="extend"&&localHandoverSupported;}
-     Write(control,handover?"RELEASE\nHANDOVER\n":"RELEASE\nSTOP\n");
+     std::string finalCommand;{std::lock_guard<std::mutex>g(lock);finalCommand=edgelink::FinalSessionControl(lastStopReason,options.mode,localHandoverSupported,backgroundRetainSupported);}
+     Write(control,finalCommand);
      {std::lock_guard<std::mutex>g(lock);stopControlWritten=true;stopControlWriteCompleted=true;controlWriterReady=false;changed.notify_all();}
      break;
     }
@@ -1004,7 +1013,7 @@ class Client {
    const auto topology=ParseDesktopTopology(topologyFields,options.mode=="extend");
    const auto controlCapabilities=ParseControlCapabilities(capabilities);
    const bool cursorSupported=controlCapabilities.cursor;
-   {std::lock_guard<std::mutex>g(lock);timingNegotiated=timed;localHandoverSupported=extensionFields.find(" local-handover-v1")!=std::string::npos;desktopTopology=topology;cursorChannelSupported=cursorSupported;cursorCapabilityKnown=true;
+   {std::lock_guard<std::mutex>g(lock);timingNegotiated=timed;localHandoverSupported=extensionFields.find(" local-handover-v1")!=std::string::npos;backgroundRetainSupported=extensionFields.find(" background-retain-v1")!=std::string::npos;desktopTopology=topology;cursorChannelSupported=cursorSupported;cursorCapabilityKnown=true;
     desktopOverviewCapabilityKnown=true;desktopOverviewSupported=controlCapabilities.desktopOverview;rateV2Supported=edgelinkwan::HasRateV2(extensionFields);rateTargetKbps=isTailnet()?4000:authKbps;rateAppliedKbps=authKbps;
     if(cursorSupported&&options.mode=="extend"&&topology.valid)commands.push_front("CURSOR 1");}
    if(options.mode=="extend"&&!isRTC()&&!isUDP()&&extensionFields.find(" desktop-live-v1")!=std::string::npos)send("TOPOLOGY 1");
@@ -1067,7 +1076,7 @@ class Client {
      <<",\"audioRendererDeviceChanges\":"<<sound.rendererDeviceChanges<<",\"audioRendererDeviceChangeReason\":"<<sound.rendererDeviceChangeReason<<",\"audioRendererResourceOwned\":"<<(sound.rendererResourceOwned?"true":"false")<<",\"audioCapturerResourceOwned\":"<<(sound.capturerResourceOwned?"true":"false")<<",\"audioProviderOperations\":"<<sound.providerOperations<<",";
   out<<"\"audioReadinessPhase\":"<<audioReadinessPhase<<",\"audioPrepareAgeMs\":"<<(audioPrepareStartedNs&&now>=audioPrepareStartedNs?double(now-audioPrepareStartedNs)/1e6:-1)<<",\"audioReadyWaitMs\":"<<(audioReadySentNs?double((audioReadyAckNs?audioReadyAckNs:now)-audioReadySentNs)/1e6:-1)<<",\"audioReadyAcknowledged\":"<<(audioReadyAckNs?"true":"false")<<",";
   out<<"\"audioRendererProbeInFlight\":"<<(sound.rendererProbeInFlight?"true":"false")<<",\"audioRendererProbeAgeMs\":"<<(sound.rendererProbeStartedNs&&now>=sound.rendererProbeStartedNs?double(now-sound.rendererProbeStartedNs)/1e6:-1)<<",";
-  out<<"\"sessionID\":"<<sid<<",\"localHandoverSupported\":"<<(localHandoverSupported?"true":"false")<<",\"audioCleanupWorkers\":"<<audioWorkers<<",\"microphoneSupported\":"<<(microphoneSupported?"true":"false")<<",\"microphoneAllowed\":"<<(microphoneAllowed?"true":"false")<<",\"microphoneState\":"<<Quoted(micState)<<",\"microphoneError\":"<<Quoted(micError)<<",\"microphonePackets\":"<<micPackets<<",\"microphonePeakS16\":"<<micPeak<<",\"microphoneRmsS16\":"<<micRms<<",\"microphonePeakMaxS16\":"<<micPeakMax<<",\"microphoneRmsMaxS16\":"<<micRmsMax<<",\"microphoneSourceMode\":0,\"microphoneDropped\":"<<micDropped<<",\"audioState\":"<<Quoted(audioState)<<",\"audioError\":"<<Quoted(audioError)<<",\"audioPackets\":"<<audioPackets<<",\"audioRejected\":"<<audioRejected<<",\"audioGaps\":"<<audioGaps<<",\"audioSystemVolume\":true,\"audioPlaybackActive\":"<<(sound.playback?"true":"false")<<",\"audioMicActive\":"<<(sound.microphone?"true":"false")<<",\"audioFastRequested\":"<<(sound.fastRequested?"true":"false")<<",\"audioLatencyMode\":"<<int(sound.latencyMode)<<",\"audioQueueDropped\":"<<sound.playbackQueue.dropped<<",\"audioUnderflows\":"<<sound.playbackQueue.underflow<<","<<AxisObservationStats()<<","<<CursorLockStats()<<","<<NativeMouseNodeStats()<<","<<CursorChannelStats()<<",\"heldKeys\":"<<heldKeys.size()<<",\"heldButtons\":"<<heldButtons.size()<<",\"localUI\":"<<(localUI?"true":"false")<<",\"ignoredSystemKeys\":"<<ignoredSystemKeys<<",\"ignoredModifierRepeats\":"<<ignoredModifierRepeats<<",\"stopReason\":"<<Quoted(lastStopReason)<<",\"inputCalls\":"<<inputCalls<<",\"nativeKeyEvents\":"<<nativeKeyEvents<<",\"inputSent\":"<<inputSent<<",\"state\":"<<Quoted(status)<<",\"error\":"<<Quoted(error)<<",\"receivedFrames\":"<<received<<",\"decodedFrames\":"<<decoded<<",\"renderSubmittedFrames\":"<<rendered<<",\"lostFrames\":"<<lost<<",\"receivedFPS\":"<<double(received-lastReceived)/seconds<<",\"renderSubmittedFPS\":"<<double(rendered-lastRendered)/seconds<<",\"displayClockFPS\":"<<double(clockTicks-lastTicks)/seconds<<",\"inputQueueP95ms\":"<<videoQueueMs.Percentile(0.95)<<",\"bytesReceived\":"<<bytes<<",\"running\":"<<(running?"true":"false");
+  out<<"\"surfaceAvailable\":"<<(surfaceAvailable?"true":"false")<<",\"backgroundRetainSupported\":"<<(backgroundRetainSupported?"true":"false")<<",\"sessionID\":"<<sid<<",\"localHandoverSupported\":"<<(localHandoverSupported?"true":"false")<<",\"audioCleanupWorkers\":"<<audioWorkers<<",\"microphoneSupported\":"<<(microphoneSupported?"true":"false")<<",\"microphoneAllowed\":"<<(microphoneAllowed?"true":"false")<<",\"microphoneState\":"<<Quoted(micState)<<",\"microphoneError\":"<<Quoted(micError)<<",\"microphonePackets\":"<<micPackets<<",\"microphonePeakS16\":"<<micPeak<<",\"microphoneRmsS16\":"<<micRms<<",\"microphonePeakMaxS16\":"<<micPeakMax<<",\"microphoneRmsMaxS16\":"<<micRmsMax<<",\"microphoneSourceMode\":0,\"microphoneDropped\":"<<micDropped<<",\"audioState\":"<<Quoted(audioState)<<",\"audioError\":"<<Quoted(audioError)<<",\"audioPackets\":"<<audioPackets<<",\"audioRejected\":"<<audioRejected<<",\"audioGaps\":"<<audioGaps<<",\"audioSystemVolume\":true,\"audioPlaybackActive\":"<<(sound.playback?"true":"false")<<",\"audioMicActive\":"<<(sound.microphone?"true":"false")<<",\"audioFastRequested\":"<<(sound.fastRequested?"true":"false")<<",\"audioLatencyMode\":"<<int(sound.latencyMode)<<",\"audioQueueDropped\":"<<sound.playbackQueue.dropped<<",\"audioUnderflows\":"<<sound.playbackQueue.underflow<<","<<AxisObservationStats()<<","<<CursorLockStats()<<","<<NativeMouseNodeStats()<<","<<CursorChannelStats()<<",\"heldKeys\":"<<heldKeys.size()<<",\"heldButtons\":"<<heldButtons.size()<<",\"localUI\":"<<(localUI?"true":"false")<<",\"ignoredSystemKeys\":"<<ignoredSystemKeys<<",\"ignoredModifierRepeats\":"<<ignoredModifierRepeats<<",\"stopReason\":"<<Quoted(lastStopReason)<<",\"inputCalls\":"<<inputCalls<<",\"nativeKeyEvents\":"<<nativeKeyEvents<<",\"inputSent\":"<<inputSent<<",\"state\":"<<Quoted(status)<<",\"error\":"<<Quoted(error)<<",\"receivedFrames\":"<<received<<",\"decodedFrames\":"<<decoded<<",\"renderSubmittedFrames\":"<<rendered<<",\"lostFrames\":"<<lost<<",\"receivedFPS\":"<<double(received-lastReceived)/seconds<<",\"renderSubmittedFPS\":"<<double(rendered-lastRendered)/seconds<<",\"displayClockFPS\":"<<double(clockTicks-lastTicks)/seconds<<",\"inputQueueP95ms\":"<<videoQueueMs.Percentile(0.95)<<",\"bytesReceived\":"<<bytes<<",\"running\":"<<(running?"true":"false");
   WriteDesktopTopologyStats(out,desktopTopology);out<<",\"desktopTopologyRevision\":"<<desktopTopologyRevision;
   const auto rtc=rtcIngress.counts();out<<","<<RtcEventStats()<<",\"rtcMode\":"<<(isRTC()?"true":"false")<<",\"rtcActive\":"<<(rtcActive?"true":"false")<<",\"rtcAuthenticatedFrames\":"<<rtcAuthenticatedFrames<<",\"rtcIngressDropped\":"<<rtcIngressDropped<<",\"rtcQueueExpired\":"<<rtc.expired<<",\"rtcRenderACKs\":"<<rtcRenderACKs;
   out<<",\"decoderName\":"<<Quoted(decoderName)<<",\"decoderHardwareRequested\":true,\"decoderLowLatencyRequested\":true"
@@ -1143,7 +1152,7 @@ static napi_value MicAllowed(napi_env env,napi_callback_info info){size_t n=1;na
 static napi_value StoreSessionFlags(napi_env env,napi_callback_info){napi_value v;napi_create_int32(env,Client::Instance().storeSessionFlags(),&v);return v;}
 static napi_value Stats(napi_env env,napi_callback_info){auto s=Client::Instance().stats();napi_value v;napi_create_string_utf8(env,s.c_str(),s.size(),&v);return v;}
 static napi_value Network(napi_env env,napi_callback_info info){size_t n=2;napi_value v[2];napi_get_cb_info(env,info,&n,v,nullptr,nullptr);if(n==2){auto dir=String(env,v[0]);auto config=String(env,v[1]);if(!dir.empty()&&dir.size()<1024&&config.size()<8192)NetworkStart(dir,config);}auto s=NetworkStatus();napi_value result;napi_create_string_utf8(env,s.c_str(),s.size(),&result);return result;}
-static napi_value Surface(napi_env env,napi_callback_info info){size_t n=1;napi_value v;napi_get_cb_info(env,info,&n,&v,nullptr,nullptr);auto&c=Client::Instance();c.stop();if(c.window)OH_NativeWindow_DestroyNativeWindow(c.window);c.window=nullptr;try{uint64_t id=std::stoull(String(env,v));if(OH_NativeWindow_CreateNativeWindowFromSurfaceId(id,&c.window)!=0)c.setStatus("error","创建 NativeWindow 失败");}catch(...){c.setStatus("error","Surface ID 无效");}return Void(env);}
+static napi_value Surface(napi_env env,napi_callback_info info){size_t n=1;napi_value v;napi_get_cb_info(env,info,&n,&v,nullptr,nullptr);auto&c=Client::Instance();std::lock_guard<std::recursive_mutex>lifecycle(c.lifecycleLock);c.surfaceAvailable=false;c.stop();if(c.window)OH_NativeWindow_DestroyNativeWindow(c.window);c.window=nullptr;try{uint64_t id=std::stoull(String(env,v));if(OH_NativeWindow_CreateNativeWindowFromSurfaceId(id,&c.window)!=0)c.setStatus("error","创建 NativeWindow 失败");}catch(...){c.setStatus("error","Surface ID 无效");}c.surfaceAvailable=c.window!=nullptr;return Void(env);}
 static napi_value RtcPush(napi_env env,napi_callback_info info){size_t n=2;napi_value values[2];napi_get_cb_info(env,info,&n,values,nullptr,nullptr);void*bytes=nullptr;size_t size=0;bool accepted=false;if(n==2&&napi_get_arraybuffer_info(env,values[1],&bytes,&size)==napi_ok&&size<=2*1024*1024)accepted=Client::Instance().rtcPush(String(env,values[0]),(const uint8_t*)bytes,size);napi_value result;napi_get_boolean(env,accepted,&result);return result;}
 static napi_value RtcSignal(napi_env env,napi_callback_info info){size_t n=2;napi_value values[2];napi_get_cb_info(env,info,&n,values,nullptr,nullptr);bool accepted=false;if(n==2){auto session=String(env,values[0]),body=String(env,values[1]);if(body.size()<=65536)accepted=Client::Instance().rtcSignal(session,body);}napi_value result;napi_get_boolean(env,accepted,&result);return result;}
 void RegisterStoreLinkAPI(napi_env,napi_value);

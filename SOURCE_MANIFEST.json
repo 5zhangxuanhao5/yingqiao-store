@@ -6,8 +6,8 @@
   },
   {
     "path": ".github/workflows/compatibility.yml",
-    "bytes": 4948,
-    "sha256": "a15e04b715593cb7f358ddf4e7769267b052733d3a42fa9e7d606197ee415549"
+    "bytes": 5240,
+    "sha256": "4bf30edbd0cc91f10a68b99172c1a1514e57cd03c3eee7f65d0bc483e682b81e"
   },
   {
     "path": ".gitignore",
@@ -130,6 +130,11 @@
     "sha256": "51aab1025f2a8f41f2fe0a4197ce8d3914cf1865d012e208f22a0aadb89425a9"
   },
   {
+    "path": "docs/EDGE_BACKGROUND_TEST9.md",
+    "bytes": 3560,
+    "sha256": "1e98a2ecbe76e38c5657d5a8a8c1d8ca71285b6823010645174b6ba812b1ff86"
+  },
+  {
     "path": "docs/FIRST_RUN_NEARBY_030.md",
     "bytes": 2146,
     "sha256": "517190d8608c70e2722bbead4f6c870bbd02ac3274a211e3258e2ab0696048c4"
@@ -212,7 +217,7 @@
   {
     "path": "harmony/AppScope/app.json5",
     "bytes": 199,
-    "sha256": "0b0e0a07d6978733bf22dc0e5935be4ca67330e06803089ea5a64d39c2921788"
+    "sha256": "2cda032f5a9a5ca18a1bc2da0f08480d7032b7e9fc4a852b26e1977eed605187"
   },
   {
     "path": "harmony/AppScope/resources/base/element/string.json",
@@ -291,8 +296,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/client.cpp",
-    "bytes": 107988,
-    "sha256": "ea4705319db17da73d60126a3ca709528c5b1a83461df1c2efb2341243d56064"
+    "bytes": 109438,
+    "sha256": "a3c3c40ad272e357f08bbd904afd1afa760beb1db30cee9f57182a760496dd4a"
   },
   {
     "path": "harmony/entry/src/main/cpp/clock_refresh.h",
@@ -341,8 +346,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/local/availability.cpp",
-    "bytes": 38193,
-    "sha256": "0bf8106129b478d0bdcbf6ad94b44afc91c2f1820532dd54f06d364906615bef"
+    "bytes": 38966,
+    "sha256": "ff1c982e10f5e9dd83589f4f5676b2b6d172dcd0fa3d9c0ba7c61c5686cbc36e"
   },
   {
     "path": "harmony/entry/src/main/cpp/local/availability.h",
@@ -440,6 +445,11 @@
     "sha256": "f35b5bd58c9c9521664238e3c313c945f7b44db6cc2d31b49733896640cd8c5c"
   },
   {
+    "path": "harmony/entry/src/main/cpp/session_end_policy.h",
+    "bytes": 376,
+    "sha256": "34a1a963021457a518c50630a9dfb4f60959ade238a9e68593c76a0e96b7ad53"
+  },
+  {
     "path": "harmony/entry/src/main/cpp/split_policy.h",
     "bytes": 3230,
     "sha256": "6ee6cade2ae6240f133bbf82e9daf34ed354d007add169320d5b7600323a90ad"
@@ -476,8 +486,8 @@
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/index.d.ts",
-    "bytes": 3427,
-    "sha256": "0ad12160a8ed3a9f0a1ccf4c7bfb2303d33bf458a70fb98e3ebe8ae092465f12"
+    "bytes": 3487,
+    "sha256": "6792966a01cae2fa4bc22c107d6c49599ef53bade9e898b9e34501465d82553f"
   },
   {
     "path": "harmony/entry/src/main/cpp/types/libedgelink/oh-package.json5",
@@ -491,13 +501,18 @@
   },
   {
     "path": "harmony/entry/src/main/ets/entryability/EntryAbility.ets",
-    "bytes": 5417,
-    "sha256": "d5da1e26cc4ba0966e5d39a0034dd3bd48173e9e4216ec77b74670175479d87a"
+    "bytes": 5689,
+    "sha256": "173788ae24ed5969b433a8df0cbba6f36a931fbdff38e995ed9360ffe944b3f3"
   },
   {
     "path": "harmony/entry/src/main/ets/pages/Index.ets",
-    "bytes": 149854,
-    "sha256": "e8ab9987c9256a038607249b33446957211b3be1360c2b2404eb3d4f8e336e3f"
+    "bytes": 152167,
+    "sha256": "be1b5cc9611fd86d5897ce45c72d8b0879ff43ed573e4d03d3885e8b4eb0dafd"
+  },
+  {
+    "path": "harmony/entry/src/main/ets/service/BackgroundExtension.ets",
+    "bytes": 4760,
+    "sha256": "2b2c1b7c8b3e6bb3c8bf54ac10f59f6232f46a47d15b8c2d117d35a1ed0278ed"
   },
   {
     "path": "harmony/entry/src/main/ets/service/DirectWANRoute.ets",
@@ -546,8 +561,8 @@
   },
   {
     "path": "harmony/entry/src/main/module.json5",
-    "bytes": 1292,
-    "sha256": "d32e646847eb6458110daa6d8ae336b80e4d06f4d395933c84b898b229c6eb52"
+    "bytes": 1441,
+    "sha256": "668c671f5f1919789d36fd2c0d9405c6cd2e11de126a6512f0e2eb136cfeba41"
   },
   {
     "path": "harmony/entry/src/main/resources/base/element/color.json",
@@ -675,6 +690,11 @@
     "sha256": "605b21d12dbb830d15fc38e13e5b1cf15de180e65bb957821e3cda0357e2348a"
   },
   {
+    "path": "mac/Sources/ExtensionParkingLease.swift",
+    "bytes": 1043,
+    "sha256": "e2e6b0292b07bf68c24519dede841e7202420ae56657a001bfcbd1cc8251cc57"
+  },
+  {
     "path": "mac/Sources/Gesture.swift",
     "bytes": 1867,
     "sha256": "bf97c139f0d3855e8b020056254e86f51e703aa4478ebbe3cbbf4f690a0736e0"
@@ -711,8 +731,8 @@
   },
   {
     "path": "mac/Sources/OriginalStandbyCoordinator.swift",
-    "bytes": 10840,
-    "sha256": "fd1787037939c21ed482c9f0e48906745644aea53f44f631b67080e0aad0622a"
+    "bytes": 11468,
+    "sha256": "1b64edf06abb032a6864412295d44e4937c5be91a33a5cb2f3ce12c62d650c13"
   },
   {
     "path": "mac/Sources/StoreCapture.swift",
@@ -726,8 +746,8 @@
   },
   {
     "path": "mac/Sources/StoreDashboard.swift",
-    "bytes": 9641,
-    "sha256": "9aeb4955cdb838824ce0887080eae618d7ecdcfecc96f21fdb10a712fade2ee1"
+    "bytes": 9715,
+    "sha256": "457619e8f15295f400108a224cd4db1290a087d74e1adc9f39f4b9e4d7c72a3d"
   },
   {
     "path": "mac/Sources/StoreDiscovery.swift",
@@ -761,8 +781,8 @@
   },
   {
     "path": "mac/Sources/StoreOriginalConnections.swift",
-    "bytes": 10423,
-    "sha256": "6bdf6120034e4de899a3568b490fadc7a2e14fdb33e06ffa2e59458fcf5e2a78"
+    "bytes": 10649,
+    "sha256": "638dc22af47a86df1d5f9ba3ac8ebc61db2d5b795c8b3ea6f102b8012eab8ad0"
   },
   {
     "path": "mac/Sources/StoreOriginalUSBDebug.swift",
@@ -796,8 +816,8 @@
   },
   {
     "path": "mac/Sources/main.swift",
-    "bytes": 25114,
-    "sha256": "10d3efebe0dfcf0a8299ccdb2e934cad3fd1fce5eef9242643edf8c306645de3"
+    "bytes": 26582,
+    "sha256": "e67605c776d4484cde3279eb3a5c7ffcfffc2aa508c5704dc6f28a7dbf3d9af8"
   },
   {
     "path": "mac/USB/AccessoryControl.cpp",
@@ -827,7 +847,7 @@
   {
     "path": "mac/build.sh",
     "bytes": 3731,
-    "sha256": "d0321b28cd0aff7fcb736b38c57c9c17f8e9b10964b74e4205156de01547dd9d"
+    "sha256": "5535beafc4406ad7912dfdf5420991832719946a46793600341be628ff4826fc"
   },
   {
     "path": "shared/DisplayProfile.hpp",
@@ -883,6 +903,11 @@
     "path": "tests/route_selection_test.cpp",
     "bytes": 1208,
     "sha256": "7d310783d7f29bd5267bbc47ca9aa6e041b80d0787582587e2287cc2ec94e1d9"
+  },
+  {
+    "path": "tests/session_end_policy_test.cpp",
+    "bytes": 870,
+    "sha256": "ee0e92933b0b7d65755b5fd694a7a6c22fc128d8531bee8ece9972381e0bf46f"
   },
   {
     "path": "tests/usb_test.cpp",
@@ -1921,13 +1946,18 @@
   },
   {
     "path": "tools/check-source.py",
-    "bytes": 1744,
-    "sha256": "0b7e552985dde7e64b0dbd489f77f268b6016b4942134a0df324252e7b0a9d5a"
+    "bytes": 1786,
+    "sha256": "b46a602cb6dd401c744ae91574a2eb0ba127d35c1b4d936e7ea497936554b3a6"
   },
   {
     "path": "tools/prepare-original-tablet-test.py",
     "bytes": 2561,
     "sha256": "5b1ec53508bf72e773c69b2c4821bcf079ec88cc3358350ad9813f5357ed09b1"
+  },
+  {
+    "path": "tools/test-background-extension.cjs",
+    "bytes": 3146,
+    "sha256": "ef41a821422f93906394dfc679d924da967effd0a347d8c4924a1d6c88d9422e"
   },
   {
     "path": "tools/test-discovery-presence.cjs",

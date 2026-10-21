@@ -1,4 +1,5 @@
 import native from 'libedgelink.so';
+import { BackgroundExtension } from '../service/BackgroundExtension';
 import { UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { fileIo } from '@kit.CoreFileKit';
@@ -22,6 +23,7 @@ export default class EntryAbility extends UIAbility {
  }
  onCreate(want: Want): void {
   AppStorage.setOrCreate('storeProbeAddress',want.parameters?.['storeProbeAddress'] as string || '');
+  AppStorage.setOrCreate('extensionParked', false);
   AppStorage.setOrCreate('remoteInputWindowActive', false);
   AppStorage.setOrCreate('remoteSessionForeground', false);
   AppStorage.setOrCreate('diagnosticMode', '');
@@ -54,8 +56,8 @@ export default class EntryAbility extends UIAbility {
  }
  // Focus loss (including a local dialog) is not a hidden streaming window.
  onForeground(): void { AppStorage.setOrCreate('remoteSessionForeground', true); }
- onBackground(): void { AppStorage.setOrCreate('remoteSessionForeground', false);native.disconnect('ability_background');this.windowFocused = false;this.publishWindowInputState();this.saveLifecycle('background'); }
- onDestroy(): void { AppStorage.setOrCreate('remoteSessionForeground', false);this.windowFocused = false;this.publishWindowInputState();native.disconnect('ability_destroyed');native.availabilityStop();this.saveLifecycle('destroy'); }
+ onBackground(): void { const parked = BackgroundExtension.suspend();AppStorage.setOrCreate('remoteSessionForeground', false);if (!parked) { native.disconnect('ability_background'); }this.windowFocused = false;this.publishWindowInputState();this.saveLifecycle('background'); }
+ onDestroy(): void { BackgroundExtension.end();AppStorage.setOrCreate('remoteSessionForeground', false);this.windowFocused = false;this.publishWindowInputState();native.disconnect('ability_destroyed');native.availabilityStop();this.saveLifecycle('destroy'); }
  onWindowStageCreate(stage: window.WindowStage): void {
   const mainWindow = stage.getMainWindowSync();
   this.inputWindowId = mainWindow.getWindowProperties().id;
@@ -66,7 +68,7 @@ export default class EntryAbility extends UIAbility {
    else if (event === window.WindowStageEventType.PAUSED) { this.windowPaused = true;this.publishWindowInputState(); }
    else if (event === window.WindowStageEventType.RESUMED) { this.windowPaused = false;this.publishWindowInputState(); }
    else if (event === window.WindowStageEventType.HIDDEN) {
-    AppStorage.setOrCreate('remoteSessionForeground', false);this.windowFocused = false;this.windowPaused = false;this.publishWindowInputState();native.disconnect('window_hidden');
+    const parked = BackgroundExtension.suspend();AppStorage.setOrCreate('remoteSessionForeground', false);this.windowFocused = false;this.windowPaused = false;this.publishWindowInputState();if (!parked) { native.disconnect('window_hidden'); }
    }
    this.saveLifecycle(`window_${event}`);
   });

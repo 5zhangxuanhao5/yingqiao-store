@@ -48,6 +48,7 @@ public:
  bool Configure(const std::string& host,int port,const std::string& token,const std::string& certificate);
  void State(const std::string& state);
  bool Reply(const std::string& id,bool accepted);
+ bool End(uint32_t session);
  void Stop();
  void Refresh();
  std::string Status();
@@ -182,6 +183,7 @@ private:
   if(kind=="RTT"){if(!(fields>>a)||!Hex(a,32)||(fields>>extra))return false;if(a==probe_){const auto now=NowMs();if(now>=probeSent_&&now<=probeDeadline_)rtts_.push_back(std::max(.001,double(now-probeSent_)));probe_.clear();++probeCount_;}return true;}
   if(kind=="HOST"){if(!(fields>>a)||(fields>>extra))return false;if(options_.route=="usb"&&LocalAddress(a))Manager::Get().HostHint(a);return true;}
   if(kind=="START"){if(!(fields>>a>>b>>c)||!Hex(a,32)||b!="extend"||c!=options_.route||(fields>>extra))return false;if(!Manager::Get().StartRequest(shared_from_this(),a))Queue("ACK "+a+" 0",true);return true;}
+  if(line=="END OK")return true;
   if(kind=="END"){if(!(fields>>a)||(fields>>extra)||a.empty()||a.size()>10||!std::all_of(a.begin(),a.end(),[](char c){return c>='0'&&c<='9';}))return false;Manager::Get().EndRequest(shared_from_this(),a);return true;}
   if(kind=="CANCEL"){if(!(fields>>a)||!Hex(a,32)||(fields>>extra))return false;Manager::Get().CancelRequest(shared_from_this(),a);return true;}
   if(kind=="BURST_SKIP"){if(!(fields>>a)||!Hex(a,32)||(fields>>extra))return false;if(a==burst_){burst_.clear();PublishMetric();}return true;}
@@ -377,6 +379,12 @@ bool Manager::Reply(const std::string& id,bool accepted){
  return allow==accepted;
 }
 
+bool Manager::End(uint32_t session){
+ if(!session)return false;std::shared_ptr<Worker> usb,lan;
+ {std::lock_guard<std::mutex>g(lock_);usb=usb_;lan=lan_;}
+ const std::string line="END "+std::to_string(session);bool sent=false;
+ if(usb)sent=usb->Queue(line,true)||sent;if(lan)sent=lan->Queue(line,true)||sent;return sent;
+}
 void Manager::State(const std::string& state){
  if(!AvailabilityState(state))return;
  std::shared_ptr<Worker> usb,lan,canceledWorker;std::string canceled;
@@ -518,6 +526,7 @@ napi_value ConfigureJS(napi_env env,napi_callback_info info){
 }
 napi_value StateJS(napi_env env,napi_callback_info info){napi_value args[1];size_t count=1;napi_get_cb_info(env,info,&count,args,nullptr,nullptr);std::string state;if(count==1&&StringArgument(env,args[0],32,state)&&edgelinkavailability::AvailabilityState(state))Manager::Get().State(state);else napi_throw_error(env,"availability_invalid_state","Availability state is invalid");return Undefined(env);}
 napi_value ReplyJS(napi_env env,napi_callback_info info){napi_value args[2];size_t count=2;napi_get_cb_info(env,info,&count,args,nullptr,nullptr);std::string id;bool accepted=false;const bool ok=count==2&&StringArgument(env,args[0],32,id)&&napi_get_value_bool(env,args[1],&accepted)==napi_ok&&Manager::Get().Reply(id,accepted);napi_value value;napi_get_boolean(env,ok,&value);return value;}
+napi_value EndJS(napi_env env,napi_callback_info info){napi_value arg;size_t n=1;uint32_t session=0;napi_get_cb_info(env,info,&n,&arg,nullptr,nullptr);bool ok=n==1&&napi_get_value_uint32(env,arg,&session)==napi_ok&&Manager::Get().End(session);napi_value value;napi_get_boolean(env,ok,&value);return value;}
 napi_value StopJS(napi_env env,napi_callback_info){Manager::Get().Stop();return Undefined(env);}
 napi_value RefreshJS(napi_env env,napi_callback_info){Manager::Get().Refresh();return Undefined(env);}
 napi_value StatusJS(napi_env env,napi_callback_info){const auto json=Manager::Get().Status();napi_value value;napi_create_string_utf8(env,json.data(),json.size(),&value);return value;}
@@ -529,6 +538,7 @@ void RegisterAvailability(napi_env env,napi_value exports){
   {"availabilityConfigure",nullptr,ConfigureJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityState",nullptr,StateJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityReply",nullptr,ReplyJS,nullptr,nullptr,nullptr,napi_default,nullptr},
+  {"availabilityEnd",nullptr,EndJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityStop",nullptr,StopJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityRefresh",nullptr,RefreshJS,nullptr,nullptr,nullptr,napi_default,nullptr},
   {"availabilityIdentity",nullptr,IdentityJS,nullptr,nullptr,nullptr,napi_default,nullptr},
