@@ -1,4 +1,12 @@
-# 下载文件说明
+# 下载与版本选择
+
+- **鸿蒙应用商城版 0.3.11**：[打开映桥商店页](https://appgallery.huawei.com/app/detail?id=cn.edgelink.store)。已于 2026-10-21 核对上架；不需要开发者模式。未唤起商店时，在平板应用市场搜索“映桥”。
+- **Mac 单应用合并预览版**：[下载 0.4.0-test.6 ZIP](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/mac-unified-v0.4.0-test.6/Yingqiao-Mac-Unified-0.4.0-test.6.zip) · [配套源码/校验](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/mac-unified-v0.4.0-test.6)。包含平板扩展与 Mac 互联，Pro→Air 已实测；仍为预览。
+- **GitHub 平板开发版**：需要开发者模式、本人调试签名；有线使用 HDC 调试通道，需要 USB 调试。与商城版不是同一签名/输入配置。
+
+商店版的普通 USB 连接需手动开启 USB 共享网络；开发版 HDC 通道不需要共享网络。两者均不能笼统承诺只插线即用。详见 [完整安装教程](INSTALL.md)。
+
+## 保留的开发基线
 
 当前可运行开发版：Mac0.3.15(36) + Pad0.3.14(35)。
 

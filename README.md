@@ -1,10 +1,24 @@
 # 映桥 · Yingqiao
 
-**把鸿蒙平板变成 Mac 的独立扩展屏。** 在平板上放文档、浏览器或聊天窗口，用平板的键盘、触控板和触屏继续操作 Mac。
+**把鸿蒙平板或另一台 Mac 变成独立扩展屏。** 在平板上放文档、浏览器或聊天窗口，用平板的键盘、触控板和触屏继续操作 Mac。
 
-[下载 Mac 开发版](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/developer-v0.3.15-test.1/Yingqiao-Mac-0.3.15.zip) · [详细安装教程](docs/INSTALL.md) · [全部下载文件](https://github.com/5zhangxuanhao5/yingqiao-store/releases/tag/developer-v0.3.15-test.1) · [反馈问题](https://github.com/5zhangxuanhao5/yingqiao-store/issues)
+[鸿蒙应用商城下载](https://appgallery.huawei.com/app/detail?id=cn.edgelink.store) · [Mac 合并预览版下载](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/mac-unified-v0.4.0-test.6/Yingqiao-Mac-Unified-0.4.0-test.6.zip) · [安装教程](docs/INSTALL.md) · [版本选择与下载](docs/downloads.md) · [反馈问题](https://github.com/5zhangxuanhao5/yingqiao-store/issues)
 
-> **当前是开发者预览。** Mac 为 **0.3.15 (36)**，平板为 **0.3.14 (35)**，两端版本号不同是正常的。本轮只精简了 Mac 首页。平板暂不提供通用安装包，需要自己的华为调试签名及 DevEco Studio 构建安装；不是下载 HAP 后点开即装。下方教程写出了完整步骤与限制。
+> **映桥已上架鸿蒙应用商城。** 2026-10-21 核对：商店公开页面为 **0.3.11**。商店版不需要开启开发者模式；GitHub 平板开发版需要开发者模式、USB 调试和本人的调试签名，两者安装方式与输入兼容配置不同。
+>
+> **Mac 互联现为合并预览版 0.4.0-test.6（build 45）**：一个应用提供“平板扩展屏”和“Mac 互联”。已在 MacBook Pro（M5 Pro）→ MacBook Air（M4）实测。默认分支保留 Mac 0.3.15 + Pad 0.3.14 开发基线；合并版源码请下载对应 Release，不能把默认分支当作 0.4.0 源码。
+
+## 先选适合自己的版本
+
+| 版本 | 如何安装 | 开发者模式与 USB |
+| --- | --- | --- |
+| 鸿蒙应用商城版 0.3.11 | 在兼容鸿蒙平板上点击上方商店链接；或在应用市场搜索“映桥”（开发者：张轩灏） | 安装和局域网使用不需要开发者模式。普通有线通道需要系统提供 USB 网络，当前须手动开启“USB 共享网络”，不是只插线即用 |
+| GitHub 平板开发版 0.3.14 | 按教程用本人华为账号和设备签名构建安装 | **需要开启并保留开发者模式**；安装及 HDC 有线连接还需 USB 调试和电脑授权。HDC 通道不需要 USB 共享网络 |
+| Mac 合并预览版 0.4.0-test.6 | 两台 Mac 分别安装同一 ZIP，选择发送或接收；也保留平板扩展入口 | Mac 不需要鸿蒙开发者模式。Mac→Mac 已实测局域网；普通 USB-C 充电/数据线不能视为已建立网络 |
+
+商店链接是正式详情页，不是邀请码。鸿蒙设备能否直接唤起应用市场取决于浏览器与系统设置；若只显示网页预览，请从应用市场搜索安装。平板运行系统、设备类型和可下载范围以商店实际显示为准。
+
+商店版和开发者版不是同一个签名包，不能保证保留数据相互覆盖；切换渠道可能需要卸载并重新允许连接。开发版实测的触控板跨屏按压拖动，不等于商店版也已通过该项验证。两版均不包含异地远控，也不是“映桥完整版”。
 
 ## 可以做什么
 
@@ -16,17 +30,17 @@
 
 这个公开分支只介绍本地扩展屏，不包含异地远控，也不是个人使用的“映桥完整版”。
 
-## 先下载哪个文件
+## GitHub 开发基线下载（需要自行签名的平板版）
 
 | 目标 | 文件或入口 | 说明 |
 | --- | --- | --- |
 | 在 Mac 上安装 | [Yingqiao-Mac-0.3.15.zip](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/developer-v0.3.15-test.1/Yingqiao-Mac-0.3.15.zip) | 解压后是“映桥.app”；Intel/Apple Silicon 通用开发包，未做 Apple 公证 |
-| 在平板上安装 | [平板构建与签名教程](docs/INSTALL.md#三平板端用自己的签名安装) | 当前没有面向所有设备的已签名 HAP 下载，不分发作者的设备 Profile |
+| 在平板上安装开发版 | [平板构建与签名教程](docs/INSTALL.md#三平板端用自己的签名安装) | 当前没有面向所有设备的已签名 HAP 下载，不分发作者的设备 Profile |
 | 下载本版源码 | [yingqiao-store-source.tar.gz](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/developer-v0.3.15-test.1/yingqiao-store-source.tar.gz) | Mac 0.3.15 + Pad 0.3.14；不是 Mac 安装包 |
 | 恢复编译依赖 | [yingqiao-store-native-dependencies.tar.gz](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/developer-v0.3.15-test.1/yingqiao-store-native-dependencies.tar.gz) | 编译平板或 Mac 时使用，解压到源码根目录 |
 | 校验附件 | [SHA256SUMS](https://github.com/5zhangxuanhao5/yingqiao-store/releases/download/developer-v0.3.15-test.1/SHA256SUMS) | 安装包/源码/依赖校验；逐文件源码哈希在 SOURCE_MANIFEST.json |
 
-## 两种连接方式
+## GitHub 平板开发版的连接方式
 
 **无线**：Mac 和平板加入能互相访问的局域网或同一手机热点，两端打开映桥即可查找。校园/公司网络可能隔离设备或拦截组播；连接同一个 Wi-Fi 名称不一定能互通，遇到找不到设备时可用同一手机热点对照。
 
@@ -40,7 +54,15 @@
 
 ## 已验证范围
 
-当前设备验证来自 **MacBook Air + MatePad Edge（HarmonyOS 7）**。开发配置下跨屏按压拖动和有线传屏已由真实设备确认；其他型号、系统版本和网络仍需验证。源码的 Mac 最低构建目标是 macOS 13、平板 compatible API 24 / target API 26，不能据此声称这些系统全部已验收。当前没有可用的 Windows 扩展屏客户端。
+已尝试的设备包括 **MacBook Pro 16 英寸（M5 Pro）、MacBook Air 13.6 英寸（M4）和 MatePad Edge（HarmonyOS 7）**。
+
+| 实测组合 | 已确认的范围 |
+| --- | --- |
+| MacBook Air → MatePad Edge | 开发版独立桌面、键盘/触控板/触屏、有线传屏及可达无线下的接续 |
+| MacBook Pro → MatePad Edge | 开发配置下扩展屏、触控板按压跨屏拖动；有线与无线发现/接续分轮测试 |
+| MacBook Pro → MacBook Air | 合并预览版 test.6：2560×1664 全屏独立桌面；iPad 随航断开及接回后，Air 保持显示，用户确认两个桌面独立 |
+
+这是上述设备和相应版本的实测记录，不是所有 Mac/鸿蒙平板、所有组合长时间同时运行的认证。其他型号、系统版本和网络仍需验证。源码的 Mac 最低构建目标是 macOS 13、平板 compatible API 24 / target API 26，不能据此声称这些系统全部已验收。当前没有可用的 Windows 扩展屏客户端。
 
 原厂 SDK 不接受本开发包用于关闭鼠标转触摸的特定配置。实验构建工具在**新建的独立 SDK 副本目录**准备配置，不修改 DevEco 安装目录；不据此宣称通过官方商店工具链验证。详见 [开发配置边界](docs/TRACKPAD_TEST_021.md)。
 

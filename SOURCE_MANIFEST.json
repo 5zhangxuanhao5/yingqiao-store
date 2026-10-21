@@ -56,8 +56,8 @@
   },
   {
     "path": "README.md",
-    "bytes": 5370,
-    "sha256": "5e79d4b595f5bc008f3361764faa2534976c41c20f12bd8c60e71da78e5a550c"
+    "bytes": 7845,
+    "sha256": "420a747d18cfeab0eb3c5663d9eefba966bbe56a4b74477bf3b2c89b9f0f0f82"
   },
   {
     "path": "THIRD_PARTY_NOTICES.md",
@@ -76,8 +76,8 @@
   },
   {
     "path": "VERSION_HISTORY.md",
-    "bytes": 10373,
-    "sha256": "fd2f8a9c3bad6f1067144c86f27a416dc6901e713a2dbd089e4af0cd81fb9c4c"
+    "bytes": 10918,
+    "sha256": "971533138c9ecb5e2b2998f55fac2907148a098ed277ef38ac1937a9cdad2f8e"
   },
   {
     "path": "docs/ACCEPTED_CORE_PROVENANCE.json",
@@ -136,8 +136,8 @@
   },
   {
     "path": "docs/INSTALL.md",
-    "bytes": 12195,
-    "sha256": "72596daa5e48e4549225dab685aca5ffdb1ead86c6331bfceb19a0129ad9c866"
+    "bytes": 15237,
+    "sha256": "ef3cf7c26c1c8983fb3c41d557d0c1c4a35123bf1f31a485d9d52a29f451567a"
   },
   {
     "path": "docs/MAC_INSTALL.md",
@@ -165,6 +165,11 @@
     "sha256": "a59dc5f1263d69a423130c917568175ed13b6acae551a5fb8ed1eb5ee56330c0"
   },
   {
+    "path": "docs/RELEASE_DOCS_20261021.md",
+    "bytes": 550,
+    "sha256": "65b50cab0f6bcb461b9542eaf5d58f643ec7942dcf325d7284dc9b56716953b5"
+  },
+  {
     "path": "docs/TRACKPAD_TEST_021.md",
     "bytes": 1161,
     "sha256": "8025518a56037a3828c5fab08a5fcba1761b3eca3051b510a40a4d16738cf847"
@@ -181,8 +186,8 @@
   },
   {
     "path": "docs/downloads.md",
-    "bytes": 1086,
-    "sha256": "4b9ef80ab2dcd46e253827e037f3db94f72c837415fbd21f3dd2120e92695a45"
+    "bytes": 2122,
+    "sha256": "308fb9866a5b37c20ff46a3180b8845f323f7eeaf83a9ddaa03df83072e4ac26"
   },
   {
     "path": "docs/tablet-input-compatibility-reference.json",

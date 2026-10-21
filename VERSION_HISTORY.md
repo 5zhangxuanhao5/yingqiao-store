@@ -75,3 +75,11 @@ Independent public-source prototype. First-run companion installation guide, exp
 按用户要求以原版扩展屏为基线，保留现有界面与媒体/输入核心，恢复原版LocalAvailability持续TLS备用控制、StandbyCoordinator及Pad接续函数，不再运行周期短连接测速与RNDIS优选替代流程。统一独立49561/49562/49563端口，保留测试版独立身份。恢复原版Input/Gesture、动态屏幕拓扑协议和码率请求应用。
 
 原版USB依赖授权的HDC反向转发，只在显式ORIGINAL_USB_TEST开发构建开启；没有复制设备序列号，不打包开发工具，不当成普通消费者USB。RNDIS研究源码及失败历史保留；上架门槛仍需单独解决。0.1.14拔线未获得恢复确认，0.1.15/16未安装，不宣称失败候选已修复。
+
+## docs-v2026.10.21
+
+- 核对鸿蒙应用商城公开详情页：映桥 0.3.11 已上架，加入正式商店链接。
+- 分开说明商店安装、Edge 开发者模式/调试签名和两种 USB 通道。
+- 补充 MacBook Pro M5 Pro、MacBook Air M4、MatePad Edge 的分版本实测范围。
+- 增加 Mac 合并预览版 test.6 下载和使用步骤；记录 2026-10-20 随航断开/重连后的用户确认，不把预览称为全机型稳定版。
+- 仅更新文档和仓库简介，不修改应用、签名、安装或现有设备状态。
