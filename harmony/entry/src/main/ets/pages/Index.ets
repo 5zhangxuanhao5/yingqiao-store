@@ -807,6 +807,7 @@ struct Index {
  private onReconnectForegroundChanged(): void {
   if (AppStorage.get<boolean>('remoteSessionForeground') !== true) {
    if (this.active && this.mode === 'extend' && BackgroundExtension.suspend()) {
+    if (this.timer >= 0) { clearInterval(this.timer);this.timer = -1; }
     this.storeStopFastHandover();this.unbindCursorChannel();this.unbindNativeMouseRoute();this.restoreSystemCursor();
     this.endGestures();native.input('LOCALUI 1');this.streaming = false;
     this.message = '扩展桌面已保留，回到映桥后恢复画面。';
