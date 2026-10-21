@@ -46,6 +46,7 @@ enum MacPreviewWire {
  }
  static func failure(_ message:String)->NSError{NSError(domain:"MacReceiverPreview",code:1,userInfo:[NSLocalizedDescriptionKey:message])}
  static func selfTest(){
+  MacMediaPolicy.selfTest()
   let d=dimensions(width:2560,height:1664)!;precondition(d.0==2560 && d.1==1664)
   precondition(dimensions(width:0,height:100)==nil && dimensions(width:.infinity,height:100)==nil)
   let h=dimensions(width:6000,height:4000)!;precondition(h.0*h.1<=8_000_000 && abs(Double(h.0)/Double(h.1)-1.5)<0.003)

@@ -5,6 +5,7 @@ import Security
 import CryptoKit
 import ScreenCaptureKit
 import ApplicationServices
+import VideoToolbox
 
 @MainActor final class MacPreviewApp:NSObject,NSApplicationDelegate,NSWindowDelegate,NetServiceBrowserDelegate,NetServiceDelegate {
  var window:NSWindow!,videoWindow:NSWindow?,display:MacPreviewDisplay?
@@ -23,6 +24,8 @@ import ApplicationServices
  var control:NWConnection?,viewer:NWConnection?,clientBuffer=Data(),parser=MacPreviewWire.Parser(),clientTimer:Timer?
  var clientKey:SymmetricKey?,clientSID:UInt32=0,clientPrefix=Data(),targetService:NetService?,connectEpoch=0
  var requestedWidth=0,requestedHeight=0,receivedFrames=0
+ var capabilityNegotiation=false,receiverCapabilities=MacMediaPolicy.Capabilities(hevc:false,scale:2)
+ var activeMediaPlan:MacMediaPolicy.Plan?
  var resolvedTarget:(host:String,port:NWEndpoint.Port,pin:String)?,lastEvent="launch",automaticTestAttempted=false
  var pendingTarget:NetService?,savedPresentation:NSApplication.PresentationOptions?
  var loopback:Bool{CommandLine.arguments.contains("--mac-preview-loopback")}
@@ -121,8 +124,8 @@ import ApplicationServices
    l.stateUpdateHandler={[weak self] state in DispatchQueue.main.async{guard let self,self.listener===l else{return};switch state{
     case .ready:
      guard let port=l.port,let pin=Self.fingerprint(id.certificate) else{return}
-     self.status.stringValue="发送端已就绪。请在 Air 打开同一个测试版并点“连接并全屏”。"
-     if self.loopback{self.beginLoopback(port:port,pin:pin)}else{let s=NetService(domain:"local.",type:MacPreviewWire.service,name:(Host.current().localizedName ?? "Mac")+" · 映桥",port:Int32(port.rawValue));s.setTXTRecord(NetService.data(fromTXTRecord:["sha256":Data(pin.utf8),"schema":Data("1".utf8)]));self.advertisement=s;s.publish()}
+     self.status.stringValue="发送端已就绪。请在接收电脑打开映桥并点“连接并全屏”。"
+     if self.loopback{self.beginLoopback(port:port,pin:pin)}else{let s=NetService(domain:"local.",type:MacPreviewWire.service,name:(Host.current().localizedName ?? "Mac")+" · 映桥",port:Int32(port.rawValue));s.setTXTRecord(NetService.data(fromTXTRecord:["sha256":Data(pin.utf8),"schema":Data("1".utf8),"media":Data("2".utf8)]));self.advertisement=s;s.publish()}
     case .failed(let error):self.status.stringValue=error.localizedDescription;self.stopHostListener()
     default:break
    }}}
@@ -150,10 +153,12 @@ import ApplicationServices
     reject(p,reason:"发送端尚未获得录屏权限。请在发送端映桥中打开录屏设置，允许后重试。")
     trace("screenPermissionRequired");return
    }
-   guard hostControl==nil,!hostStarting,!hostStopping,a.count==5,let w=Int(a[1]),let h=Int(a[2]),let fps=Int(a[3]),[30,60].contains(fps),w>=640,h>=480,w<=3840,h<=3200,w*h<=8_000_000,w%2==0,h%2==0,let nameData=Data(base64Encoded:a[4]),nameData.count<=256 else{p.close();return}
+   guard hostControl==nil,!hostStarting,!hostStopping,[5,6].contains(a.count),let w=Int(a[1]),let h=Int(a[2]),let fps=Int(a[3]),[30,60].contains(fps),w>=640,h>=480,w<=3840,h<=3200,w*h<=8_000_000,w%2==0,h%2==0,let nameData=Data(base64Encoded:a[4]),nameData.count<=256 else{p.close();return}
+   let caps:MacMediaPolicy.Capabilities
+   if a.count==6 {guard let decoded=MacMediaPolicy.Capabilities(token:a[5]) else{reject(p,reason:"接收端媒体能力格式无效，请更新两端映桥。");return};caps=decoded}else{caps=MacMediaPolicy.Capabilities(hevc:false,scale:2)}
    let name=String(decoding:nameData,as:UTF8.self).filter{!$0.isNewline && !$0.isASCIIControl}
    hostStarting=true
-   func approved(){self.createHostSession(p,width:w,height:h,fps:fps)}
+   func approved(){self.createHostSession(p,width:w,height:h,fps:fps,capabilities:caps,negotiated:a.count==6)}
    if loopback{approved();return}
    let alert=NSAlert();alert.messageText="允许这台 Mac 使用扩展屏？";alert.informativeText="\(name.prefix(64)) 请求接收 \(w) × \(h) 的独立桌面。仅接受这次连接；结束后停止采集。现有 Edge 与随航连接不会被主动关闭。";alert.addButton(withTitle:"允许连接");alert.addButton(withTitle:"拒绝")
    alert.beginSheetModal(for:window){[weak self,weak p] r in guard let self,let p else{return};if r == .alertFirstButtonReturn && !p.closed{approved()}else{self.hostStarting=false;p.close()}}
@@ -177,21 +182,29 @@ import ApplicationServices
  func reject(_ p:LinePeer,reason:String){
   p.connection.send(content:Data(("ERR "+reason+"\n").utf8),completion:.contentProcessed{_ in p.close()})
  }
- func createHostSession(_ p:LinePeer,width:Int,height:Int,fps:Int){
+ func createHostSession(_ p:LinePeer,width requestedWidth:Int,height requestedHeight:Int,fps requestedFPS:Int,capabilities:MacMediaPolicy.Capabilities,negotiated:Bool){
   trace("hostPreparing")
   guard !p.closed else{hostStarting=false;return}
   guard syntheticMode || CGPreflightScreenCaptureAccess() else{hostStarting=false;reject(p,reason:"请先在发送端允许映桥录屏，然后重新连接。");status.stringValue="收到 Air 请求；请点“录屏权限”，完成后在 Air 重新连接。";return}
   epoch+=1;let generation=epoch;hostControl=p;hostLastPing=Date()
   Task{@MainActor in do{
-   let sender=try VideoSender(port:0,tcpMode:true,targetFPS:fps);self.sender=sender;sender.start();sender.setTargetBitrate(kbps:40000)
-   let codec=StoreCapture.supports(kCMVideoCodecType_HEVC) ? "hevc":"avc"
-   if syntheticMode{synthetic=try NativeCapture(width:width,height:height,fps:fps,sender:sender,codec:codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264)}
+   let candidates=MacMediaPolicy.candidates(width:requestedWidth,height:requestedHeight,fps:requestedFPS,capabilities:capabilities)
+   // Probe only at session start. No software encoder or continuous polling.
+   let chosen=await Task.detached(priority:.userInitiated){candidates.first(where:{ plan in
+    (negotiated || (plan.width==requestedWidth && plan.height==requestedHeight && plan.fps==requestedFPS)) && StoreCapture.supports(plan.hevc ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264,width:plan.width,height:plan.height,fps:plan.fps)
+   })}.value
+   guard self.epoch==generation,!p.closed else{return}
+   guard let plan=chosen else {throw MacPreviewWire.failure("两端没有可用的硬件编码组合，请降低接收屏分辨率或更新系统。")}
+   self.activeMediaPlan=plan
+   let width=plan.width,height=plan.height,fps=plan.fps,codec=plan.hevc ? "hevc":"avc"
+   let sender=try VideoSender(port:0,tcpMode:true,targetFPS:fps);self.sender=sender;sender.start();sender.setTargetBitrate(kbps:plan.bitrate/1000)
+   if syntheticMode{synthetic=try NativeCapture(width:width,height:height,fps:fps,sender:sender,bitrate:plan.bitrate,codec:codec=="hevc" ? kCMVideoCodecType_HEVC:kCMVideoCodecType_H264)}
    else{
-    let c=StoreCapture(width:width,height:height,fps:fps,codec:codec,sender:sender,displayName:"映桥 · Mac 接收屏",displayProduct:0x4d52,displaySerial:0x4d525031,showCursor:true);capture=c
+    let c=StoreCapture(width:width,height:height,fps:fps,codec:codec,sender:sender,bitrate:plan.bitrate,displayName:"映桥 · Mac 接收屏",displayProduct:0x4d52,displaySerial:0x4d525031,showCursor:true,displayScale:plan.scale);capture=c
     let id=try await c.start();guard generation==epoch,!p.closed else{_ = await c.stop();return};try input.configure(displayID:id,extended:false)
     c.onStreamFailure={[weak self,weak c] error in DispatchQueue.main.async{guard let self,let c,self.epoch==generation,self.capture===c else{return};self.handleCaptureFailure(error,capture:c,generation:generation)}}
    }
-   sender.onReady={[weak self] in Task{@MainActor in guard let self,self.epoch==generation else{return};do{if let synthetic=self.synthetic{try synthetic.startSynthetic()}else{try await self.capture?.startMedia()};guard self.epoch==generation else{return};self.hostStarting=false;self.status.stringValue="正在向 Air 发送 \(width) × \(height) 独立桌面，\(fps) FPS 目标。"}catch{guard self.epoch==generation else{return};self.trace("captureStartFailed");if let current=self.capture{self.handleCaptureFailure(error,capture:current,generation:generation)}else{self.status.stringValue=error.localizedDescription;self.endHostSession()}}}}
+   sender.onReady={[weak self] in Task{@MainActor in guard let self,self.epoch==generation else{return};do{if let synthetic=self.synthetic{try synthetic.startSynthetic()}else{try await self.capture?.startMedia()};guard self.epoch==generation else{return};self.hostStarting=false;self.status.stringValue="正在向接收电脑发送 \(width) × \(height) 独立桌面，\(fps) FPS 目标。"}catch{guard self.epoch==generation else{return};self.trace("captureStartFailed");if let current=self.capture{self.handleCaptureFailure(error,capture:current,generation:generation)}else{self.status.stringValue=error.localizedDescription;self.endHostSession()}}}}
    p.send(sender.handshake(width:width,height:height,fps:fps,desktop:nil)+" codec-\(codec)-v1")
    hostTimer=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in guard let self else{return};if Date().timeIntervalSince(self.hostLastPing)>10{self.endHostSession()};self.writeHealth()}
   }catch{guard epoch==generation else{return};hostStarting=false;status.stringValue=error.localizedDescription;trace("hostSetupFailed");p.send("ERR "+error.localizedDescription);endHostSession()}}
@@ -225,7 +238,7 @@ import ApplicationServices
   }
  }
  func endHostSession(){
-  epoch+=1;recoveringCapture=false;hostStarting=false;hostTimer?.invalidate();hostTimer=nil;input.reset();let c=capture,s=synthetic;c?.onFailure=nil;c?.onStreamFailure=nil;capture=nil;synthetic=nil;sender?.stop();sender=nil
+  epoch+=1;activeMediaPlan=nil;recoveringCapture=false;hostStarting=false;hostTimer?.invalidate();hostTimer=nil;input.reset();let c=capture,s=synthetic;c?.onFailure=nil;c?.onStreamFailure=nil;capture=nil;synthetic=nil;sender?.stop();sender=nil
   let peers=[hostControl,hostViewer];hostControl=nil;hostViewer=nil;for p in peers{p?.onClose=nil;p?.close()}
   hostStopping = c != nil || s != nil;Task{_ = await c?.stop();await s?.stop();self.hostStopping=false};writeHealth()
  }
@@ -271,20 +284,21 @@ import ApplicationServices
  }
  @objc func connectSelected(){guard role.selectedSegment==0,control==nil,videoWindow==nil,pendingTarget==nil,available.indices.contains(devices.indexOfSelectedItem) else{return};let service=available[devices.indexOfSelectedItem];guard isReady(service) else{probeNearby();return};pendingTarget=service;connectButton.enabled(false);status.stringValue="正在更新电脑地址…";service.stop();service.resolve(withTimeout:4)}
  func openReceiver(_ service:NetService){guard role.selectedSegment==0,control==nil,videoWindow==nil else{return};targetService=service
-  guard let txt=service.txtRecordData(),let pinData=NetService.dictionary(fromTXTRecord:txt)["sha256"],let pin=String(data:pinData,encoding:.utf8),let host=service.hostName,let port=NWEndpoint.Port(rawValue:UInt16(service.port)) else{status.stringValue="电脑地址正在更新，请稍后重试。";trace("targetUnavailable");return};resolvedTarget=(host,port,pin);trace("selected")
-  let video=MacPreviewDisplay(frame:NSScreen.main?.frame ?? NSRect(x:0,y:0,width:1280,height:832));display=video;video.send={[weak self] in self?.sendClient($0)};video.finish={[weak self] in self?.endCurrent()}
+  guard let txt=service.txtRecordData(),let pinData=NetService.dictionary(fromTXTRecord:txt)["sha256"],let pin=String(data:pinData,encoding:.utf8),let host=service.hostName,let port=NWEndpoint.Port(rawValue:UInt16(service.port)) else{status.stringValue="电脑地址正在更新，请稍后重试。";trace("targetUnavailable");return};resolvedTarget=(host,port,pin);capabilityNegotiation=NetService.dictionary(fromTXTRecord:txt)["media"]==Data("2".utf8);trace("selected")
+  let receivingScreen=window.screen ?? NSScreen.main
+  let video=MacPreviewDisplay(frame:receivingScreen?.frame ?? NSRect(x:0,y:0,width:1280,height:832));display=video;video.send={[weak self] in self?.sendClient($0)};video.finish={[weak self] in self?.endCurrent()}
   let w=MacPreviewWindow(contentRect:video.frame,styleMask:[.borderless],backing:.buffered,defer:false);videoWindow=w;w.title="映桥 · 接收屏（Esc 结束）";w.isReleasedWhenClosed=false;w.delegate=self;w.contentView=video;w.acceptsMouseMovedEvents=true
   // A borderless viewport covers the physical panel, including the area next
   // to the camera. Native full-screen reserves the menu/safe-area strip.
   savedPresentation=NSApp.presentationOptions;NSApp.presentationOptions=[.hideDock,.hideMenuBar]
-  w.setFrame(NSScreen.main?.frame ?? video.frame,display:true);w.makeKeyAndOrderFront(nil);w.makeFirstResponder(video);video.layoutSubtreeIfNeeded();trace("panelViewportReady");connectFullscreenWindow()
+  w.setFrame(receivingScreen?.frame ?? video.frame,display:true);w.makeKeyAndOrderFront(nil);w.makeFirstResponder(video);video.layoutSubtreeIfNeeded();trace("panelViewportReady");connectFullscreenWindow()
  }
 
  func windowDidEnterFullScreen(_ notification:Notification){guard let w=notification.object as? NSWindow,w===videoWindow else{return};trace("enteredFullscreen");connectFullscreenWindow()}
  func connectFullscreenWindow(){guard control==nil,let w=videoWindow,let video=display,let target=resolvedTarget else{trace("fullscreenTargetUnavailable");return}
-  guard let d=MacPreviewWire.dimensions(width:video.bounds.width*w.backingScaleFactor,height:video.bounds.height*w.backingScaleFactor) else{status.stringValue="接收窗口尺寸尚未就绪，请按 Esc 后重试。";video.showMessage(status.stringValue);trace("viewportInvalid");return};requestedWidth=d.0;requestedHeight=d.1;trace("viewportReady");startClient(host:target.host,port:target.port,pin:target.pin)
+  guard let d=MacPreviewWire.dimensions(width:video.bounds.width*w.backingScaleFactor,height:video.bounds.height*w.backingScaleFactor) else{status.stringValue="接收窗口尺寸尚未就绪，请按 Esc 后重试。";video.showMessage(status.stringValue);trace("viewportInvalid");return};receiverCapabilities=MacMediaPolicy.Capabilities(hevc:VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC),scale:w.backingScaleFactor<1.5 ? 1:2);requestedWidth=d.0;requestedHeight=d.1;trace("viewportReady");startClient(host:target.host,port:target.port,pin:target.pin)
  }
- func beginLoopback(port:NWEndpoint.Port,pin:String){requestedWidth=1280;requestedHeight=832;let d=MacPreviewDisplay(frame:NSRect(x:0,y:0,width:640,height:416));display=d
+ func beginLoopback(port:NWEndpoint.Port,pin:String){capabilityNegotiation=true;receiverCapabilities=MacMediaPolicy.Capabilities(hevc:VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC),scale:2);requestedWidth=1280;requestedHeight=832;let d=MacPreviewDisplay(frame:NSRect(x:0,y:0,width:640,height:416));display=d
   let w=NSWindow(contentRect:d.frame,styleMask:[.titled,.closable],backing:.buffered,defer:false);w.title="映桥 · 本机编解码对照";w.contentView=d;w.isReleasedWhenClosed=false;videoWindow=w;w.orderFront(nil);startClient(host:"127.0.0.1",port:port,pin:pin)
  }
  func startClient(host:String,port:NWEndpoint.Port,pin:String){
@@ -292,7 +306,7 @@ import ApplicationServices
   let params=NWParameters(tls:Self.clientOptions(pin:pin),tcp:NWProtocolTCP.Options());(params.defaultProtocolStack.transportProtocol as? NWProtocolTCP.Options)?.noDelay=true;params.includePeerToPeer=true
   let c=NWConnection(host:NWEndpoint.Host(host),port:port,using:params);control=c
   c.stateUpdateHandler={[weak self] state in DispatchQueue.main.async{guard let self,self.connectEpoch==generation,self.control===c else{return};switch state{
-   case .ready:self.trace("controlReady");self.sendClient("HELLO \(self.requestedWidth) \(self.requestedHeight) 60 "+Data((Host.current().localizedName ?? "Mac 接收端").utf8.prefix(256)).base64EncodedString());self.readControl(c,generation:generation,host:host,port:port,pin:pin)
+   case .ready:self.trace("controlReady");self.sendClient("HELLO \(self.requestedWidth) \(self.requestedHeight) 60 "+Data((Host.current().localizedName ?? "Mac 接收端").utf8.prefix(256)).base64EncodedString()+(self.capabilityNegotiation ? " "+self.receiverCapabilities.token:""));self.readControl(c,generation:generation,host:host,port:port,pin:pin)
    case .waiting(let error):self.status.stringValue="等待网络连接："+error.localizedDescription+"。请检查局域网权限。";self.display?.showMessage(self.status.stringValue);self.trace("clientWaiting")
    case .failed(let error):self.status.stringValue=error.localizedDescription;self.trace("clientFailed");self.endClient()
    case .cancelled:self.endClient()
@@ -303,7 +317,9 @@ import ApplicationServices
  }
  func readControl(_ c:NWConnection,generation:Int,host:String,port:NWEndpoint.Port,pin:String){c.receive(minimumIncompleteLength:1,maximumLength:8192){[weak self] data,_,end,error in guard let self,self.connectEpoch==generation else{return};if let data{self.clientBuffer.append(data)};guard self.clientBuffer.count<=16384 else{self.endClient();return}
   while let i=self.clientBuffer.firstIndex(of:10){let line=String(decoding:self.clientBuffer.prefix(upTo:i),as:UTF8.self);self.clientBuffer.removeSubrange(...i);let a=line.split(separator:" ").map(String.init)
-   if a.first=="OK",a.count>=9,self.viewer==nil,let sidData=MacPreviewWire.unhex(a[1]),sidData.count==4,let key=MacPreviewWire.unhex(a[2]),key.count==16,let prefix=MacPreviewWire.unhex(a[3]),prefix.count==4,Int(a[6])==self.requestedWidth,Int(a[7])==self.requestedHeight {
+   if a.first=="OK",a.count>=9,self.viewer==nil,let sidData=MacPreviewWire.unhex(a[1]),sidData.count==4,let key=MacPreviewWire.unhex(a[2]),key.count==16,let prefix=MacPreviewWire.unhex(a[3]),prefix.count==4,let width=Int(a[6]),let height=Int(a[7]),let fps=Int(a[8]),MacMediaPolicy.accepts(width:width,height:height,fps:fps,requestedWidth:self.requestedWidth,requestedHeight:self.requestedHeight,negotiated:self.capabilityNegotiation) {
+    guard !a.contains("codec-hevc-v1") || self.receiverCapabilities.hevc else{self.status.stringValue="发送端选择了接收端不支持的编码。";self.endClient();return}
+    self.requestedWidth=width;self.requestedHeight=height
     self.clientSID=UInt32(sidData.uintBE(0,4));self.clientKey=SymmetricKey(data:key);self.clientPrefix=prefix;self.display?.playback.setCodec(hevc:a.contains("codec-hevc-v1"));self.trace("handshakeAccepted");self.openViewer(host:host,port:port,pin:pin,token:a[5],generation:generation)
     self.clientTimer=Timer.scheduledTimer(withTimeInterval:2,repeats:true){[weak self] _ in self?.sendClient("PING");self?.writeHealth()}
    }else if a.first=="ERR"{self.status.stringValue=String(line.dropFirst(4));self.endClient();return}
@@ -331,7 +347,7 @@ import ApplicationServices
  func windowDidResignKey(_ notification:Notification){if let w=notification.object as? NSWindow,w===videoWindow{display?.restoreCursor();sendClient("RELEASE")}}
  func windowDidBecomeKey(_ notification:Notification){if let w=notification.object as? NSWindow,w===videoWindow{display?.updateCursor()}}
  func trace(_ event:String){lastEvent=event;writeHealth()}
- func writeHealth(){refreshThemedState();var values:[String:Any]=["event":lastEvent,"message":status.stringValue,"role":role?.selectedSegment ?? -1,"fullscreen":videoWindow != nil,"borderlessPanel":videoWindow?.styleMask.contains(.borderless) ?? false,"targetResolved":resolvedTarget != nil,"schema":"mac-preview-health-v1","synthetic":syntheticMode,"sending":sender != nil,"receiving":viewer != nil,"receivedFrames":receivedFrames,"submittedFrames":display?.frames ?? 0,"decoderState":display?.video.status.rawValue ?? 0,"width":requestedWidth,"height":requestedHeight,"viewportWidth":display?.bounds.width ?? 0,"viewportHeight":display?.bounds.height ?? 0,"screenPermission":CGPreflightScreenCaptureAccess(),"inputPermission":AXIsProcessTrusted(),"time":Date().timeIntervalSince1970];if let capture{values["capture"]=capture.stats()};if let sender{values["sender"]=sender.transportStats()};if let data=try? JSONSerialization.data(withJSONObject:values,options:[.sortedKeys]){try? FileManager.default.createDirectory(at:StoreIdentity.directory,withIntermediateDirectories:true);try? data.write(to:StoreIdentity.directory.appendingPathComponent("mac-preview-health.json"),options:.atomic)}}
+ func writeHealth(){refreshThemedState();var values:[String:Any]=["event":lastEvent,"message":status.stringValue,"role":role?.selectedSegment ?? -1,"fullscreen":videoWindow != nil,"borderlessPanel":videoWindow?.styleMask.contains(.borderless) ?? false,"targetResolved":resolvedTarget != nil,"schema":"mac-preview-health-v1","synthetic":syntheticMode,"sending":sender != nil,"receiving":viewer != nil,"receivedFrames":receivedFrames,"submittedFrames":display?.frames ?? 0,"decoderState":display?.video.status.rawValue ?? 0,"width":requestedWidth,"height":requestedHeight,"viewportWidth":display?.bounds.width ?? 0,"viewportHeight":display?.bounds.height ?? 0,"screenPermission":CGPreflightScreenCaptureAccess(),"inputPermission":AXIsProcessTrusted(),"time":Date().timeIntervalSince1970];if let plan=activeMediaPlan{values["mediaPlan"]=["width":plan.width,"height":plan.height,"fps":plan.fps,"scale":plan.scale,"codec":plan.hevc ? "hevc":"avc","bitrate":plan.bitrate]};if let capture{values["capture"]=capture.stats()};if let sender{values["sender"]=sender.transportStats()};if let data=try? JSONSerialization.data(withJSONObject:values,options:[.sortedKeys]){try? FileManager.default.createDirectory(at:StoreIdentity.directory,withIntermediateDirectories:true);try? data.write(to:StoreIdentity.directory.appendingPathComponent("mac-preview-health.json"),options:.atomic)}}
  func applicationWillTerminate(_ notification:Notification){endCurrent();browser.stop();stopHostListener()}
  func applicationShouldTerminateAfterLastWindowClosed(_ sender:NSApplication)->Bool{true}
 }

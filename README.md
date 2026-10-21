@@ -1,3 +1,5 @@
+> **本分支是 Mac 合并预览工程，当前为 0.4.0-test.7 / build 46 兼容候选。** [本次多机型适配与验证边界](docs/MAC_COMPATIBILITY_TEST7.md) · [正式下载选择和安装说明](https://github.com/5zhangxuanhao5/yingqiao-store)。本候选没有安装到现用设备，不能当作已通过全机型实测的版本。
+
 # 映桥 · Yingqiao
 
 **把鸿蒙平板变成 Mac 的独立扩展屏。** 在平板上放文档、浏览器或聊天窗口，用平板的键盘、触控板和触屏继续操作 Mac。

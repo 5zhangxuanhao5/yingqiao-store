@@ -1,7 +1,7 @@
 name: Compatibility simulation and compilation
 on:
   push:
-    branches: [main]
+    branches: [main, mac-receiver-preview-20261020]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -69,6 +69,9 @@ jobs:
       - run: python3 tools/check-source.py
       - name: Compile both architectures and run headless self-test
         run: bash mac/build.sh
+        env:
+          YQ_MAC_UNIFIED: "1"
+          YQ_ORIGINAL_USB_TEST: "1"
       - name: Compile IOKit research adapter without accessing USB
         run: |
           for arch in arm64 x86_64; do
